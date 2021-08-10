@@ -8,28 +8,29 @@
 #include <FlexCAN.h>
 
 #ifndef __MK66FX1M0__
-#error "Teensy 3.6 with dual CAN bus is required to run this example"
+  #error "Teensy 3.6 with dual CAN bus is required to run this example"
 #endif
 
-FlexCAN CANbus0(500000, 0);
+FlexCAN CANbus0(1000000, 0);
 FlexCAN CANbus1(1000000, 1);
 
 static CAN_message_t msg;
 static uint8_t hex[17] = "0123456789abcdef";
 
+
 // -------------------------------------------------------------
 static void hexDump(uint8_t dumpLen, uint8_t *bytePtr)
 {
   uint8_t working;
-  while (dumpLen--)
-  {
+  while( dumpLen-- ) {
     working = *bytePtr++;
-    Serial.write(hex[working >> 4]);
-    Serial.write(hex[working & 15]);
+    Serial.write( hex[ working>>4 ] );
+    Serial.write( hex[ working&15 ] );
   }
   Serial.write('\r');
   Serial.write('\n');
 }
+
 
 // -------------------------------------------------------------
 void setup(void)
@@ -39,15 +40,23 @@ void setup(void)
 
   delay(1000);
   Serial.println(F("Hello Teensy 3.6 dual CAN Test."));
-  msg.id = 7;
-  msg.len = 1;
-  msg.timeout = 1000;
-  msg.buf[0] = (uint8_t)0xFF;
 }
+
 
 // -------------------------------------------------------------
 void loop(void)
 {
-  Serial.println(CANbus0.write(msg));
-  delay(1000);
+  if(CANbus0.available()) 
+  {
+    CANbus0.read(msg);
+//    Serial.print("CAN bus 0: "); hexDump(8, msg.buf);
+    CANbus1.write(msg);
+  }
+
+  if(CANbus1.available()) 
+  {
+    CANbus1.read(msg);
+//    Serial.print("CAN bus 1: "); hexDump(8, msg.buf);
+    CANbus0.write(msg);
+  }
 }
