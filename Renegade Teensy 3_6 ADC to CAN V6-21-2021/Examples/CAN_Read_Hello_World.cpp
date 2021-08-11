@@ -1,5 +1,5 @@
 // -------------------------------------------------------------
-// Hello World CAN send test
+// Can READ test
 // by Jacob Waters
 //
 // This test listens for a sample CAN frame over teensy 3.6 CAN0
@@ -17,8 +17,6 @@ bool canBus = 0;       //use 0 CAN0 or 1 for CAN1
 FlexCAN CANbus0(busSpeed, canBus);
 
 static CAN_message_t msg;
-
-static uint8_t hex[17] = "0123456789abcdef";
 
 // -------------------------------------------------------------
 void setup(void)
@@ -39,8 +37,6 @@ void printData(CAN_message_t &msg)
   }
   Serial.print(msg.buf[msg.len - 1], HEX);
   Serial.println();
-
-
 }
 // -------------------------------------------------------------
 void loop(void)
