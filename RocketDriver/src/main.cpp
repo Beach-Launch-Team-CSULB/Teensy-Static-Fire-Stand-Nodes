@@ -1,14 +1,15 @@
 // -------------------------------------------------------------
-// CAN Write test
+// Can READ test
 // by Jacob Waters
 //
-// This test transmits a sample CAN frame over teensy CAN0 bus
+// This test listens for a sample CAN frame over teensy 3.6 CAN0
 // teensy pin 3 -> CAN TX
 // teensy pin 4 _> CAN RX
 // CANL -> CANL
 // CANH -> CANH
 // GND -> GND I.E. connect grounds of CAN Nodes
 
+#include <Arduino.h>
 #include <FlexCAN.h>
 
 int busSpeed = 500000; //baudrate
@@ -23,50 +24,33 @@ void setup(void)
   CANbus0.begin();
 
   delay(1000);
-  Serial.println(F("Hello Teensy CAN Write test."));
-
-  /*
-    msg.ext=0 -> 11 Bit ID field size, maximum size = 2^11 -1 = 2047
-    msg.ext=1 -> 29 Bit ID field size, maximum size = 2^29 -1 = some big number use a calculator bruh
-    Note that values larger than the respective max sizes will result in overflow
-  */
-  msg.ext = 1;
-  msg.id = 2048; //will overflow to 0 in regular ID mode,
-                 //but not in extended ID Mode
-
-  msg.timeout = 1000; //How long to keep trying before message failure in milliseconds
-
-  msg.len = 8; //length in bytes of message, up to 8 bytes
-
-  msg.buf[0] = (uint8_t)0x0A; //assigning hex values to bytes, can use decimal too
-  msg.buf[1] = (uint8_t)0x0B;
-  msg.buf[2] = (uint8_t)0x0C;
-  msg.buf[3] = (uint8_t)0x00;
-  msg.buf[4] = (uint8_t)0x00;
-  msg.buf[5] = (uint8_t)0x01;
-  msg.buf[6] = (uint8_t)0x02;
-  msg.buf[7] = (uint8_t)0x03;
+  Serial.println(F("Teensy 3.6 can bus READ test"));
 }
 
 // -------------------------------------------------------------
+void printData(CAN_message_t &msg)
+{
+  for (int i = 0; i < msg.len - 1; i++)
+  {
+    Serial.print(msg.buf[i], HEX);
+    Serial.print(".");
+  }
+  Serial.print(msg.buf[msg.len - 1], HEX);
+  Serial.println();
+}
+// -------------------------------------------------------------
 void loop(void)
 {
-  //CANbus0.write returns a 1 if successful and zero if not.
-  bool writeSuccessful = CANbus0.write(msg);
-  if (writeSuccessful)
-    Serial.println("write successful!");
-  else
-    Serial.println("Write failed, check hardware config");
-
   delay(1000);
-  /*On a pi, if msg.ext == 0, should output:
+  Serial.println(CANbus0.available());
+  if (CANbus0.available())
+  {
+    CANbus0.read(msg);
 
-    can0   000   [8]    0A 0B 0C 00 00 01 02 03  
-    bus  | ID  | size | data in HEX format
-    
-  else if msg.ext == 1, should output:
+    Serial.print("CAN bus 0: ");
+    printData(msg);
 
-    can0   00000800   [8]    0A 0B 0C 00 00 01 02 03
-    bus  | ID       | size | data in HEX format
-*/
+    Serial.print("ID: ");
+    Serial.println(msg.id, HEX);
+  }
 }
