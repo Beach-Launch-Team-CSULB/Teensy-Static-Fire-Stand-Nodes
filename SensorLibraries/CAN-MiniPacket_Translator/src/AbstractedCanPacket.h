@@ -18,6 +18,8 @@
 
 #define smallestMiniPacketSize 5 //size of smallest possible MiniPacket to be sent
 
+#define standardID_Length 5//this needs to be known beforehand for receiving CAN messages
+
 //IMPORTANT CONFIG #DEFINES
 
 #include <Arduino.h>
@@ -60,11 +62,6 @@ private:
     uint8_t maxBufferSize; //maximum possible size of abstracted bit buffer
     uint8_t usedBits;      //current size of abstracted bit buffer
 
-    //pre-send overhead
-    uint8_t ID_Length;       //in bits. Needs to be known before runtime
-    //bool extendedID;         //use data in msg instead!!!
-    //uint8_t CAN_Buffer_Size; //for setting msg.len CALCULATE BASED ON USEDBITS
-
     //payload data
     MiniPacket priority; //info contained in data field
     MiniPacket nodeID;   //info contained in ID field
@@ -93,9 +90,19 @@ private:
     dataOffset is how far shifted left the relevant bits are
     */
     void setLowLevelBufferBitsHelper(uint32_t data, uint8_t dataWidth, uint8_t dataOffset);//atomic write
+    
+    /*
+    This method writes to the CAN message as if it were a continuous bit-buffer.
+    In practice this means that it should be easy to write data to it, even if 
+    that means writing some if the bits into the ID field, and other parts into 
+    buf[someIndex]. 
+    data: contains what we're writing to the CAN message
+    dataWidth: tells method how many bits are relevant. 
+    Store relevant bits starting at LSB moving to MSB for proper function. 
+    */
     void setLowLevelBufferBits(uint32_t data, uint8_t dataWidth);
 
-    CAN_message_t getCanMessage();//testing REMOVE THIS
+    CAN_message_t getCanMessage();//testing REMOVE THIS. Returns the private CAN message this class encodes
 
 };
 

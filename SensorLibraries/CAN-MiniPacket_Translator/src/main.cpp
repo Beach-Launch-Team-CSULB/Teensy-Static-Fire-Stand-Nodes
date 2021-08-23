@@ -12,7 +12,7 @@ void setup()
 }
 AbstractedCanPacket myCanPacket;
 
-
+//useful for testing and debug
 void printBits(int data, int size)
 {
   for(int i = size-1; i >= 0; i--)
@@ -70,13 +70,10 @@ void loop()
   Serial << "bit boundary index: " << myCanPacket.getLowLevelBufferFreeSpace() << endl;
 
   myCanPacket.setLowLevelBufferBits(mask, 5);
-  //Serial.print(myCanPacket.getCanMessage().id, BIN);
   printBits(myCanPacket.getCanMessage().id,11);
   for (int i = 0; i < 8; i++)
   {
     printBits(myCanPacket.getCanMessage().buf[i], 8);
-    //Serial << " ";
-    //Serial.print(myCanPacket.getCanMessage().buf[i], BIN);
   }
   Serial << endl;
 

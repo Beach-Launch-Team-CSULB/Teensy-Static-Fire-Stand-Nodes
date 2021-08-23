@@ -1,8 +1,8 @@
 #include "AbstractedCanPacket.h"
-//MiniPacket priority(0,3);
 AbstractedCanPacket::AbstractedCanPacket()
 {
-    ID_Length = 5; //TESTING! Configure for implementation specific address size
+    //testing Maybe use #define for this??
+    //ID_Length = 5; //TESTING! Configure for implementation specific address size
 
     //////////////////////////////////////////Configure priority and nodeID in header file
     priority.setID_Length(priorityID_Length);
@@ -11,39 +11,47 @@ AbstractedCanPacket::AbstractedCanPacket()
     nodeID.setID_Length(nodeID_ID_Length);
     nodeID.setDataLength(nodeID_DataLength);
 
-    //////////////////////////////////////////initialize our array
-    index = 0;
+    index = 0;//is this an unnecessary assignment in C++?
 
-    setExtendedID(true);//default to extendedID format
-    //////////////////////////////////////////
-    //////////////////////////////////////////
-    //////////////////////////////////////////
+    setExtendedID(true); //default to extendedID format
 }
 
-//returns false if priority is too large for MiniPacket priority buffer
-bool AbstractedCanPacket::setMessagePriority(uint32_t value)
+//returns false if newPriority is too large for MiniPacket priority buffer, otherwise sets priority
+bool AbstractedCanPacket::setMessagePriority(uint32_t newPriority)
 {
-    return priority.setData(value);
+    return priority.setData(newPriority);
 }
-//returns false if priority is too large for MiniPacket priority buffer
+//returns the priority value of this AbstractedCanPacket
 uint32_t AbstractedCanPacket::getMessagePriority()
 {
     return priority.getData();
 }
-//returns false if priority is too large for MiniPacket priority buffer
-bool AbstractedCanPacket::setNodeID(uint32_t value)
+
+//returns false if newID is too large for MiniPacket ID buffer
+bool AbstractedCanPacket::setNodeID(uint32_t newID)
 {
-    return nodeID.setID(value);
+    return nodeID.setID(newID);
 }
+
+/*
+returns the ID of this AbstractedCanPacket.
+*/
 uint32_t AbstractedCanPacket::getNodeID()
 {
     return nodeID.getID();
 }
+
+/*
+returns the total number of additional bits which can be written to this AbstractedCanPacket.
+*/
 uint8_t AbstractedCanPacket::getFreeBits()
 {
     return maxBufferSize - usedBits;
 }
 
+/*
+returns true if this AbstractedCanPacket can fit nextPacket, false otherwise. 
+*/
 bool AbstractedCanPacket::canFit(MiniPacket nextPacket)
 {
 
@@ -66,6 +74,10 @@ bool AbstractedCanPacket::canFit(MiniPacket nextPacket)
     }
 }
 
+/*
+adds a MiniPacket to our high-level buffer, and returns false if this fails. 
+TODO: update so that the low-level buffer is in sync.
+*/
 bool AbstractedCanPacket::add(MiniPacket nextPacket)
 {
 
@@ -80,10 +92,16 @@ bool AbstractedCanPacket::add(MiniPacket nextPacket)
     return false; //not enough space
 }
 
+/*
+returns an array containing our MiniPackets.
+*/
 MiniPacket *AbstractedCanPacket::getPacketBuffer()
 {
     return packetBuffer;
 }
+/*
+returns the number of MiniPackets in this AbstractedCanPacket.
+*/
 uint8_t AbstractedCanPacket::getBufferSize()
 {
     return index;
@@ -116,6 +134,10 @@ int8_t AbstractedCanPacket::getLowLevelBufferIndex()
 
     return tempUsedBits / 8;
 }
+/*
+returns the size of the low-level data unit we're writing to. 
+This can be 29, 11, or 8.
+*/
 uint8_t AbstractedCanPacket::getLowLevelBufferSize()
 {
     uint8_t idSize;
@@ -129,6 +151,11 @@ uint8_t AbstractedCanPacket::getLowLevelBufferSize()
     else
         return 8;
 }
+/*
+returns the index of leftmost free bit, 
+which is also the size of the free space of the current 
+buffer we are writing to (id or buf[i])
+*/
 uint8_t AbstractedCanPacket::getLowLevelBufferFreeSpace()
 {
 
@@ -144,39 +171,43 @@ uint8_t AbstractedCanPacket::getLowLevelBufferFreeSpace()
     else
         tempUsedBits -= idSize;
 
-    return 8 - (tempUsedBits % 8); //remainder after dividing by 8
+    return 8 - (tempUsedBits % 8); //usedBits % 8 is used space, 8 - that is free space
 }
+/*
+Returns the leftmost index which can bit data of bitWidth size without overwriting data on the left. 
+*/
 uint8_t AbstractedCanPacket::getLowLevelBitBoundaryIndex(uint8_t bitWidth)
 {
     return getLowLevelBufferFreeSpace() - bitWidth;
 }
 void AbstractedCanPacket::setLowLevelBufferBitsHelper(uint32_t data, uint8_t dataWidth, uint8_t dataOffset)
 {
-    config compression = {dataWidth, dataOffset};
-    
-    uint8_t destinationOffset = getLowLevelBitBoundaryIndex(dataWidth) ;
-    config extraction = {dataWidth, destinationOffset};
+    config compression = {dataWidth, dataOffset}; //take relevant bits our of data
+
+    uint8_t destinationOffset = getLowLevelBitBoundaryIndex(dataWidth); //find leftmost index which will contain data (pack from left to right)
+    config extraction = {dataWidth, destinationOffset};                 //mapping for where our relevant bits go
 
     BitChopper bitChopper;
 
+    //maps relevant bits in input to the right offset for the output
     uint32_t selectedData = bitChopper.compress(compression, data);
     uint32_t dataToWrite = bitChopper.extract(extraction, selectedData);
 
-    int8_t index = getLowLevelBufferIndex();
-    Serial.print("index: "); Serial.println(index);
-    if(index == -1)
+    int8_t index = getLowLevelBufferIndex(); //figure out which part of msg to write to
+    if (index == -1) //write to id
         msg.id = msg.id | dataToWrite;
-    else
-        msg.buf[index] = msg.buf[index] | (uint8_t) dataToWrite;
+    else //write to buf
+        msg.buf[index] = msg.buf[index] | (uint8_t)dataToWrite;
 
-    usedBits += dataWidth;
+    usedBits += dataWidth; //update to indicate we wrote to CAN buffer
 }
 void AbstractedCanPacket::setLowLevelBufferBits(uint32_t data, uint8_t dataWidth)
 {
-    while(dataWidth > 0)
+    while (dataWidth > 0)
     {
-
+        //you can only write as many bits the smaller of the current buffer free space and our input dataWidth
         uint8_t dataWidthHelper = min(getLowLevelBufferFreeSpace(), dataWidth);
+        //start writing from the MSB to LSB, ie write left side first. Simplifies to 0 if we can write dataWidth bits
         uint8_t dataOffset = dataWidth - dataWidthHelper;
         setLowLevelBufferBitsHelper(data, dataWidthHelper, dataOffset);
         dataWidth -= dataWidthHelper;
