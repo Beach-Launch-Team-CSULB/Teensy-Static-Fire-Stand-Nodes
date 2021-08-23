@@ -24,29 +24,32 @@
 #include <Vector.h>
 #include <FlexCAN.h>
 #include "MiniPacket.h"
+#include "BitChopper.h"
 
 #ifndef AbstractedCanPacker_H
 #define AbstractedCanPacker_H
-
 
 class AbstractedCanPacket
 {
 public:
     AbstractedCanPacket();
 
+    //CAN frame config
+    void setExtendedID(bool extID);
+    bool getExtendedID();
 
     //for converting MiniPackets to CAN_Frames
     AbstractedCanPacket(uint8_t idLength);
     bool setMessagePriority(uint32_t priority);
     bool setNodeID(uint32_t ID);
-    uint8_t getFreeBits();     //returns free space in bits
+    uint8_t getFreeBits();              //returns free space in bits
     bool canFit(MiniPacket nextPacket); //returns true if it can fit the MiniPacket
-    bool add(MiniPacket next); //returns true if add successful
-    bool send();               //returns true if send successful, false otherwise
+    bool add(MiniPacket next);          //returns true if add successful
+    bool send();                        //returns true if send successful, false otherwise
 
     //for converting CAN Frames to MiniPackets
     AbstractedCanPacket(uint8_t idLength, CAN_message_t CAN_Message);
-    MiniPacket* getPacketBuffer();
+    MiniPacket *getPacketBuffer();
     uint8_t getBufferSize();
     uint32_t getMessagePriority();
     uint32_t getNodeID();
@@ -59,12 +62,10 @@ private:
 
     //pre-send overhead
     uint8_t ID_Length;       //in bits. Needs to be known before runtime
-    bool extendedID;         //to set when actually building a CAN packet
-    uint8_t CAN_Buffer_Size; //for setting msg.len
+    //bool extendedID;         //use data in msg instead!!!
+    //uint8_t CAN_Buffer_Size; //for setting msg.len CALCULATE BASED ON USEDBITS
 
     //payload data
-    // #define priorityID_Length 0
-    //#define priorityDataLength 3
     MiniPacket priority; //info contained in data field
     MiniPacket nodeID;   //info contained in ID field
 
@@ -75,6 +76,27 @@ private:
 #define maxBufferSize (29 + (8 * 8) - overheadBits)
 #define maxWeCouldStore (maxBufferSize / smallestMiniPacketSize)
     MiniPacket packetBuffer[maxWeCouldStore]; //our array
+
+    public:
+    //private helper methods MiniPacket -> CanPacket
+
+    //returns either the ID field in the CAN_message_t or the byte address in the 8 byte buffer
+    int8_t getLowLevelBufferIndex();
+    //size of the current CAN_message_t buffer we're writing to. Can be 29, 11, or 8.
+    uint8_t getLowLevelBufferSize();
+    //This is the number of unused bits in our current low level buffer
+    uint8_t getLowLevelBufferFreeSpace(); //corresponds to index from left to right ie MSB to LSB
+    uint8_t getLowLevelBitBoundaryIndex(uint8_t bitWidth);
+    /*
+    data is the data we're writing to the low level buffer. 
+    dataWidth is how many bits data contains.
+    dataOffset is how far shifted left the relevant bits are
+    */
+    void setLowLevelBufferBitsHelper(uint32_t data, uint8_t dataWidth, uint8_t dataOffset);//atomic write
+    void setLowLevelBufferBits(uint32_t data, uint8_t dataWidth);
+
+    CAN_message_t getCanMessage();//testing REMOVE THIS
+
 };
 
 #endif
