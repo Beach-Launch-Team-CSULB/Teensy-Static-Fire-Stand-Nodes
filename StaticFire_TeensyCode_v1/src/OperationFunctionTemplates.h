@@ -4,8 +4,12 @@
 #define BITFLAG_SIZE 16
 
 #include "ValveClass.h"
+#include "SensorClass.h"
 #include <array>
 #include <bitset>
+#include <FlexCAN.h>
+#include <ADC.h>
+
 
 
 // This contains some of the functions to be used during operations they are templates, and so defined in the header. BEWARE
@@ -61,5 +65,26 @@ std::bitset<BITFLAG_SIZE> setValveFlags(const std::array<T, size>& valveArray)
     
     return valveStatus;
 }
+
+// this runs the begin method for each sensor
+template <std::size_t size>
+void sensorSetUp(const std::array<SENSOR*, size>& sensorArray)
+{
+    for(auto sensor : sensorArray)
+    {
+        sensor->begin();
+    }
+}
+
+// This function reads all the sensor values
+template <std::size_t size>
+void readSensors(const std::array<SENSOR*, size>& sensorArray, ADC* adc)
+{
+    for(auto sensor : sensorArray)
+    {
+        sensor->read(adc);
+    }
+}
+
 
 #endif
