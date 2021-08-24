@@ -231,8 +231,48 @@ void AbstractedCanPacket::lowLevelAdd(MiniPacket nextPacket)
 //how many bits to pull from CAN bit buffer, offset is how those bits should be shifted before returned
 uint32_t AbstractedCanPacket::readLowLevelBitsHelper(uint8_t bitWidth, uint8_t offset)
 {
+    int8_t bufferIndex = getLowLevelBufferIndex();
+    //Serial.print("bufferIndex: ");
+    //Serial.println(bufferIndex);
+    uint8_t bitIndex = getLowLevelBitBoundaryIndex(bitWidth);
+    config compression = {bitWidth, bitIndex};
+    config extraction = {bitWidth, offset};
+
+
+    BitChopper bitChopper;
+
+    uint32_t data;
+    if(bufferIndex<0)
+    {
+        data = msg.id;
+    }
+    else
+    {
+        data = msg.buf[bufferIndex];
+    }
+
+    //maps relevant bits in input to the right offset for the output
+    uint32_t selectedData = bitChopper.compress(compression, data);
+    uint32_t dataToWrite = bitChopper.extract(extraction, selectedData);
     
+    usedBits += bitWidth;
+    return dataToWrite;
 }
+uint32_t AbstractedCanPacket::readLowLevelBits(uint8_t bitWidth)
+{
+    uint32_t toReturn =0;
+    while (bitWidth > 0)
+    {
+        //you can only write as many bits the smaller of the current buffer free space and our input dataWidth
+        uint8_t dataWidthHelper = min(getLowLevelBufferFreeSpace(), bitWidth);
+        //start writing from the MSB to LSB, ie write left side first. Simplifies to 0 if we can write dataWidth bits
+        uint8_t dataOffset = bitWidth - dataWidthHelper;
+        toReturn = toReturn | readLowLevelBitsHelper(dataWidthHelper, dataOffset);
+        bitWidth -= dataWidthHelper;
+    }
+    return toReturn;
+}
+
 
 //TODO testing
 AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t CAN_Message)
@@ -240,6 +280,11 @@ AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t CAN_Mes
     AbstractedCanPacket();
 }
 
+void AbstractedCanPacket::reset()
+{
+    usedBits =0;
+    index = 0;
+}
 //will be deleted, for testing only.
 CAN_message_t AbstractedCanPacket::getCanMessage()
 {

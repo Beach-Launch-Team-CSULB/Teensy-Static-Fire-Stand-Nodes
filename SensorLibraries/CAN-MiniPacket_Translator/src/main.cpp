@@ -21,7 +21,7 @@ void printBits(int data, int size)
     if (i % 4 == 0)
       Serial.print("");
   }
-  Serial.print("-");
+  Serial.print("");
 }
 void printCanMessage(CAN_message_t msg)
 {
@@ -93,27 +93,44 @@ void loop()
 
   MiniPacket a;
   a.setDataLength(5);
-  a.setID_Length(3);
+  a.setID_Length(0);
 
+ //builds a = {010, 01110}
   uint32_t mask = (1 << 3) - 1; //build mask with resolution bits
   mask = mask << 1;
   a.setData(mask);     //01110
+  /*
   mask = (1 << 1) - 1; //build mask with resolution bits
   mask = mask << 1;
   a.setID(mask); //010
   Serial << "a: ";
   a.print();
   Serial << endl << endl;
+  */
 
+
+  //int counter = 0;
   while (myCanPacket.canFit(a))
   {
+    //a.setData(counter << 1);
+    //counter++;
+
     myCanPacket.add(a);
     printCanMessage(myCanPacket.getCanMessage());
     Serial << endl;
+    delay(150);
+  }
+  printCanMessage(myCanPacket.getCanMessage());
+  Serial << "BitRead:" << endl;
+  delay(1500);
+  myCanPacket.reset();
+  while (1)
+  {
+    uint8_t bitWidth = 12;
+    uint32_t data = myCanPacket.readLowLevelBits(bitWidth);
+    printBits(data,bitWidth);
     delay(1500);
   }
-  while (1)
-    delay(1000);
   Serial << endl
          << endl;
   delay(1500);

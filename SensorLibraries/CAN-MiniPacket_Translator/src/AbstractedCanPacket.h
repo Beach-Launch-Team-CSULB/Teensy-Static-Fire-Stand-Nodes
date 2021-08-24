@@ -5,7 +5,7 @@
 
     It should hold a vector of MiniPackets, as well as keep track
     of how many MiniPackets, it contains, as well as if it can fit
-    any more. 
+    any more.
 */
 
 //IMPORTANT CONFIG #DEFINES, THIS IS ALL PEASANTS GET TO TOUCH IN HERE
@@ -56,11 +56,13 @@ public:
     uint32_t getMessagePriority();
     uint32_t getNodeID();
 
+    void reset();//resets can packet to be reused. However, old data is not deleted.
+
 private:
     CAN_message_t msg; //underlying data structure this class abstracts
 
     //uint8_t maxBufferSize; //maximum possible size of abstracted bit buffer TESTING
-    
+
     /*
     usedBits is essentially the high-level index of where we are in the abstract bit buffer
     Ie how many bits we've used out of the total number of bits we have considered continuously.
@@ -68,11 +70,12 @@ private:
     When converting MiniPackets to CAN frames, usedBits corresponds with the total number of
     bits we've written to the CAN_message_t. However, when AbstractedCanPacket is constructed
     from a CAN frame, converting to MiniPackets, usedBits refers to how many bits we have read
-    from the CAN frame. 
+    from the CAN frame.
 
     Note, that after the constructor finishes, usedBits will simply be the sum of the sizes
     of all the MiniPackets this AbstractedCanPacket contains.
     */
+
     uint8_t usedBits;      //current size of abstracted bit buffer
 
     //payload data
@@ -98,20 +101,20 @@ private:
     uint8_t getLowLevelBufferFreeSpace(); //corresponds to index of leftmost free bit
     uint8_t getLowLevelBitBoundaryIndex(uint8_t bitWidth);
     /*
-    data is the data we're writing to the low level buffer. 
+    data is the data we're writing to the low level buffer.
     dataWidth is how many bits data contains.
     dataOffset is how far shifted left the relevant bits are
     */
     void setLowLevelBufferBitsHelper(uint32_t data, uint8_t dataWidth, uint8_t dataOffset);//atomic write
-    
+
     /*
     This method writes to the CAN message as if it were a continuous bit-buffer.
-    In practice this means that it should be easy to write data to it, even if 
-    that means writing some if the bits into the ID field, and other parts into 
-    buf[someIndex]. 
+    In practice this means that it should be easy to write data to it, even if
+    that means writing some if the bits into the ID field, and other parts into
+    buf[someIndex].
     data: contains what we're writing to the CAN message
-    dataWidth: tells method how many bits are relevant. 
-    Store relevant bits starting at LSB moving to MSB for proper function. 
+    dataWidth: tells method how many bits are relevant.
+    Store relevant bits starting at LSB moving to MSB for proper function.
     */
     void setLowLevelBufferBits(uint32_t data, uint8_t dataWidth);
 
@@ -129,7 +132,7 @@ private:
     uint32_t readLowLevelBits(uint8_t bitWidth);
 
     CAN_message_t getCanMessage();//testing REMOVE THIS. Returns the private CAN message this class encodes
-
+    void setUsedBits();
 };
 
 #endif
