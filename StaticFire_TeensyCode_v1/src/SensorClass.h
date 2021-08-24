@@ -9,22 +9,10 @@
 #include <ADC.h>
 
 
-
-
-
 using std::string;
 
-// senstype options, add and expand as sensor types come up
-    //Add in the sensetype CAN ID formatting into the class declaration, or maybe split to whole CAN ID formatting header file?
-// pt1000
-// pt5000
-// load_cell1000
-// tcktype
-// rtd
-// 
 
-
-
+// enum for holding sensor types
 enum SensorType
 {
   pt1000,
@@ -42,7 +30,7 @@ class SENSOR
     const int ADCinput;               //the input that will be read for this sensor that will get used in the ADC read main loop
     const int sens_sample_rate;       //the sample rate this given sensor will be read at
     elapsedMillis timer;              // timer for future sensor timing operations
-    int currentRawValue{};               // holds the current value for the sensor
+    int currentRawValue{};            // holds the current value for the sensor
     // read bit size should be added
 
   public:
@@ -60,13 +48,13 @@ class SENSOR
     
     void resetTimer();                // resets timer to zero
 
-    void read(ADC* adc);                // updates currentRawValue with current reading
+    void read(ADC* adc);              // updates currentRawValue with current reading, using an activated ADC object
 
 };
 
 // need to add differential read toggle somehow 
 // - differential boolean variable that allows second input to be chosen or defaulted to correct option
-// need to add a way to set other SENSOR types like the RTD sensors over I2C
+// need to add a way to set other SENSOR types like the RTD sensors over I2C (we'd probably want multiple classes. ADCsensors, I2C sensors, SPI sensors etc - Mat)
 // - maybe not the right call to roll into this? Hmm. Need to establish use of SENSOR class with sample rates and real read/sends to see what is better
 // That will set me up for incorporating the external ADCs later
 

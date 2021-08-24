@@ -50,14 +50,14 @@ bool input_enable[25] = {false, false, false, false, false, false, true, false, 
 
 void setup() 
 {
-  // Start Serial
+  // -----Start Serial-----
   Serial.begin(115200);
   delay(5000);
 
-  // Run Valve Setup
+  // -----Run Valve Setup-----
   valveSetUp(valveArray);
 
-  // Run Sensor Setup
+  // -----Run Sensor Setup-----
   for (int i = 0; i < PINS; i++)
     {
         pinMode(adc_pins[i], INPUT);
@@ -66,17 +66,17 @@ void setup()
   sensorSetUp(sensorArray);
 
 
-  // Start Can
+  // -----Start Can-----
   Can0.begin(busSpeed);
 
-  // SD set up
+  // -----SD set up-----
   pinMode(BUILTIN_SDCARD, OUTPUT);
   if(!builtInSD.begin(BUILTIN_SDCARD))
   {
     Serial.println("Built in SD card failed or not present.");
   }
 
-  // set up the csv
+  // -----set up the csv-----
   File dataFile = builtInSD.open("datalog.csv", FILE_WRITE);
   if(dataFile)
   {
@@ -94,7 +94,7 @@ void setup()
   dataFile.close();
 
 
-  // ADC Set Up
+  // -----ADC Set Up-----
   // reference can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 or ADC_REFERENCE::REF_EXT.
   //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
 
@@ -123,6 +123,8 @@ void setup()
  
 }
 
+// -------------------- LOOP SECTION --------------------
+
 void loop() 
 {
   // --- Step 1, Read CAN bus and update current command ---
@@ -132,14 +134,14 @@ void loop()
     Serial.println(currentCommand);
   }
 
-  // Process Commands Here
+  // -----Process Commands Here-----
 
 
-  // Advance needed valve tasks
+  // -----Advance needed valve tasks-----
   valveTasks(valveArray);
 
 
-  // Peform sensor reads and write to CAN
+  // -----Peform sensor reads and write to CAN-----
   if(sensorTimer >= 2) // performs these operations only 500 times/second
   {
       // Read Sensors
