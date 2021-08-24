@@ -15,12 +15,30 @@ AbstractedCanPacket myCanPacket;
 //useful for testing and debug
 void printBits(int data, int size)
 {
-  for(int i = size-1; i >= 0; i--)
+  for (int i = size - 1; i >= 0; i--)
   {
-    Serial.print(bitRead(data,i));
-    if(i % 4 == 0) Serial.print("");
-  }  
+    Serial.print(bitRead(data, i));
+    if (i % 4 == 0)
+      Serial.print("");
+  }
   Serial.print("-");
+}
+void printCanMessage(CAN_message_t msg)
+{
+  uint8_t idSize;
+  if (msg.ext)
+  {
+    idSize = 29;
+  }
+  else
+  {
+    idSize = 11;
+  }
+  printBits(msg.id, idSize);
+  for (int i = 0; i < msg.len; i++)
+  {
+    printBits(msg.buf[i], 8);
+  }
 }
 void loop()
 {
@@ -61,6 +79,8 @@ void loop()
   Serial << endl << "a size: " << a.getSize() << endl;
   Serial << "canFit(a): " <<  myCanPacket.canFit(a) << endl;
 */
+
+  /*
   uint32_t mask = (1 << 3) - 1; //build mask with resolution bits
   mask = mask << 1;
   Serial << "mask: ";
@@ -68,15 +88,32 @@ void loop()
   myCanPacket.setExtendedID(false);
   //Serial << "get extended ID: " << myCanPacket.getExtendedID() << endl;
   Serial << "bit boundary index: " << myCanPacket.getLowLevelBufferFreeSpace() << endl;
+*/
+  //myCanPacket.setLowLevelBufferBits(mask, 5);
 
-  myCanPacket.setLowLevelBufferBits(mask, 5);
-  printBits(myCanPacket.getCanMessage().id,11);
-  for (int i = 0; i < 8; i++)
+  MiniPacket a;
+  a.setDataLength(5);
+  a.setID_Length(3);
+
+  uint32_t mask = (1 << 3) - 1; //build mask with resolution bits
+  mask = mask << 1;
+  a.setData(mask);     //01110
+  mask = (1 << 1) - 1; //build mask with resolution bits
+  mask = mask << 1;
+  a.setID(mask); //010
+  Serial << "a: ";
+  a.print();
+  Serial << endl << endl;
+
+  while (myCanPacket.canFit(a))
   {
-    printBits(myCanPacket.getCanMessage().buf[i], 8);
+    myCanPacket.add(a);
+    printCanMessage(myCanPacket.getCanMessage());
+    Serial << endl;
+    delay(1500);
   }
-  Serial << endl;
-
+  while (1)
+    delay(1000);
   Serial << endl
          << endl;
   delay(1500);

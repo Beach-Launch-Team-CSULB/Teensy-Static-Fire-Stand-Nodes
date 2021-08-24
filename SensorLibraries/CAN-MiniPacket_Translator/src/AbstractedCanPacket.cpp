@@ -11,7 +11,7 @@ AbstractedCanPacket::AbstractedCanPacket()
     nodeID.setID_Length(nodeID_ID_Length);
     nodeID.setDataLength(nodeID_DataLength);
 
-    index = 0;//is this an unnecessary assignment in C++?
+    index = 0; //is this an unnecessary assignment in C++?
 
     setExtendedID(true); //default to extendedID format
 }
@@ -85,7 +85,7 @@ bool AbstractedCanPacket::add(MiniPacket nextPacket)
     if (canFit(nextPacket))
     {
         packetBuffer[index] = nextPacket;
-        usedBits += nextPacket.getSize();
+        lowLevelAdd(nextPacket);
         index++;
         return true;
     }
@@ -194,10 +194,13 @@ void AbstractedCanPacket::setLowLevelBufferBitsHelper(uint32_t data, uint8_t dat
     uint32_t dataToWrite = bitChopper.extract(extraction, selectedData);
 
     int8_t index = getLowLevelBufferIndex(); //figure out which part of msg to write to
-    if (index == -1) //write to id
+    if (index == -1)                         //write to id
         msg.id = msg.id | dataToWrite;
     else //write to buf
+    {
         msg.buf[index] = msg.buf[index] | (uint8_t)dataToWrite;
+        msg.len = index + 1; //update length to make sure the message sends properly
+    }
 
     usedBits += dataWidth; //update to indicate we wrote to CAN buffer
 }
@@ -214,11 +217,35 @@ void AbstractedCanPacket::setLowLevelBufferBits(uint32_t data, uint8_t dataWidth
     }
 }
 
+/*
+    public add function will update high level MiniPacket buffer, this function
+    will update the private CAN_message_t within it. Also, this method updates
+    usedBits.
+    */
+void AbstractedCanPacket::lowLevelAdd(MiniPacket nextPacket)
+{
+    setLowLevelBufferBits(nextPacket.getID(), nextPacket.getID_Length());
+    setLowLevelBufferBits(nextPacket.getData(), nextPacket.getDataLength());
+}
+
+//how many bits to pull from CAN bit buffer, offset is how those bits should be shifted before returned
+uint32_t AbstractedCanPacket::readLowLevelBitsHelper(uint8_t bitWidth, uint8_t offset)
+{
+    
+}
+
+//TODO testing
+AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t CAN_Message)
+{
+    AbstractedCanPacket();
+}
+
+//will be deleted, for testing only.
 CAN_message_t AbstractedCanPacket::getCanMessage()
 {
     return msg;
 }
-//TODO TESTING
+//Can_send proxy TODO testing
 bool AbstractedCanPacket::send()
 {
     return false;
