@@ -19,16 +19,25 @@ void MiniPacket::setID_Length(uint32_t ID_Length)
 {
     MiniPacket::ID_Length = ID_Length;
 }
+uint8_t MiniPacket::getID_Length()
+{
+    return ID_Length;
+}
+
 void MiniPacket::setDataLength(uint32_t dataLength)
 {
     MiniPacket::dataLength = dataLength;
+}
+uint8_t MiniPacket::getDataLength()
+{
+    return dataLength;
 }
 bool MiniPacket::setData(uint32_t data)
 {
 
     //error checking
     uint32_t mask = (1 << dataLength) - 1;
-    if ((data & mask) == data)//make sure no information is lost in encoding
+    if ((data & mask) == data) //make sure no information is lost in encoding
     {
         MiniPacket::data = data;
         return true;
@@ -47,7 +56,7 @@ bool MiniPacket::setID(uint32_t ID)
 
     //error checking
     uint32_t mask = (1 << ID_Length) - 1;
-    if ((ID & mask) == ID)//make sure no information is lost
+    if ((ID & mask) == ID) //make sure no information is lost
     {
         MiniPacket::ID = ID;
         return true;
@@ -59,10 +68,21 @@ uint32_t MiniPacket::getID()
 {
     return ID;
 }
+
+//useful for testing and debug
+void MiniPacket::printBits(int data, int size)
+{
+  for(int i = size-1; i >= 0; i--)
+  {
+    Serial.print(bitRead(data,i));
+    if(i % 4 == 0) Serial.print("");
+  }  
+  Serial.print("");
+}
 void MiniPacket::print()
 {
-    Serial.print( "ID: ");
-     Serial.print(ID, BIN);
-     Serial.print(", DATA: ");
-     Serial.print(data, BIN);
+    Serial.print("ID: ");
+    printBits(ID, ID_Length);
+    Serial.print(", DATA: ");
+    printBits(data, dataLength);
 }
