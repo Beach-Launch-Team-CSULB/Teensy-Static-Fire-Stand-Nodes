@@ -10,6 +10,7 @@ enum class State
     abort,      // lox vent open, fuel vent open,   lox iso open,   fuel iso open,   main lox closed, main fuel closed, iso enable on,  fuel vent enable on,  lox vent enable off, MV enable off
     test,       // only this state allows individual actuation
     passive,    // lox vent open, fuel vent closed, lox iso closed, fuel iso closed, main lox closed, main fuel closed, iso enable off, fuel vent enable off, lox vent enable off, MV enable off 
+    vent,
     
     // These states can only be accessed in sequence, from passive
     loxLoad,    // lox vent open, fuel vent closed, lox iso closed, fuel iso closed, main lox closed, main fuel closed, iso enable off, fuel vent enable off, lox vent enable on, MV enable off

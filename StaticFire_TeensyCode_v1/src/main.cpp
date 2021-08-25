@@ -63,6 +63,12 @@ void setup()
   // -----Read Last State off eeprom and update -----
   currentState = static_cast<State>(EEPROM.read(stateAddress));
 
+  // don't reboot into the fire state
+  if(currentState == State::fire)
+  {
+    currentState = State::vent;
+  }
+
   // -----Run Valve Setup-----
   valveSetUp(valveArray);
 
