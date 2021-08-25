@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <EEPROM.h>
 #include <array>
 #include <string>
 #include <FlexCAN.h>
@@ -25,7 +26,10 @@ uint32_t loopCount {0};// for debugging
 
 // Set the global command, and global state
 Command currentCommand{command_NOCOMMAND};
-State currentState{State::setup};
+State currentState{State::passive};
+
+// Set EEPROM address for storing states
+uint8_t stateAddress{0};
 
 // 2 timers to not print too much
 elapsedMillis sensorTimer;
@@ -55,6 +59,9 @@ void setup()
   // -----Start Serial-----
   Serial.begin(115200);
   delay(5000);
+
+  // -----Read Last State off eeprom and update -----
+  currentState = static_cast<State>(EEPROM.read(stateAddress));
 
   // -----Run Valve Setup-----
   valveSetUp(valveArray);
@@ -152,6 +159,9 @@ void loop()
 
   // -----Advance needed valve tasks-----
   valveTasks(valveArray);
+
+  // -----Update State on EEPROM -----
+  EEPROM.update(stateAddress, static_cast<uint8_t>(currentState)); // Never use .write()
 
 
   // -----Peform sensor reads and write to CAN-----
