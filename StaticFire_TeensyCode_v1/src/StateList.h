@@ -5,16 +5,14 @@
 
 enum class State
 {
+    debug,      //this is a debug state
     // These are the God States, they can be reached from any position
-    abort,
-    setup,      // fuel iso closed, lox iso closed, lox vent closed, fuel vent closed, lox main closed, fuel main closed
-    vent,       // fuel iso closed, lox iso closed, lox vent open,   fuel vent open,   lox main closed, fuel main closed
-    test,
-    passive,    // fuel iso closed, lox iso closed, lox vent open,   fuel vent open,   lox main closed, fuel main closed
-    offNominal, // off nominal is for when individual valves are actuated out of sequence
-
+    abort,      // lox vent open, fuel vent open,   lox iso open,   fuel iso open,   main lox closed, main fuel closed, iso enable on,  fuel vent enable on,  lox vent enable off, MV enable off
+    test,       // only this state allows individual actuation
+    passive,    // lox vent open, fuel vent closed, lox iso closed, fuel iso closed, main lox closed, main fuel closed, iso enable off, fuel vent enable off, lox vent enable off, MV enable off 
+    
     // These states can only be accessed in sequence, from passive
-    loxLoad,
+    loxLoad,    // lox vent open, fuel vent closed, lox iso closed, fuel iso closed, main lox closed, main fuel closed, iso enable off, fuel vent enable off, lox vent enable on, MV enable off
     pressArm,
     pressurize,
     fireArmed,

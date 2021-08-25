@@ -3,6 +3,7 @@
 #include <string>
 #include <FlexCAN.h>
 #include <ADC.h>
+#include <adafruit_MCP9808.h>
 //#include <ADC_util.h>
 #include <Wire.h>
 #include <SD.h>
@@ -44,7 +45,8 @@ uint8_t adc_pins_diff[] = {A10, A11};
 
 bool input_enable[25] = {false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
-
+// Temp Sensor
+Adafruit_MCP9808 tempSensor = Adafruit_MCP9808();
 
 // -------------------------------------------------------------
 
@@ -87,6 +89,8 @@ void setup()
       dataFile.print(name.c_str());
       dataFile.print(", ");
     }
+    // Temp Column
+    dataFile.print("Temp, ");
 
     // valve status column
     dataFile.println("ValveStatus, ");
@@ -113,6 +117,15 @@ void setup()
 
   delay(500);
 
+// ----- Temp Sensor Setup -----
+if(!tempSensor.begin(0x19))
+{
+  Serial.println("Temp Sensor did not initialize.");
+}
+else
+{
+  tempSensor.setResolution(3);
+}
 
 
   
@@ -166,6 +179,23 @@ void loop()
           dataFile.print(", ");
         }
 
+      }
+      // Get and send temperature
+      tempSensor.shutdown_wake(0);
+      float tempValue{tempSensor.readTempF()};                     // in future figure out proper analog .read16(reg)
+      uint32_t sendValue{static_cast<uint32_t>(tempValue * 1000)}; // turn it to an int for CAN
+      std::array<uint8_t, 4> tempMsgArray{};
+      tempMsgArray.at(0) = (sendValue >> 24) & 0xff;
+      tempMsgArray.at(1) = (sendValue >> 16) & 0xff;
+      tempMsgArray.at(2) = (sendValue >> 16) & 0xff;
+      tempMsgArray.at(3) = sendValue & 0xff;
+
+      CANwrite(Can0, tempMsgArray, 0);  // need IDs for different returns
+
+      if(dataFile)
+      {
+        dataFile.print(tempValue);
+        dataFile.print(", ");
       }
 
       // Get and send valve status

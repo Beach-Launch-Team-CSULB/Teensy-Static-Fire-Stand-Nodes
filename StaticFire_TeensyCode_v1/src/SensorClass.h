@@ -25,23 +25,26 @@ enum SensorType
 class SENSOR
 {
   private:
+    const int sensorID;
     const string sens_name;           //your own name for sensor to reference it
     const SensorType senstype;        //sensor type from pt,tc,load_cell, or any others added (update options here as they are added for reference) (Changed this to enum)
     const int ADCinput;               //the input that will be read for this sensor that will get used in the ADC read main loop
     const int sens_sample_rate;       //the sample rate this given sensor will be read at
     elapsedMillis timer;              // timer for future sensor timing operations
     int currentRawValue{};            // holds the current value for the sensor
-    // read bit size should be added
+    const int bitDepth;               // bit depth of the sample
 
   public:
-    SENSOR(string setSens_Name, SensorType setSensType, int setADCinput, int setSens_Sample_rate);
+    SENSOR(int setSensorID, string setSens_Name, SensorType setSensType, int setADCinput, int setSens_Sample_rate, int setBitDepth);
 
     // Access functions defined in place
+    int getSensorID(){return sensorID;}
     string getSensorName(){return sens_name;}
     SensorType getSensorType(){return senstype;}
     int getADCinput(){return ADCinput;}
     int getSensSampleRate(){return sens_sample_rate;}
     int getCurrentRawValue(){return currentRawValue;}
+    int getBitDepth(){return bitDepth;}
 
     // further fuctions defined in SensorClass.cpp
     void begin();                     // run in setup to get pins going

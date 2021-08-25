@@ -7,8 +7,8 @@
 using std::string;
 
 // Constructor
-SENSOR::SENSOR(string setSens_Name, SensorType setSensType, int setADCinput, int setSens_Sample_rate)
-                : sens_name{setSens_Name}, senstype{setSensType}, ADCinput{setADCinput}, sens_sample_rate{setSens_Sample_rate}
+SENSOR::SENSOR(int setSensorID, string setSens_Name, SensorType setSensType, int setADCinput, int setSens_Sample_rate, int setBitDepth)
+                : sensorID{setSensorID}, sens_name{setSens_Name}, senstype{setSensType}, ADCinput{setADCinput}, sens_sample_rate{setSens_Sample_rate}, bitDepth{setBitDepth}
 {
     // place any constructor operations here
 }
