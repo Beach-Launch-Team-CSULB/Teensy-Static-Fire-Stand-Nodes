@@ -1,0 +1,27 @@
+Note that currently, nodeID and Priority are not added to the CAN buffer.
+In addition, the current requirement would be that the are written to the
+CAN message first, and in order, for it to work correctly. 
+
+This is unacceptable, so that plan is to fully decouple high and low level writes,
+and ideally separate them into their own classes, so that when converting MiniPacket 
+to CanPackets, all high level writes can be done, and the low level writes occur
+just before sending, as originally planned. 
+
+Notes on separating this class into two classes. Ideally there would be a BitBuffer class,
+and an AbstractCanPacket class. 
+
+BitBuffer: Would handle all low level reads and writes to the CAN packet. Ideally, 
+this would only look at a CAN frame as a continuous buffer to be read from or written to.
+
+AbstractCanPacket: Would contain the arrays of MiniPackets as well as Priority and nodeID.
+You can set the priority and nodeID, add MiniPackets, and sendCanMessage while writing,
+and while reading from CAN frame, can construct from CAN, get the priority and nodeID,
+and get the MiniPacket. 
+
+Setting and getting the extendedID shouldn't even be a thing, it should just figure that out
+before sending the CAN frame. 
+
+add(MiniPacket) should become highLevelAdd(MiniPacket). AbstractCanPacket should be entierly high-level.
+We need a way to keep track of how many usedBits there are if we give up on keeping the high and low level
+states consistent. We could make a new variable, or we could just keep using usedBits and then reset it
+to zero before writing to the CAN frame. Seems like a good, simple solution.

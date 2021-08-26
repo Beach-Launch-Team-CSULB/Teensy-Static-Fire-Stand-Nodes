@@ -48,37 +48,47 @@ void loop()
   Serial << " nodeID: " << myCanPacket.getNodeID() << endl;
   Serial << "setMessagePriority sucess: " << myCanPacket.setMessagePriority(7);
   Serial << " message priority: " << myCanPacket.getMessagePriority() << endl;
-  Serial << "free bits: " << myCanPacket.getFreeBits() << endl;
+  
+  Serial << "free bits: " << myCanPacket.getFreeBitsHighLevel() << endl;
+  */
   MiniPacket a;
-  a.setDataLength(3);
-  a.setID_Length(2);
+  a.setDataLength(4);
+  a.setID_Length(3);
   a.setData(0);
   a.setID(1);
   Serial << "a: ";
   a.print();
-  Serial << endl << "a size: " << a.getSize() << endl;
+  Serial << endl
+         << "a size: " << a.getSize() << endl;
 
-  Serial << "canFit(a): " <<  myCanPacket.canFit(a) << endl;
+  Serial << "canFitHighLevel(a): " << myCanPacket.canFitHighLevel(a) << endl;
+  delay(50);
 
-  while (myCanPacket.canFit(a))
+  Serial << "highLevelFreeBits: " << myCanPacket.getFreeBitsHighLevel() << endl;
+  while (myCanPacket.canFitHighLevel(a))
   {
-    myCanPacket.add(a);
-    a.setData(a.getData()+1);
+    myCanPacket.highLevelAdd(a);
+    Serial << "highLevelFreeBits: " << myCanPacket.getFreeBitsHighLevel() << endl;
+    delay(50);
+
+    a.setData(a.getData() + 1);
   }
 
-  MiniPacket * myBuffer = myCanPacket.getPacketBuffer();
+  MiniPacket *myBuffer = myCanPacket.getPacketBuffer();
 
-  for(int i =0; i < myCanPacket.getBufferSize(); i++)
+  for (int i = 0; i < myCanPacket.getBufferSize(); i++)
   {
     Serial << "myBuffer[" << i << "]: ";
     myBuffer[i].print();
     Serial << endl;
+    delay(50);
   }
 
-  Serial << "free bits: " << myCanPacket.getFreeBits() << endl;
-  Serial << endl << "a size: " << a.getSize() << endl;
-  Serial << "canFit(a): " <<  myCanPacket.canFit(a) << endl;
-*/
+  Serial << "free bits High Level: " << myCanPacket.getFreeBitsHighLevel() << endl;
+  Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
+  Serial << endl
+         << "a size: " << a.getSize() << endl;
+  Serial << "canFit(a): " << myCanPacket.canFitHighLevel(a) << endl;
 
   /*
   uint32_t mask = (1 << 3) - 1; //build mask with resolution bits
@@ -91,14 +101,15 @@ void loop()
 */
   //myCanPacket.setLowLevelBufferBits(mask, 5);
 
-  MiniPacket a;
-  a.setDataLength(5);
-  a.setID_Length(0);
+  MiniPacket b;
+  b.setDataLength(5);
+  b.setID_Length(5);
 
- //builds a = {010, 01110}
+  //builds a = {010, 01110}
   uint32_t mask = (1 << 3) - 1; //build mask with resolution bits
   mask = mask << 1;
-  a.setData(mask);     //01110
+  b.setData(mask); //01110
+  b.setID(10);     //01010
   /*
   mask = (1 << 1) - 1; //build mask with resolution bits
   mask = mask << 1;
@@ -108,29 +119,47 @@ void loop()
   Serial << endl << endl;
   */
 
-
-  //int counter = 0;
-  while (myCanPacket.canFit(a))
+  while (myCanPacket.canFitLowLevel(b))
   {
-    //a.setData(counter << 1);
-    //counter++;
 
-    myCanPacket.add(a);
+    myCanPacket.lowLevelAdd(b);
     printCanMessage(myCanPacket.getCanMessage());
     Serial << endl;
     delay(150);
   }
+
+  Serial << "free bits High Level: " << myCanPacket.getFreeBitsHighLevel() << endl;
+  Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
+  CAN_message_t shallowCopy = myCanPacket.getCanMessage();
+
+  AbstractedCanPacket fromCanPacket(standardID_Length, shallowCopy);
+
+  Serial << "fromCan Message Priority: " << fromCanPacket.getMessagePriority();
+
+  MiniPacket *myBufferB = fromCanPacket.getPacketBuffer();
+
+  for (int i = 0; i < fromCanPacket.getBufferSize(); i++)
+  {
+    Serial << "myBuffer[" << i << "]: ";
+    myBufferB[i].print();
+    Serial << endl;
+    delay(100);
+  }
+  /*
   printCanMessage(myCanPacket.getCanMessage());
   Serial << "BitRead:" << endl;
   delay(1500);
   myCanPacket.reset();
-  while (1)
+  uint8_t bitWidth = 12;
+
+  while (myCanPacket.canFit(bitWidth))
   {
-    uint8_t bitWidth = 12;
     uint32_t data = myCanPacket.readLowLevelBits(bitWidth);
     printBits(data,bitWidth);
     delay(1500);
   }
+  while(1);
+  */
   Serial << endl
          << endl;
   delay(1500);

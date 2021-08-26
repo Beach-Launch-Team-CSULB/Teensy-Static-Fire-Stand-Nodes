@@ -11,9 +11,11 @@ AbstractedCanPacket::AbstractedCanPacket()
     nodeID.setID_Length(nodeID_ID_Length);
     nodeID.setDataLength(nodeID_DataLength);
 
-    index = 0; //is this an unnecessary assignment in C++?
+    packetBufferSize = 0; //is this an unnecessary assignment in C++?
 
     setExtendedID(true); //default to extendedID format
+
+
 }
 
 //returns false if newPriority is too large for MiniPacket priority buffer, otherwise sets priority
@@ -44,27 +46,35 @@ uint32_t AbstractedCanPacket::getNodeID()
 /*
 returns the total number of additional bits which can be written to this AbstractedCanPacket.
 */
-uint8_t AbstractedCanPacket::getFreeBits()
+uint8_t AbstractedCanPacket::getFreeBitsHighLevel()
 {
-    return maxBufferSize - usedBits;
+    return maxBufferSize - highLevelUsedBits;
 }
-
 /*
-returns true if this AbstractedCanPacket can fit nextPacket, false otherwise. 
+returns the total number of additional bits which can be written to this AbstractedCanPacket.
 */
-bool AbstractedCanPacket::canFit(MiniPacket nextPacket)
+uint8_t AbstractedCanPacket::getFreeBitsLowLevel()
+{
+    return maxBufferSize - lowLevelUsedBits;
+}
+//returns true if it can fit nBits more bits
+bool AbstractedCanPacket::canFitHighLevel(uint8_t nBits)
 {
 
-    //test for a malformed config file
-    if (nextPacket.getSize() < smallestMiniPacketSize)
+    if (getFreeBitsHighLevel() - nBits >= 0)
     {
-        Serial.print("\n\nERROR, OVERFLOW POSSIBLE, ADJUST smallestMiniPacketSize to ");
-        Serial.print(nextPacket.getSize());
-        Serial.println(" in AbstractedCanPacket.h");
-        return false; //should fail hard rather than soft.
+        return true;
     }
+    else
+    {
+        return false;
+    }
+}
+//returns true if it can fit nBits more bits
+bool AbstractedCanPacket::canFitLowLevel(uint8_t nBits)
+{
 
-    if (getFreeBits() - nextPacket.getSize() >= 0)
+    if (getFreeBitsLowLevel() - nBits >= 0)
     {
         return true;
     }
@@ -75,21 +85,95 @@ bool AbstractedCanPacket::canFit(MiniPacket nextPacket)
 }
 
 /*
+returns true if this AbstractedCanPacket can fit nextPacket, false otherwise. 
+*/
+bool AbstractedCanPacket::canFitHighLevel(MiniPacket nextPacket)
+{
+
+    //test for a malformed config file
+    if (nextPacket.getSize() < smallestMiniPacketSize)
+    {
+        Serial.print("\n\nERROR, OVERFLOW POSSIBLE, ADJUST smallestMiniPacketSize to ");
+        Serial.print(nextPacket.getSize());
+        Serial.println(" in AbstractedCanPacket.h");
+        return false; //should fail hard rather than soft.
+    }
+    return canFitHighLevel(nextPacket.getSize());
+}
+/*
+returns true if this AbstractedCanPacket can fit nextPacket, false otherwise. 
+*/
+bool AbstractedCanPacket::canFitLowLevel(MiniPacket nextPacket)
+{
+
+    //test for a malformed config file
+    if (nextPacket.getSize() < smallestMiniPacketSize)
+    {
+        Serial.print("\n\nERROR, OVERFLOW POSSIBLE, ADJUST smallestMiniPacketSize to ");
+        Serial.print(nextPacket.getSize());
+        Serial.println(" in AbstractedCanPacket.h");
+        return false; //should fail hard rather than soft.
+    }
+    return canFitLowLevel(nextPacket.getSize());
+}
+
+/*
 adds a MiniPacket to our high-level buffer, and returns false if this fails. 
 TODO: update so that the low-level buffer is in sync.
 */
 bool AbstractedCanPacket::add(MiniPacket nextPacket)
 {
+    return highLevelAdd(nextPacket);
+    //return lowLevelAdd(nextPacket);
+}
 
-    //make sure there's room
-    if (canFit(nextPacket))
+//toRead must have ID_Length and dataLength set
+MiniPacket AbstractedCanPacket::read(uint8_t ID_Length, uint8_t dataLength)
+{
+    //important to read ID then Data
+    uint32_t ID = readLowLevelBits(ID_Length);
+    uint32_t data = readLowLevelBits(dataLength);
+    MiniPacket toReturn;
+
+    toReturn.setDataLength(dataLength);
+    toReturn.setID_Length(ID_Length);
+    toReturn.setID(ID);
+    toReturn.setData(data);
+
+    return toReturn;
+}
+
+/*
+    TODO Testing
+    This is the function mapping of our packetID to the length of data.
+    Each sensor in each node should have a unique ID, and code will go here to 
+    map that ID to how long its data is.
+
+    This is incomplete, but I'm architecting so it's easy to improve later. 
+
+    I'm considering implementing a 2D array for this mapping, where
+    the first dimension is the nodeID, and the second dimension is the 
+    MiniPacket ID unique to that node, where MiniPacket ID corresponds
+    to what sensor or other type of data is trying to be sent. 
+*/
+uint8_t AbstractedCanPacket::packetIdToDataLength(uint8_t nodeID, uint8_t packetID)
+{
+    if (nodeID == 0) //zero is null ID
     {
-        packetBuffer[index] = nextPacket;
-        lowLevelAdd(nextPacket);
-        index++;
-        return true;
+        return 0;
     }
-    return false; //not enough space
+    return 5;
+}
+MiniPacket AbstractedCanPacket::read(uint8_t ID_Length)
+{
+    MiniPacket toReturn;
+    toReturn.setID_Length(ID_Length);
+    toReturn.setID(readLowLevelBits(ID_Length));
+
+    uint8_t dataLength = packetIdToDataLength(getNodeID(), toReturn.getID());
+    toReturn.setData(readLowLevelBits(dataLength));
+
+    return toReturn;
 }
 
 /*
@@ -104,7 +188,7 @@ returns the number of MiniPackets in this AbstractedCanPacket.
 */
 uint8_t AbstractedCanPacket::getBufferSize()
 {
-    return index;
+    return packetBufferSize;
 }
 
 void AbstractedCanPacket::setExtendedID(bool extendedID)
@@ -120,7 +204,7 @@ bool AbstractedCanPacket::getExtendedID()
 //returns -1 if msg.id is current buffer, else returns index for msg.buf[index]
 int8_t AbstractedCanPacket::getLowLevelBufferIndex()
 {
-    uint8_t tempUsedBits = usedBits;
+    uint8_t tempUsedBits = lowLevelUsedBits;
     uint8_t idSize;
     if (getExtendedID() == true) //idSize is 29 bits
         idSize = 29;
@@ -146,7 +230,7 @@ uint8_t AbstractedCanPacket::getLowLevelBufferSize()
     else //idSize is 11 bits
         idSize = 11;
 
-    if (usedBits < idSize)
+    if (lowLevelUsedBits < idSize)
         return idSize;
     else
         return 8;
@@ -159,7 +243,7 @@ buffer we are writing to (id or buf[i])
 uint8_t AbstractedCanPacket::getLowLevelBufferFreeSpace()
 {
 
-    uint8_t tempUsedBits = usedBits;
+    uint8_t tempUsedBits = lowLevelUsedBits;
     uint8_t idSize;
     if (getExtendedID() == true) //idSize is 29 bits
         idSize = 29;
@@ -174,7 +258,7 @@ uint8_t AbstractedCanPacket::getLowLevelBufferFreeSpace()
     return 8 - (tempUsedBits % 8); //usedBits % 8 is used space, 8 - that is free space
 }
 /*
-Returns the leftmost index which can bit data of bitWidth size without overwriting data on the left. 
+Returns the leftmost index which data of bitWidth size can be written to without overwriting data on the left. 
 */
 uint8_t AbstractedCanPacket::getLowLevelBitBoundaryIndex(uint8_t bitWidth)
 {
@@ -202,7 +286,7 @@ void AbstractedCanPacket::setLowLevelBufferBitsHelper(uint32_t data, uint8_t dat
         msg.len = index + 1; //update length to make sure the message sends properly
     }
 
-    usedBits += dataWidth; //update to indicate we wrote to CAN buffer
+    lowLevelUsedBits += dataWidth; //update to indicate we wrote to CAN buffer
 }
 void AbstractedCanPacket::setLowLevelBufferBits(uint32_t data, uint8_t dataWidth)
 {
@@ -222,10 +306,29 @@ void AbstractedCanPacket::setLowLevelBufferBits(uint32_t data, uint8_t dataWidth
     will update the private CAN_message_t within it. Also, this method updates
     usedBits.
     */
-void AbstractedCanPacket::lowLevelAdd(MiniPacket nextPacket)
+bool AbstractedCanPacket::lowLevelAdd(MiniPacket nextPacket)
 {
-    setLowLevelBufferBits(nextPacket.getID(), nextPacket.getID_Length());
-    setLowLevelBufferBits(nextPacket.getData(), nextPacket.getDataLength());
+    if (canFitLowLevel(nextPacket))
+    {
+        setLowLevelBufferBits(nextPacket.getID(), nextPacket.getID_Length());
+        setLowLevelBufferBits(nextPacket.getData(), nextPacket.getDataLength());
+        return true;
+    }
+    return false;
+}
+
+bool AbstractedCanPacket::highLevelAdd(MiniPacket nextPacket)
+{
+
+    //make sure there's room
+    if (canFitHighLevel(nextPacket))
+    {
+        packetBuffer[packetBufferSize] = nextPacket;
+        highLevelUsedBits+=nextPacket.getSize();
+        packetBufferSize++;
+        return true;
+    }
+    return false; //not enough space
 }
 
 //how many bits to pull from CAN bit buffer, offset is how those bits should be shifted before returned
@@ -238,11 +341,10 @@ uint32_t AbstractedCanPacket::readLowLevelBitsHelper(uint8_t bitWidth, uint8_t o
     config compression = {bitWidth, bitIndex};
     config extraction = {bitWidth, offset};
 
-
     BitChopper bitChopper;
 
     uint32_t data;
-    if(bufferIndex<0)
+    if (bufferIndex < 0)
     {
         data = msg.id;
     }
@@ -254,13 +356,13 @@ uint32_t AbstractedCanPacket::readLowLevelBitsHelper(uint8_t bitWidth, uint8_t o
     //maps relevant bits in input to the right offset for the output
     uint32_t selectedData = bitChopper.compress(compression, data);
     uint32_t dataToWrite = bitChopper.extract(extraction, selectedData);
-    
-    usedBits += bitWidth;
+
+    lowLevelUsedBits += bitWidth;
     return dataToWrite;
 }
 uint32_t AbstractedCanPacket::readLowLevelBits(uint8_t bitWidth)
 {
-    uint32_t toReturn =0;
+    uint32_t toReturn = 0;
     while (bitWidth > 0)
     {
         //you can only write as many bits the smaller of the current buffer free space and our input dataWidth
@@ -273,17 +375,32 @@ uint32_t AbstractedCanPacket::readLowLevelBits(uint8_t bitWidth)
     return toReturn;
 }
 
-
 //TODO testing
 AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t CAN_Message)
 {
     AbstractedCanPacket();
+    priority = read(priorityID_Length, priorityDataLength);
+    nodeID = read(nodeID_ID_Length, nodeID_DataLength);
+    Serial.print("\nhere\nPriority: ");
+    priority.print();
+    Serial.print("NodeID: ");nodeID.print();
+    Serial.println();
+
+    while (canFitLowLevel(idLength))
+    {
+        MiniPacket next = read(idLength);
+        next.print();
+        Serial.println();
+        if (next.getID() != 0)
+            highLevelAdd(next);
+    }
 }
 
 void AbstractedCanPacket::reset()
 {
-    usedBits =0;
-    index = 0;
+    lowLevelUsedBits = 0;
+    highLevelUsedBits = 0;
+    packetBufferSize = 0;
 }
 //will be deleted, for testing only.
 CAN_message_t AbstractedCanPacket::getCanMessage()
