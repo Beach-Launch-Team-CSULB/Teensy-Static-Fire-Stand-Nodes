@@ -63,7 +63,7 @@ void setup()
   // -----Read Last State off eeprom and update -----
   currentState = static_cast<State>(EEPROM.read(stateAddress));
 
-  // don't reboot into the fire state
+  // don't reboot into the fire state, switch to vent
   if(currentState == State::fire)
   {
     currentState = State::vent;
