@@ -1,11 +1,8 @@
-Note that currently, nodeID and Priority are not added to the CAN buffer.
-In addition, the current requirement would be that the are written to the
-CAN message first, and in order, for it to work correctly. 
+BUG: The 8th byte in msg.buf is not getting written to in practice. 
+I think the issue is in CanFitLowLevel(). 
 
-This is unacceptable, so that plan is to fully decouple high and low level writes,
-and ideally separate them into their own classes, so that when converting MiniPacket 
-to CanPackets, all high level writes can be done, and the low level writes occur
-just before sending, as originally planned. 
+BUG: free bits High Level != free bits Low Level after writing to CAN buffer.
+They must be equal!
 
 Notes on separating this class into two classes. Ideally there would be a BitBuffer class,
 and an AbstractCanPacket class. 
@@ -20,8 +17,3 @@ and get the MiniPacket.
 
 Setting and getting the extendedID shouldn't even be a thing, it should just figure that out
 before sending the CAN frame. 
-
-add(MiniPacket) should become highLevelAdd(MiniPacket). AbstractCanPacket should be entierly high-level.
-We need a way to keep track of how many usedBits there are if we give up on keeping the high and low level
-states consistent. We could make a new variable, or we could just keep using usedBits and then reset it
-to zero before writing to the CAN frame. Seems like a good, simple solution.

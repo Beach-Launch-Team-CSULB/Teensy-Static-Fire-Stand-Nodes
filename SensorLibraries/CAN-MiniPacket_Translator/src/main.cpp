@@ -21,7 +21,7 @@ void printBits(int data, int size)
     if (i % 4 == 0)
       Serial.print("");
   }
-  Serial.print("");
+  Serial.print("-");
 }
 void printCanMessage(CAN_message_t msg)
 {
@@ -42,15 +42,16 @@ void printCanMessage(CAN_message_t msg)
 }
 void loop()
 {
-  /*
-  //refer to AbstractedCanPacket.h to see how large nodeID and messagePriority can be
-  Serial << "setNodeID success: " << myCanPacket.setNodeID(31);
-  Serial << " nodeID: " << myCanPacket.getNodeID() << endl;
-  Serial << "setMessagePriority sucess: " << myCanPacket.setMessagePriority(7);
-  Serial << " message priority: " << myCanPacket.getMessagePriority() << endl;
   
-  Serial << "free bits: " << myCanPacket.getFreeBitsHighLevel() << endl;
-  */
+  //refer to AbstractedCanPacket.h to see how large nodeID and messagePriority can be
+  Serial << "setMessagePriority sucess: " << myCanPacket.setMessagePriority(7);//111
+  Serial << " message priority: " << myCanPacket.getMessagePriority() << endl;
+  Serial << "setNodeID success: " << myCanPacket.setNodeID(31);//11111
+  Serial << " nodeID: " << myCanPacket.getNodeID() << endl;
+  
+  Serial << "free bits High Level: " << myCanPacket.getFreeBitsHighLevel() << endl;
+  Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
+  
   MiniPacket a;
   a.setDataLength(4);
   a.setID_Length(3);
@@ -64,12 +65,13 @@ void loop()
   Serial << "canFitHighLevel(a): " << myCanPacket.canFitHighLevel(a) << endl;
   delay(50);
 
-  Serial << "highLevelFreeBits: " << myCanPacket.getFreeBitsHighLevel() << endl;
+  Serial << "free bits High Level: " << myCanPacket.getFreeBitsHighLevel() << endl;
+  Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
   while (myCanPacket.canFitHighLevel(a))
   {
     myCanPacket.highLevelAdd(a);
-    Serial << "highLevelFreeBits: " << myCanPacket.getFreeBitsHighLevel() << endl;
-    delay(50);
+    //Serial << "highLevelFreeBits: " << myCanPacket.getFreeBitsHighLevel() << endl;
+    //delay(50);
 
     a.setData(a.getData() + 1);
   }
@@ -83,9 +85,17 @@ void loop()
     Serial << endl;
     delay(50);
   }
-
   Serial << "free bits High Level: " << myCanPacket.getFreeBitsHighLevel() << endl;
   Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
+  myCanPacket.writeToCAN();
+  Serial << "After write to can:" << endl;
+  Serial << "msg len: " << myCanPacket.getCanMessage().len << endl;
+  printCanMessage(myCanPacket.getCanMessage());
+
+  Serial << endl << "free bits High Level: " << myCanPacket.getFreeBitsHighLevel() << endl;
+  Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
+  
+  
   Serial << endl
          << "a size: " << a.getSize() << endl;
   Serial << "canFit(a): " << myCanPacket.canFitHighLevel(a) << endl;
@@ -130,6 +140,7 @@ void loop()
 
   Serial << "free bits High Level: " << myCanPacket.getFreeBitsHighLevel() << endl;
   Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
+  /*
   CAN_message_t shallowCopy = myCanPacket.getCanMessage();
 
   AbstractedCanPacket fromCanPacket(standardID_Length, shallowCopy);
@@ -145,7 +156,7 @@ void loop()
     Serial << endl;
     delay(100);
   }
-  /*
+  
   printCanMessage(myCanPacket.getCanMessage());
   Serial << "BitRead:" << endl;
   delay(1500);
@@ -158,8 +169,11 @@ void loop()
     printBits(data,bitWidth);
     delay(1500);
   }
-  while(1);
   */
+  while(1)
+  {
+    delay(1000);
+  }
   Serial << endl
          << endl;
   delay(1500);

@@ -51,7 +51,7 @@ public:
     bool canFitHighLevel(uint8_t nBits);         //returns true if it can fit nBits more bits. Should be private
     bool canFitLowLevel(uint8_t nBits);         //returns true if it can fit nBits more bits. Should be private
     bool canFitHighLevel(MiniPacket nextPacket); //returns true if it can fit the MiniPacket
-    bool canFitLowLevel(MiniPacket nextPacket); //returns true if it can fit the MiniPacket
+    bool canFitLowLevel(MiniPacket nextPacket, bool errorChecking = true); //returns true if it can fit the MiniPacket
     bool add(MiniPacket next);          //returns true if add successful
     bool send();                        //returns true if send successful, false otherwise
 
@@ -140,7 +140,7 @@ public: //TESTING, CHANGE THIS TO PRIVATE LATER
     will update the private CAN_message_t within it. Also, this method updates
     usedBits.
     */
-    bool lowLevelAdd(MiniPacket nextPacket);
+    bool lowLevelAdd(MiniPacket nextPacket, bool errorChecking = true);
     bool highLevelAdd(MiniPacket nextPacket);
 
     //private helper method CAN_message_t -> AbstractedCanPacket
@@ -152,6 +152,8 @@ public: //TESTING, CHANGE THIS TO PRIVATE LATER
     MiniPacket read(uint8_t ID_Length, uint8_t dataLength);
     uint8_t packetIdToDataLength(uint8_t nodeID, uint8_t packetId); //function mapping for variable data lengths for minipacket
     MiniPacket read(uint8_t ID_Length);
+
+    void writeToCAN();
 
     CAN_message_t getCanMessage(); //testing REMOVE THIS. Returns the private CAN message this class encodes
 };
