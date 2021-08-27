@@ -1,4 +1,6 @@
 #include "AbstractedCanPacket.h"
+#include <Streaming.h> //testing
+
 AbstractedCanPacket::AbstractedCanPacket()
 {
     //testing Maybe use #define for this??
@@ -30,6 +32,7 @@ uint32_t AbstractedCanPacket::getMessagePriority()
 //returns false if newID is too large for MiniPacket ID buffer
 bool AbstractedCanPacket::setNodeID(uint32_t newID)
 {
+    Serial << "nodeID size " << nodeID.getSize();
     return nodeID.setID(newID);
 }
 
@@ -43,10 +46,11 @@ uint32_t AbstractedCanPacket::getNodeID()
 
 /*
 returns the total number of additional bits which can be written to this AbstractedCanPacket.
+High level bits are not for Priority or nodeID, so subtract overheadBits.
 */
 uint8_t AbstractedCanPacket::getFreeBitsHighLevel()
 {
-    return maxBufferSize - highLevelUsedBits;
+    return maxBufferSize - overheadBits - highLevelUsedBits;
 }
 /*
 returns the total number of additional bits which can be written to this AbstractedCanPacket.
@@ -285,10 +289,12 @@ void AbstractedCanPacket::setLowLevelBufferBitsHelper(uint32_t data, uint8_t dat
     else //write to buf
     {
         msg.buf[index] = msg.buf[index] | (uint8_t)dataToWrite;
-        msg.len = index + 1; //update length to make sure the message sends properly
     }
 
     lowLevelUsedBits += dataWidth; //update to indicate we wrote to CAN buffer
+
+    //must be done after updating usedBits to ensure index is consistent
+    msg.len = getLowLevelBufferIndex() + 1; //update length to make sure the message sends properly
 }
 void AbstractedCanPacket::setLowLevelBufferBits(uint32_t data, uint8_t dataWidth)
 {
@@ -316,7 +322,12 @@ bool AbstractedCanPacket::lowLevelAdd(MiniPacket nextPacket, bool errorChecking)
         setLowLevelBufferBits(nextPacket.getData(), nextPacket.getDataLength());
         return true;
     }
-    Serial.print("ERROR");
+
+    Serial.print("ERROR\n\nAborted Packet: ");
+    nextPacket.print();
+    Serial << "Free bits low level: " << getFreeBitsLowLevel() << endl;
+
+    Serial.println();
     return false;
 }
 
@@ -390,6 +401,7 @@ AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t CAN_Mes
     nodeID.print();
     Serial.println();
 
+    int counter = 0;
     while (canFitLowLevel(idLength))
     {
         MiniPacket next = read(idLength);
@@ -397,6 +409,9 @@ AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t CAN_Mes
         Serial.println();
         if (next.getID() != 0)
             highLevelAdd(next);
+        counter++;
+        while (counter > 50)
+            delay(1000);
     }
 }
 
@@ -408,12 +423,29 @@ void AbstractedCanPacket::reset()
 }
 void AbstractedCanPacket::writeToCAN()
 {
+    Serial << "START WRITE TO CAN\n\n";
     lowLevelUsedBits = 0; //reset so we can rewrite data.
-    lowLevelAdd(priority, false);//false means no error checking
+
+    lowLevelAdd(priority, false); //false means no error checking
+    //Serial << "added Priority" << endl;
+    //Serial << "Priority size: " << priority.getSize() << endl;
+    //Serial << "Free bits low level: " << getFreeBitsLowLevel() << endl
+    //       << endl;
+
     lowLevelAdd(nodeID, false);
+    //Serial << "added nodeID" << endl;
+    //Serial << "nodeID size: " << nodeID.getSize() << endl;
+    //Serial << "Free bits low level: " << getFreeBitsLowLevel() << endl
+    //       << endl;
+
     for (int i = 0; i < packetBufferSize; i++)
     {
         lowLevelAdd(packetBuffer[i]);
+
+        //Serial << "added packetBuffer[" << i << "]" << endl;
+        //Serial << "packetBuffer[" << i << "] size: " << packetBuffer[i].getSize() << endl;
+        //Serial << "Free bits low level: " << getFreeBitsLowLevel() << endl
+        //       << endl;
     }
 }
 
