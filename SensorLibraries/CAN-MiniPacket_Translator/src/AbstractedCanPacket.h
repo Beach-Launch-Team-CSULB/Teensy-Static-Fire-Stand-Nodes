@@ -44,7 +44,7 @@ public:
     AbstractedCanPacket(uint8_t idLength);
     bool setMessagePriority(uint32_t priority);
     bool setNodeID(uint32_t ID);
-    uint8_t getFreeBitsHighLevel(); //returns free space in bits    
+    uint8_t getFreeBitsHighLevel(); //returns free space in bits
     uint8_t getFreeBitsLowLevel(); //returns free space in bits
 
 
@@ -64,7 +64,7 @@ public:
 
     void reset(); //resets can packet to be reused. However, old data is not deleted.
 
-private:
+//private:
     CAN_message_t msg; //underlying data structure this class abstracts
 
     //uint8_t maxBufferSize; //maximum possible size of abstracted bit buffer TESTING
@@ -93,17 +93,16 @@ private:
     this keeps track of the size of packetBuffer.
     It is also conveniently the next index to write to when adding an additional
     MiniPacket to the packetBuffer, hence its name. But really it should be called
-    size or something. 
+    size or something.
     */
     uint8_t packetBufferSize;
 
 //compiler pre-processing to figure out how big out array needs to be, in order to avoid dynamic allocation
 #define overheadBits (priorityID_Length + priorityDataLength + nodeID_ID_Length + nodeID_DataLength)
-#define maxBufferSize 29 + (8 * 8) 
+#define maxBufferSize 29 + (8 * 8)
 #define maxWeCouldStore (maxBufferSize / smallestMiniPacketSize)
     MiniPacket packetBuffer[maxWeCouldStore]; //our array
 
-public: //TESTING, CHANGE THIS TO PRIVATE LATER
     //private helper methods MiniPacket -> CanPacket
 
     //returns either the ID field in the CAN_message_t or the byte address in the 8 byte buffer
@@ -155,6 +154,7 @@ public: //TESTING, CHANGE THIS TO PRIVATE LATER
 
     void writeToCAN();
 
+    void printCanMessage();
     CAN_message_t getCanMessage(); //testing REMOVE THIS. Returns the private CAN message this class encodes
 };
 
