@@ -1,8 +1,4 @@
-BUG: The 8th byte in msg.buf is not getting written to in practice. 
-I think the issue is in CanFitLowLevel(). 
 
-BUG: free bits High Level != free bits Low Level after writing to CAN buffer.
-They must be equal!
 
 Notes on separating this class into two classes. Ideally there would be a BitBuffer class,
 and an AbstractCanPacket class. 
