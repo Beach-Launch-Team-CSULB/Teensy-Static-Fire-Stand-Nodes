@@ -18,6 +18,12 @@
 #include "SensorDefinitions.h"
 #include "StateList.h"
 
+// Abort Pin
+const int abortPin{29}; // set this high to reboot teensy into the abort state
+
+// Reset Pin
+const int resetPin{28};  // pin that drives the reset pin
+
 // Can Set Up
 int busSpeed = 500000; //baudrate
 
@@ -53,12 +59,28 @@ bool input_enable[25] = {false, false, false, false, false, false, true, false, 
 Adafruit_MCP9808 tempSensor = Adafruit_MCP9808();
 
 // -------------------------------------------------------------
+// abort reset function
+void abortReset()
+{
+  cli();
+  EEPROM.update(stateAddress, static_cast<uint8_t>(State::abort)); // write abort code to the EEPROM to be read on restart
+  sei();
+  digitalWrite(resetPin, 0);                                       // set reset pin low to restart
+}
+
+// -------------------------------------------------------------
 
 void setup() 
 {
   // -----Start Serial-----
   Serial.begin(115200);
   delay(5000);
+
+  // ----- Abort Pin Setup -----
+  pinMode(resetPin, OUTPUT);
+  digitalWrite(resetPin, 1);
+  pinMode(abortPin, INPUT_PULLDOWN);
+  attachInterrupt(digitalPinToInterrupt(abortPin), abortReset, RISING); 
 
   // -----Read Last State off eeprom and update -----
   currentState = static_cast<State>(EEPROM.read(stateAddress));
@@ -167,7 +189,9 @@ void loop()
   valveTasks(valveArray);
 
   // -----Update State on EEPROM -----
+  cli(); // disables interrupts to protect write command
   EEPROM.update(stateAddress, static_cast<uint8_t>(currentState)); // Never use .write()
+  sei(); // reenables interrupts after write is completed
 
 
   // -----Peform sensor reads and write to CAN-----
