@@ -17,12 +17,8 @@
 #include "SensorClass.h"
 #include "SensorDefinitions.h"
 #include "StateList.h"
+#include "pinList.h"
 
-// Abort Pin
-const int abortPin{29}; // set this high to reboot teensy into the abort state
-
-// Reset Pin
-const int resetPin{28};  // pin that drives the reset pin
 
 // Can Set Up
 int busSpeed = 500000; //baudrate
@@ -47,6 +43,7 @@ SDClass builtInSD;
 // ADC Setup
 // Make the ADC OBJECT here
 ADC* adc = new ADC();
+// ----------------------------- not sure if below section in necessary, copied from Dan ---------------------------------------------------
 #define PINS 23 //was default 25 but skipping two pins for I2C bus use?
 #define PINS_DIFF 2
 uint8_t adc_pins[] = {A0, A1, A2, A3, A6, A7, A8, A9, A10,
@@ -54,6 +51,7 @@ uint8_t adc_pins[] = {A0, A1, A2, A3, A6, A7, A8, A9, A10,
 uint8_t adc_pins_diff[] = {A10, A11};
 
 bool input_enable[25] = {false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 // Temp Sensor
 Adafruit_MCP9808 tempSensor = Adafruit_MCP9808();
@@ -65,7 +63,7 @@ void abortReset()
   cli();
   EEPROM.update(stateAddress, static_cast<uint8_t>(State::abort)); // write abort code to the EEPROM to be read on restart
   sei();
-  digitalWrite(resetPin, 0);                                       // set reset pin low to restart
+  digitalWrite(pin::reset, 0);                                       // set reset pin low to restart
 }
 
 // -------------------------------------------------------------
@@ -77,10 +75,10 @@ void setup()
   delay(5000);
 
   // ----- Abort Pin Setup -----
-  pinMode(resetPin, OUTPUT);
-  digitalWrite(resetPin, 1);
-  pinMode(abortPin, INPUT_PULLDOWN);
-  attachInterrupt(digitalPinToInterrupt(abortPin), abortReset, RISING); 
+  pinMode(pin::reset, OUTPUT);
+  digitalWrite(pin::reset, 1);
+  pinMode(pin::abort, INPUT_PULLDOWN);
+  attachInterrupt(digitalPinToInterrupt(pin::abort), abortReset, RISING); 
 
   // -----Read Last State off eeprom and update -----
   currentState = static_cast<State>(EEPROM.read(stateAddress));
