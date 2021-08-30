@@ -26,13 +26,13 @@ class Valve
         const uint32_t fireDelay;                   // Time to wait until actuation after fire command given, in MICROS
         ValveState state;                           // Tracks the valve state
         elapsedMicros timer;                        // timer for the valve, used for changing duty cycles, in MICROS
-        const uint8_t fullDuty{255};               // full duty cycle for servo initial actuation
-        const uint8_t holdDuty{50};               // partial duty cycle to hold valve in actuated state
+        const uint8_t fullDuty{255};                // full duty cycle for servo initial actuation
+        const uint8_t holdDuty{};                   // partial duty cycle to hold valve in actuated state
         
         
     public:
     // constructor, define the valve ID here, and the pin that controls the valve, setFireDelay is only parameter that can be left blank
-        Valve(int setValveID, ValveType setValveType, int setPin, uint32_t setFullDutyTime, uint32_t setFireDelay, u_int8_t setHoldDuty); 
+        Valve(int setValveID, ValveType setValveType, int setPin, uint32_t setFullDutyTime, uint32_t setFireDelay = 0 , u_int8_t setHoldDuty = 50); 
 
     // a start up method, to set pins from within setup()
         void begin();
