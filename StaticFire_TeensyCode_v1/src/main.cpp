@@ -80,6 +80,11 @@ void setup()
   pinMode(pin::abort, INPUT_PULLDOWN);
   attachInterrupt(digitalPinToInterrupt(pin::abort), abortReset, RISING); 
 
+  // ----- Safety Pin Setup -----
+  pinMode(pin::isoSafe, OUTPUT);
+  pinMode(pin::fuelVentSafe, OUTPUT);
+  pinMode(pin::loxVentSafe, OUTPUT);
+
   // -----Read Last State off eeprom and update -----
   currentState = static_cast<State>(EEPROM.read(stateAddress));
 
