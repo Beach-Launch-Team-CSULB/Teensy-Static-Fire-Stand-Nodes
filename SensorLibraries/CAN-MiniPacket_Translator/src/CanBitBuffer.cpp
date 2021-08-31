@@ -202,15 +202,20 @@ uint32_t CanBitBuffer::readBits(uint8_t bitWidth)
     }
     return toReturn;
 }
-
+void CanBitBuffer::init()
+{
+    usedBits =0;
+}
 //TODO testing
 CanBitBuffer::CanBitBuffer()
 {
-    usedBits = 0;
+    init();
+    //msg.ext=1;
 }
 //TODO testing
-CanBitBuffer::CanBitBuffer(CAN_message_t incomingCAN_Frame) : CanBitBuffer()
+CanBitBuffer::CanBitBuffer(CAN_message_t incomingCAN_Frame)
 {
+    init();
     msg = incomingCAN_Frame;
 }
 

@@ -14,13 +14,14 @@
 class CanBitBuffer
 {
 public:
+    void init();
     CanBitBuffer();
     CanBitBuffer(CAN_message_t msg);
 
     void writeBits(uint32_t data, uint8_t dataWidth);
     uint32_t readBits(uint8_t bitWidth);
 
-    uint8_t getFreeBits(); //returns free space in bits
+    uint8_t getFreeBits();      //returns free space in bits
     bool canFit(uint8_t nBits); //returns true if it can fit nBits more bits. Should be private
 
     CAN_message_t getCanMessage(); //testing REMOVE THIS. Returns the private CAN message this class encodes

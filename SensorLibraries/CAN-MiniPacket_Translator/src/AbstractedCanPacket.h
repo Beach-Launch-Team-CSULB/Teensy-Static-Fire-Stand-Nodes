@@ -100,10 +100,11 @@ public:
 
 //compiler pre-processing to figure out how big out array needs to be, in order to avoid dynamic allocation
 #define overheadBits (priorityID_Length + priorityDataLength + nodeID_ID_Length + nodeID_DataLength)
-#define maxBufferSize 29 + (8 * 8)
-#define maxWeCouldStore (maxBufferSize / smallestMiniPacketSize)
+#define maxPossibleBufferSize 29 + (8 * 8)
+#define maxWeCouldStore (maxPossibleBufferSize / smallestMiniPacketSize)
     MiniPacket packetBuffer[maxWeCouldStore]; //our array
 
+    uint8_t getMaxBufferSize();
     //private helper methods MiniPacket -> CanPacket
 
     //returns either the ID field in the CAN_message_t or the byte address in the 8 byte buffer

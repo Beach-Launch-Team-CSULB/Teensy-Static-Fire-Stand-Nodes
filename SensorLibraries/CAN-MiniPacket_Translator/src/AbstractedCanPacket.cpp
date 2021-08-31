@@ -16,14 +16,14 @@ void AbstractedCanPacket::init()
     nodeID.setDataLength(nodeID_DataLength);
 
     packetBufferSize = 0; //is this an unnecessary assignment in C++? YES
-    lowLevelUsedBits =0;
     highLevelUsedBits = 0;
 
-
-    setExtendedID(true); //default to extendedID format
 }
 AbstractedCanPacket::AbstractedCanPacket()
 {
+    Serial << "Constructor AbstractedCanPacket\n";
+    setExtendedID(true); //default to extendedID format
+
     init();
 }
 
@@ -53,20 +53,21 @@ uint32_t AbstractedCanPacket::getNodeID()
     return nodeID.getID();
 }
 
+uint8_t AbstractedCanPacket::getMaxBufferSize()
+{
+    return msgReplacement.getMaxBufferSize();
+}
 /*
 returns the total number of additional bits which can be written to this AbstractedCanPacket.
 High level bits are not for Priority or nodeID, so subtract overheadBits.
 */
 uint8_t AbstractedCanPacket::getFreeBitsHighLevel()
 {
-    return maxBufferSize - overheadBits - highLevelUsedBits;
+    return getMaxBufferSize() - overheadBits - highLevelUsedBits;
 }
-/*
-returns the total number of additional bits which can be written to this AbstractedCanPacket.
-*/
 uint8_t AbstractedCanPacket::getFreeBitsLowLevel()
 {
-    return maxBufferSize - lowLevelUsedBits;
+    return msgReplacement.getFreeBits();
 }
 //returns true if it can fit nBits more bits
 bool AbstractedCanPacket::canFitHighLevel(uint8_t nBits)
@@ -81,20 +82,6 @@ bool AbstractedCanPacket::canFitHighLevel(uint8_t nBits)
         return false;
     }
 }
-//returns true if it can fit nBits more bits
-bool AbstractedCanPacket::canFitLowLevel(uint8_t nBits)
-{
-
-    if (getFreeBitsLowLevel() - nBits >= 0)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
 /*
 returns true if this AbstractedCanPacket can fit nextPacket, false otherwise. 
 */
@@ -129,7 +116,7 @@ bool AbstractedCanPacket::canFitLowLevel(MiniPacket nextPacket, bool errorChecki
             return false; //should fail hard rather than soft.
         }
     }
-    return canFitLowLevel(nextPacket.getSize());
+    return msgReplacement.canFit(nextPacket.getSize());
 }
 
 /*
@@ -186,8 +173,8 @@ MiniPacket AbstractedCanPacket::read(uint8_t ID_Length)
     toReturn.setID_Length(ID_Length);
     toReturn.setID(msgReplacement.readBits(ID_Length));
 
-    if(toReturn.getID() == 0)//null id ie nothing here
-        return toReturn;//make sure to test before adding a null MiniPacket
+    if (toReturn.getID() == 0) //null id i.e. nothing here
+        return toReturn;       //make sure to test before adding a null MiniPacket
 
     uint8_t dataLength = packetIdToDataLength(getNodeID(), toReturn.getID());
     toReturn.setDataLength(dataLength);
@@ -213,33 +200,14 @@ uint8_t AbstractedCanPacket::getBufferSize()
 
 void AbstractedCanPacket::setExtendedID(bool extendedID)
 {
-    msg.ext = extendedID;
+    msgReplacement.setExtendedID(extendedID);
 }
 bool AbstractedCanPacket::getExtendedID()
 {
-    return msg.ext;
+    return msgReplacement.getExtendedID();
 }
 //private send helper methods
 
-//returns -1 if msg.id is current buffer, else returns index for msg.buf[index]
-int8_t AbstractedCanPacket::getLowLevelBufferIndex()
-{
-    uint8_t tempUsedBits = lowLevelUsedBits;
-    //Serial << "in getLowLevelBufferIndex: \n";
-    //Serial << "lowLevelUsedBits: " << lowLevelUsedBits << endl;
-    uint8_t idSize;
-    if (getExtendedID() == true) //idSize is 29 bits
-        idSize = 29;
-    else //idSize is 11 bits
-        idSize = 11;
-
-    if (tempUsedBits < idSize)
-        return -1;
-    else
-        tempUsedBits -= idSize;
-
-    return tempUsedBits / 8;
-}
 /*
 returns the size of the low-level data unit we're writing to. 
 This can be 29, 11, or 8.
@@ -256,73 +224,6 @@ uint8_t AbstractedCanPacket::getLowLevelBufferSize()
         return idSize;
     else
         return 8;
-}
-/*
-returns the index of leftmost free bit, 
-which is also the size of the free space of the current 
-buffer we are writing to (id or buf[i])
-*/
-uint8_t AbstractedCanPacket::getLowLevelBufferFreeSpace()
-{
-
-    uint8_t tempUsedBits = lowLevelUsedBits;
-    uint8_t idSize;
-    if (getExtendedID() == true) //idSize is 29 bits
-        idSize = 29;
-    else //idSize is 11 bits
-        idSize = 11;
-
-    if (tempUsedBits < idSize)
-        return idSize - tempUsedBits;
-    else
-        tempUsedBits -= idSize;
-
-    return 8 - (tempUsedBits % 8); //usedBits % 8 is used space, 8 - that is free space
-}
-/*
-Returns the leftmost index which data of bitWidth size can be written to without overwriting data on the left. 
-*/
-uint8_t AbstractedCanPacket::getLowLevelBitBoundaryIndex(uint8_t bitWidth)
-{
-    return getLowLevelBufferFreeSpace() - bitWidth;
-}
-void AbstractedCanPacket::setLowLevelBufferBitsHelper(uint32_t data, uint8_t dataWidth, uint8_t dataOffset)
-{
-    config compression = {dataWidth, dataOffset}; //take relevant bits our of data
-
-    uint8_t destinationOffset = getLowLevelBitBoundaryIndex(dataWidth); //find leftmost index which will contain data (pack from left to right)
-    config extraction = {dataWidth, destinationOffset};                 //mapping for where our relevant bits go
-
-    BitChopper bitChopper;
-
-    //maps relevant bits in input to the right offset for the output
-    uint32_t selectedData = bitChopper.compress(compression, data);
-    uint32_t dataToWrite = bitChopper.extract(extraction, selectedData);
-
-    int8_t index = getLowLevelBufferIndex(); //figure out which part of msg to write to
-    if (index == -1)                         //write to id
-        msg.id = msg.id | dataToWrite;
-    else //write to buf
-    {
-        msg.buf[index] = msg.buf[index] | (uint8_t)dataToWrite;
-    }
-
-    lowLevelUsedBits += dataWidth; //update to indicate we wrote to CAN buffer
-
-    //must be done after updating usedBits to ensure index is consistent
-    msg.len = getLowLevelBufferIndex() + 1; //update length to make sure the message sends properly
-}
-void AbstractedCanPacket::setLowLevelBufferBits(uint32_t data, uint8_t dataWidth)
-{
-    while (dataWidth > 0)
-    {
-        //you can only write as many bits the smaller of the current buffer free space and our input dataWidth
-        uint8_t dataWidthHelper = min(getLowLevelBufferFreeSpace(), dataWidth);
-        //start writing from the MSB to LSB, ie write left side first. Simplifies to 0 if we can write dataWidth bits
-        uint8_t dataOffset = dataWidth - dataWidthHelper;
-        setLowLevelBufferBitsHelper(data, dataWidthHelper, dataOffset);
-        dataWidth -= dataWidthHelper;
-    }
 }
 
 /*
@@ -341,7 +242,7 @@ bool AbstractedCanPacket::lowLevelAdd(MiniPacket nextPacket, bool errorChecking)
 
     Serial.print("ERROR\n\nAborted Packet: ");
     nextPacket.print();
-    Serial << "Free bits low level: " << getFreeBitsLowLevel() << endl;
+    Serial << "Free bits low level: " << msgReplacement.getFreeBits() << endl;
 
     Serial.println();
     return false;
@@ -361,103 +262,60 @@ bool AbstractedCanPacket::highLevelAdd(MiniPacket nextPacket)
     return false; //not enough space
 }
 
-//how many bits to pull from CAN bit buffer, offset is how those bits should be shifted before returned
-uint32_t AbstractedCanPacket::readLowLevelBitsHelper(uint8_t bitWidth, uint8_t offset)
-{
-    int8_t bufferIndex = getLowLevelBufferIndex();
-    //Serial << "readLowLevelBitsHelper: \n";
-    //Serial.print("bufferIndex: ");
-    //Serial.println(bufferIndex);
-    uint8_t bitIndex = getLowLevelBitBoundaryIndex(bitWidth);
-    config compression = {bitWidth, bitIndex};
-    config extraction = {bitWidth, offset};
-
-    BitChopper bitChopper;
-
-    uint32_t data;
-    if (bufferIndex < 0)
-    {
-        data = msg.id;
-    }
-    else
-    {
-        data = msg.buf[bufferIndex];
-    }
-
-    //maps relevant bits in input to the right offset for the output
-    uint32_t selectedData = bitChopper.compress(compression, data);
-    uint32_t dataToWrite = bitChopper.extract(extraction, selectedData);
-
-    lowLevelUsedBits += bitWidth;
-    return dataToWrite;
-}
-uint32_t AbstractedCanPacket::readLowLevelBits(uint8_t bitWidth)
-{
-    uint32_t toReturn = 0;
-    while (bitWidth > 0)
-    {
-        //you can only write as many bits the smaller of the current buffer free space and our input dataWidth
-        uint8_t dataWidthHelper = min(getLowLevelBufferFreeSpace(), bitWidth);
-        //start writing from the MSB to LSB, ie write left side first. Simplifies to 0 if we can write dataWidth bits
-        uint8_t dataOffset = bitWidth - dataWidthHelper;
-        toReturn = toReturn | readLowLevelBitsHelper(dataWidthHelper, dataOffset);
-        bitWidth -= dataWidthHelper;
-    }
-    return toReturn;
-}
-
 //TODO testing
 AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t incomingCAN_Frame) : msgReplacement(incomingCAN_Frame)
 {
     init();
-    msg = incomingCAN_Frame;
+    Serial << "msgReplacement CAN Frame:\n";
+    msgReplacement.printCanMessage();
+    Serial << endl;    
+    Serial << "msgReplacement extID: " << msgReplacement.getExtendedID() << endl;
+
     //Serial << "low level read in Constructor: \n";
     //Serial << "lowLevelUsedBits: " << lowLevelUsedBits;
 
-    
-    //printCanMessage(); 
+    //printCanMessage();
     //Serial << "\nreceived CAN Frame ";
     //Serial << endl;
     priority = read(priorityID_Length, priorityDataLength);
     nodeID = read(nodeID_ID_Length, nodeID_DataLength);
+    /*
     Serial.print("\nhere\nPriority: ");
     priority.print();
     Serial.print("NodeID: ");
     nodeID.print();
     Serial.println();
-
-    Serial <<"canFitLowLevel :" << canFitLowLevel(idLength) << endl;
+    //*/
+    //Serial <<"canFitLowLevel :" << canFitLowLevel(idLength) << endl;
     int counter = 0;
-    while (canFitLowLevel(idLength))
+    while (msgReplacement.canFit(idLength))
     {
         MiniPacket next = read(idLength);
+        /*
         next.print();
         Serial.println();
-        if (next.getID() != 0)//if next_ID != nullID
+        //*/
+        if (next.getID() != 0) //if next_ID != nullID
             highLevelAdd(next);
-        counter++;
-        while (counter > 11)
-        {
-            //Serial << "here";
-            delay(1000);
-        }
-        Serial << "maxBufferSize: " << maxBufferSize << endl;
-        Serial << "usedBitsLowLevel: " << lowLevelUsedBits << endl;
-        Serial << "getFreeBitsLowLevel: " << getFreeBitsLowLevel() << endl << endl;
+        
+        
+        //Serial << "maxBufferSize: " << maxBufferSize << endl;
+        //Serial << "usedBitsLowLevel: " << lowLevelUsedBits << endl;
+        //Serial << "getFreeBitsLowLevel: " << getFreeBitsLowLevel() << endl << endl;
     }
 }
 
 void AbstractedCanPacket::reset()
 {
-    lowLevelUsedBits = 0;
+    //lowLevelUsedBits = 0;
     highLevelUsedBits = 0;
     packetBufferSize = 0;
 }
 void AbstractedCanPacket::writeToCAN()
 {
     //Serial << "START WRITE TO CAN\n\n";
-    lowLevelUsedBits = 0; //reset so we can rewrite data.
-
+    //lowLevelUsedBits = 0; //reset so we can rewrite data.
+    msgReplacement.reset();
     lowLevelAdd(priority, false); //false means no error checking
     //Serial << "added Priority" << endl;
     //Serial << "Priority size: " << priority.getSize() << endl;
@@ -484,39 +342,21 @@ void AbstractedCanPacket::writeToCAN()
 //will be deleted, for testing only.
 CAN_message_t AbstractedCanPacket::getCanMessage()
 {
-    return msg;
+    return msgReplacement.getCanMessage();
 }
 
 //useful for testing and debug
 void printBits(int data, int size)
 {
-  for (int i = size - 1; i >= 0; i--)
-  {
-    Serial.print(bitRead(data, i));
-    if (i % 4 == 0)
-      Serial.print("");
-  }
-  Serial.print("-");
+    for (int i = size - 1; i >= 0; i--)
+    {
+        Serial.print(bitRead(data, i));
+        if (i % 4 == 0)
+            Serial.print("");
+    }
+    Serial.print("-");
 }
 void AbstractedCanPacket::printCanMessage()
 {
-  uint8_t idSize;
-  if (msg.ext)
-  {
-    idSize = 29;
-  }
-  else
-  {
-    idSize = 11;
-  }
-  printBits(msg.id, idSize);
-  for (int i = 0; i < msg.len; i++)
-  {
-    printBits(msg.buf[i], 8);
-  }
-}
-//Can_send proxy TODO testing
-bool AbstractedCanPacket::send()
-{
-    return false;
+    msgReplacement.printCanMessage();
 }
