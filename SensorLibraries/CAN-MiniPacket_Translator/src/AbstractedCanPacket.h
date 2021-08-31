@@ -23,10 +23,10 @@
 //IMPORTANT CONFIG #DEFINES
 
 #include <Arduino.h>
-//#include <Vector.h>
 #include <FlexCAN.h>
 #include "MiniPacket.h"
 #include "BitChopper.h"
+#include "CanBitBuffer.h"
 
 #ifndef AbstractedCanPacker_H
 #define AbstractedCanPacker_H
@@ -35,6 +35,7 @@ class AbstractedCanPacket
 {
 public:
     AbstractedCanPacket();
+    void init();
 
     //CAN frame config
     void setExtendedID(bool extID);
@@ -66,6 +67,7 @@ public:
 
 //private:
     CAN_message_t msg; //underlying data structure this class abstracts
+    CanBitBuffer msgReplacement;
 
     //uint8_t maxBufferSize; //maximum possible size of abstracted bit buffer TESTING
 

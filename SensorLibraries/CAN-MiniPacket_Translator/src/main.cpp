@@ -33,30 +33,30 @@ void loop()
   mask = mask << 1;
 
   Serial << "Begin CanBitBufferTest \nWrite:\n";
-  while(canBitBufferTest.canFitLowLevel(5))
+  while(canBitBufferTest.canFit(5))
   {
-    canBitBufferTest.setLowLevelBufferBits(mask, 5);
+    canBitBufferTest.writeBits(mask, 5);
     //delay(500);
     canBitBufferTest.printCanMessage();    
-    Serial << "\nfreeBits: " << canBitBufferTest.getFreeBitsLowLevel() << endl;
+    Serial << "\nfreeBits: " << canBitBufferTest.getFreeBits() << endl;
 
     Serial << endl << endl;
   }
   Serial << "canBitBuffer Read:\n";
 
   canBitBufferTest.reset();
-  while(canBitBufferTest.canFitLowLevel(5))
+  while(canBitBufferTest.canFit(5))
   {
-    uint32_t tempData = canBitBufferTest.readLowLevelBits(5);
+    uint32_t tempData = canBitBufferTest.readBits(5);
     delay(500);
     printBits2(tempData,5);
-    //Serial << "\nfreeBits: " << canBitBufferTest.getFreeBitsLowLevel() << endl;
+    //Serial << "\nfreeBits: " << canBitBufferTest.getFreeBits() << endl;
 
     //Serial << endl << endl;
   }
 
 
-  Serial << "End BitBufferTest\n\n";
+  Serial << "\nEnd BitBufferTest\n\n";
 
 
   /////////////////////////////////////////////

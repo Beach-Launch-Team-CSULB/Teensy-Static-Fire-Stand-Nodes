@@ -1,9 +1,9 @@
 #include "AbstractedCanPacket.h"
 #include <Streaming.h> //testing
 
-
-AbstractedCanPacket::AbstractedCanPacket()
+void AbstractedCanPacket::init()
 {
+
     //testing Maybe use #define for this??
     //ID_Length = 5; //TESTING! Configure for implementation specific address size
 
@@ -15,12 +15,16 @@ AbstractedCanPacket::AbstractedCanPacket()
     nodeID.setID_Length(nodeID_ID_Length);
     nodeID.setDataLength(nodeID_DataLength);
 
-    packetBufferSize = 0; //is this an unnecessary assignment in C++?
+    packetBufferSize = 0; //is this an unnecessary assignment in C++? YES
     lowLevelUsedBits =0;
     highLevelUsedBits = 0;
 
 
     setExtendedID(true); //default to extendedID format
+}
+AbstractedCanPacket::AbstractedCanPacket()
+{
+    init();
 }
 
 //returns false if newPriority is too large for MiniPacket priority buffer, otherwise sets priority
@@ -142,8 +146,8 @@ bool AbstractedCanPacket::add(MiniPacket nextPacket)
 MiniPacket AbstractedCanPacket::read(uint8_t ID_Length, uint8_t dataLength)
 {
     //important to read ID then Data
-    uint32_t ID = readLowLevelBits(ID_Length);
-    uint32_t data = readLowLevelBits(dataLength);
+    uint32_t ID = msgReplacement.readBits(ID_Length);
+    uint32_t data = msgReplacement.readBits(dataLength);
     //Serial << "IN READ: ID: " << ID << "Data: " << data << endl;
     MiniPacket toReturn;
 
@@ -180,14 +184,14 @@ MiniPacket AbstractedCanPacket::read(uint8_t ID_Length)
 {
     MiniPacket toReturn;
     toReturn.setID_Length(ID_Length);
-    toReturn.setID(readLowLevelBits(ID_Length));
+    toReturn.setID(msgReplacement.readBits(ID_Length));
 
     if(toReturn.getID() == 0)//null id ie nothing here
         return toReturn;//make sure to test before adding a null MiniPacket
 
     uint8_t dataLength = packetIdToDataLength(getNodeID(), toReturn.getID());
     toReturn.setDataLength(dataLength);
-    toReturn.setData(readLowLevelBits(dataLength));
+    toReturn.setData(msgReplacement.readBits(dataLength));
 
     return toReturn;
 }
@@ -330,8 +334,8 @@ bool AbstractedCanPacket::lowLevelAdd(MiniPacket nextPacket, bool errorChecking)
 {
     if (canFitLowLevel(nextPacket, errorChecking))
     {
-        setLowLevelBufferBits(nextPacket.getID(), nextPacket.getID_Length());
-        setLowLevelBufferBits(nextPacket.getData(), nextPacket.getDataLength());
+        msgReplacement.writeBits(nextPacket.getID(), nextPacket.getID_Length());
+        msgReplacement.writeBits(nextPacket.getData(), nextPacket.getDataLength());
         return true;
     }
 
@@ -403,8 +407,9 @@ uint32_t AbstractedCanPacket::readLowLevelBits(uint8_t bitWidth)
 }
 
 //TODO testing
-AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t incomingCAN_Frame) : AbstractedCanPacket()
+AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t incomingCAN_Frame) : msgReplacement(incomingCAN_Frame)
 {
+    init();
     msg = incomingCAN_Frame;
     //Serial << "low level read in Constructor: \n";
     //Serial << "lowLevelUsedBits: " << lowLevelUsedBits;
