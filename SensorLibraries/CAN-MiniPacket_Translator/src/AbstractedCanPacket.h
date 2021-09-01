@@ -23,10 +23,10 @@
 //IMPORTANT CONFIG #DEFINES
 
 #include <Arduino.h>
-//#include <Vector.h>
 #include <FlexCAN.h>
 #include "MiniPacket.h"
 #include "BitChopper.h"
+#include "CanBitBuffer.h"
 
 #ifndef AbstractedCanPacker_H
 #define AbstractedCanPacker_H
@@ -35,25 +35,19 @@ class AbstractedCanPacket
 {
 public:
     AbstractedCanPacket();
+    void init();
 
     //CAN frame config
     void setExtendedID(bool extID);
     bool getExtendedID();
 
     //for converting MiniPackets to CAN_Frames
-    AbstractedCanPacket(uint8_t idLength);
     bool setMessagePriority(uint32_t priority);
     bool setNodeID(uint32_t ID);
-    uint8_t getFreeBitsHighLevel(); //returns free space in bits
-    uint8_t getFreeBitsLowLevel(); //returns free space in bits
-
-
-    bool canFitHighLevel(uint8_t nBits);         //returns true if it can fit nBits more bits. Should be private
-    bool canFitLowLevel(uint8_t nBits);         //returns true if it can fit nBits more bits. Should be private
-    bool canFitHighLevel(MiniPacket nextPacket); //returns true if it can fit the MiniPacket
-    bool canFitLowLevel(MiniPacket nextPacket, bool errorChecking = true); //returns true if it can fit the MiniPacket
+    uint8_t getFreeBits();              //returns free space in bits
+    bool canFit(MiniPacket nextPacket); //returns true if it can fit the MiniPacket
     bool add(MiniPacket next);          //returns true if add successful
-    bool send();                        //returns true if send successful, false otherwise
+    CAN_message_t getCanMessage();
 
     //for converting CAN Frames to MiniPackets
     AbstractedCanPacket(uint8_t idLength, CAN_message_t CAN_Message);
@@ -62,12 +56,26 @@ public:
     uint32_t getMessagePriority();
     uint32_t getNodeID();
 
-    void reset(); //resets can packet to be reused. However, old data is not deleted.
+    void reset(); //resets CAN packet to be reused. However, old data is not deleted.
+    void printCanMessage();//in binary format
 
-//private:
-    CAN_message_t msg; //underlying data structure this class abstracts
+    private:
+    //PRIVATE HELPER METHODS
+    //MiniPacket ->CAN Frame
+    bool canFit(uint8_t nBits);                                            //returns true if it can fit nBits more bits. Should be private
+    bool canFitLowLevel(uint8_t nBits);                                    //returns true if it can fit nBits more bits into the CanBitBuffer. Should be private
+    bool canFitLowLevel(MiniPacket nextPacket, bool errorChecking = true); //returns true if it can fit the MiniPacket
+    uint8_t getMaxBufferSize();
+    /*
+    public add function will update high level MiniPacket buffer, this function
+    will update the private CAN_message_t within it. Also, this method updates
+    usedBits.
+    */
+    bool addLowLevel(MiniPacket nextPacket, bool errorChecking = true);
+    void writeToCAN();
 
-    //uint8_t maxBufferSize; //maximum possible size of abstracted bit buffer TESTING
+    //private:
+    CanBitBuffer msg;
 
     /*
     usedBits is essentially the high-level index of where we are in the abstract bit buffer
@@ -82,8 +90,7 @@ public:
     of all the MiniPackets this AbstractedCanPacket contains.
     */
 
-    uint8_t highLevelUsedBits; //current size of the high-level bit buffer
-    uint8_t lowLevelUsedBits; //current size of the low level bit buffer
+    uint8_t usedBits; //current size of the high-level bit buffer
 
     //payload data
     MiniPacket priority; //info contained in data field
@@ -98,63 +105,14 @@ public:
 
 //compiler pre-processing to figure out how big out array needs to be, in order to avoid dynamic allocation
 #define overheadBits (priorityID_Length + priorityDataLength + nodeID_ID_Length + nodeID_DataLength)
-#define maxBufferSize 29 + (8 * 8)
-#define maxWeCouldStore (maxBufferSize / smallestMiniPacketSize)
+#define maxPossibleBufferSize 29 + (8 * 8)
+#define maxWeCouldStore (maxPossibleBufferSize / smallestMiniPacketSize)
     MiniPacket packetBuffer[maxWeCouldStore]; //our array
 
-    //private helper methods MiniPacket -> CanPacket
-
-    //returns either the ID field in the CAN_message_t or the byte address in the 8 byte buffer
-    int8_t getLowLevelBufferIndex();
-
-    //size of the current CAN_message_t buffer we're writing to. Can be 29, 11, or 8.
-    uint8_t getLowLevelBufferSize();
-
-    //This is the number of unused bits in our current low level buffer
-    uint8_t getLowLevelBufferFreeSpace(); //corresponds to index of leftmost free bit
-
-    uint8_t getLowLevelBitBoundaryIndex(uint8_t bitWidth);
-
-    /*
-    data is the data we're writing to the low level buffer.
-    dataWidth is how many bits data contains.
-    dataOffset is how far shifted left the relevant bits are
-    */
-    void setLowLevelBufferBitsHelper(uint32_t data, uint8_t dataWidth, uint8_t dataOffset); //atomic write
-
-    /*
-    This method writes to the CAN message as if it were a continuous bit-buffer.
-    In practice this means that it should be easy to write data to it, even if
-    that means writing some if the bits into the ID field, and other parts into
-    buf[someIndex].
-    data: contains what we're writing to the CAN message
-    dataWidth: tells method how many bits are relevant.
-    Store relevant bits starting at LSB moving to MSB for proper function.
-    */
-    void setLowLevelBufferBits(uint32_t data, uint8_t dataWidth);
-
-    /*
-    public add function will update high level MiniPacket buffer, this function
-    will update the private CAN_message_t within it. Also, this method updates
-    usedBits.
-    */
-    bool lowLevelAdd(MiniPacket nextPacket, bool errorChecking = true);
-    bool highLevelAdd(MiniPacket nextPacket);
-
     //private helper method CAN_message_t -> AbstractedCanPacket
-
-    //reads bitWidth bits from msg and returns them. Also increments usedBits.
-    uint32_t readLowLevelBitsHelper(uint8_t bitWidth, uint8_t offset);
-    uint32_t readLowLevelBits(uint8_t bitWidth);
-
     MiniPacket read(uint8_t ID_Length, uint8_t dataLength);
-    uint8_t packetIdToDataLength(uint8_t nodeID, uint8_t packetId); //function mapping for variable data lengths for minipacket
     MiniPacket read(uint8_t ID_Length);
-
-    void writeToCAN();
-
-    void printCanMessage();
-    CAN_message_t getCanMessage(); //testing REMOVE THIS. Returns the private CAN message this class encodes
+    uint8_t packetIdToDataLength(uint8_t nodeID, uint8_t packetId); //function mapping for variable data lengths for minipacket
 };
 
 #endif
