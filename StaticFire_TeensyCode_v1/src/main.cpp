@@ -18,11 +18,13 @@
 #include "SensorDefinitions.h"
 #include "StateList.h"
 #include "pinList.h"
+#include "ControlFunctions.h"
 
 
 // Can Set Up
 int busSpeed = 500000; //baudrate
 
+bool startup{true}; // is this the first loop?
 
 uint32_t loopCount {0};// for debugging
 
@@ -74,6 +76,8 @@ void setup()
   Serial.begin(115200);
   delay(5000);
 
+  startup = true;
+
   // ----- Abort Pin Setup -----
   pinMode(pin::reset, OUTPUT);
   digitalWrite(pin::reset, 1);
@@ -87,12 +91,8 @@ void setup()
 
   // -----Read Last State off eeprom and update -----
   currentState = static_cast<State>(EEPROM.read(stateAddress));
+  startupStateCheck(currentState, currentCommand);
 
-  // don't reboot into the fire state, switch to vent
-  if(currentState == State::fire)
-  {
-    currentState = State::vent;
-  }
 
   // -----Run Valve Setup-----
   valveSetUp(valveArray);
@@ -150,7 +150,7 @@ void setup()
   adc->adc1->setAveraging(4);                                             // set number of averages
   adc->adc1->setResolution(16);                                           // set bits of resolution
   adc->adc1->setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED_16BITS); // change the conversion speed
-  adc->adc1->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_HIGH_SPEED);        // change the sampling speed
+  adc->adc1->setSamplingSpeed(ADC_SAMPLING_SPEED::VERY_HIGH_SPEED);       // change the sampling speed
   //adc->adc1->recalibrate();
 
   delay(500);
@@ -178,18 +178,20 @@ else
 
 void loop() 
 {
-  // --- Step 1, Read CAN bus and update current command ---
-  if(CANread(Can0, currentCommand))
+  // --- Read CAN bus and update current command ---
+  if(CANread(Can0, currentCommand) && !startup) // do not execute on the first loop
   {
     Serial.print("Command Recieved: ");
     Serial.println(currentCommand);
   }
 
   // -----Process Commands Here-----
-
+  commandExecute(currentState, currentCommand, valveArray);
 
   // -----Advance needed valve tasks-----
   valveTasks(valveArray);
+
+
 
   // -----Update State on EEPROM -----
   cli(); // disables interrupts to protect write command
@@ -267,5 +269,5 @@ void loop()
   
 
 
-
+  startup = false;
 }
