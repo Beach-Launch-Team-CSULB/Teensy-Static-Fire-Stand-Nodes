@@ -98,7 +98,7 @@ void loop()
 		Serial << "You'd normally send the abstractedCanPacket here"; //but this line won't execute anyway
 	}
 
-	Serial << "\nAdding sensorData to abstractedCanPacket until full: " << endl;
+	Serial << "\nAdding filler MiniPackets to abstractedCanPacket until full: " << endl;
 	MiniPacket filler(idLength, dataLength);
 	filler.setID(1);   //remember zero ID is forbidden
 	filler.setData(0); //zero data is fine
@@ -118,13 +118,13 @@ void loop()
 	MiniPacket *packetArray = abstractCanPacket.getPacketBuffer();
 	for (int i = 0; i < abstractCanPacket.getBufferSize(); i++)
 	{
-		Serial << "packetArray[" << i << "]:";
+		Serial << "packetArray[" << i << "]: ";
 		packetArray[i].print();
 		Serial << endl;
 	}
 	Serial << endl;
 
-	Serial << "\nFree space in bits after Write: " << abstractCanPacket.getFreeBits() << endl;
+	Serial << "Free space in bits after Write: " << abstractCanPacket.getFreeBits() << endl << endl;
 	delay(500);
 
 	//////////////////////////////////////////Reading from CAN
@@ -135,7 +135,7 @@ void loop()
 	//Read our CAN Frame off the CAN Bus (still a sumulation)
 	//wow, we are now on the other node,
 	//and shallowCopy is there and what we read from the bus, look at that. Wasn't that nifty?
-	Serial << "We have teleported across space and time to another micro." << endl;
+	Serial << "We have teleported across space and time to another micro (wow, magic)" << endl;
 
 	Serial << "Building AbstractedCanPacket from CAN_message_t!" << endl;
 	AbstractedCanPacket incomingCanPacket(idLength, shallowCopy);
