@@ -3,240 +3,109 @@
 #include "AbstractedCanPacket.h"
 #include "CanBitBuffer.h"
 
-void waitHere()
-{
-  while (1)
-    delay(1000);
-}
-//useful for testing and debug
-void printBits2(int data, int size)
-{
-  for (int i = size - 1; i >= 0; i--)
-  {
-    Serial.print(bitRead(data, i));
-    if (i % 4 == 0)
-      Serial.print("");
-  }
-  Serial.print("-");
-}
-
-void printCanMessage(CAN_message_t msg)
-{
-  uint8_t idSize;
-  if (msg.ext)
-  {
-    idSize = 29;
-  }
-  else
-  {
-    idSize = 11;
-  }
-  printBits2(msg.id, idSize);
-  for (int i = 0; i < msg.len; i++)
-  {
-    printBits2(msg.buf[i], 8);
-  }
-}
 void setup()
 {
-  while (!Serial)
-  {
-    // wait for serial port to connect.
-  }
+    while (!Serial)
+    {
+        // wait for serial port to connect.
+    }
 }
-AbstractedCanPacket myCanPacket;
-CanBitBuffer canBitBufferTest;
+AbstractedCanPacket abstractCanPacket;
 
 void loop()
 {
+    Serial << "Setting the nodeID" << endl;
+    Serial << "max nodeID value is: " << ((1 << nodeID_ID_Length) -1); //2^ID_length -1
+    abstractCanPacket.setNodeID(0);
 
-  /*
-  /////////////////////////////////////////////
-  canBitBufferTest.setExtendedID(1);
-  uint32_t mask = (1 << 3) - 1; //build mask with resolution bits
-  mask = mask << 1;
+    MiniPacket sensorData;
 
-  Serial << "\nfreeBits: " << canBitBufferTest.getFreeBits() << endl;
-  Serial << "Begin CanBitBufferTest \nWrite:\n";
+    uint8_t idLength = 5; //5 bit ID field
+    sensorData.setID_Length(idLength);
 
-  while (canBitBufferTest.canFit(5))
-  {
-    canBitBufferTest.writeBits(mask, 5);
-    //delay(500);
-    canBitBufferTest.printCanMessage();
-    Serial << "\nfreeBits: " << canBitBufferTest.getFreeBits() << endl;
+    uint8_t dataLength = 12; //12 bit ADC read
+    sensorData.setDataLength(dataLength);
+
+    uint32_t largestID = (1 << idLength) - 1;
+    uint32_t largestData = (1 << dataLength) - 1;
+    Serial << "Largest ID: " << largestID << endl;
+    Serial << "Largest Data: " << largestData << endl;
+
+    Serial << "\nWriting too large a number to data now: " << largestData + 22 << endl;
+    //these statements should fail
+    if (sensorData.setData(largestData + 22) == true) //if our assignment is successful
+    {
+        Serial << "The data was set without issue" << endl;
+    }
+    else
+    {
+        Serial << "set data returned false and failed hard." << endl;
+    }
+
+    //forcing truncation in MiniPacket
+    uint32_t truncatedData = sensorData.truncate(largestData + 22, dataLength);
+    sensorData.setData(truncatedData);
 
     Serial << endl
-           << endl;
-  }
-  Serial << "canBitBuffer Read:\n";
-
-  canBitBufferTest.reset();
-  while (canBitBufferTest.canFit(5))
-  {
-    uint32_t tempData = canBitBufferTest.readBits(5);
-    delay(500);
-    printBits2(tempData, 5);
-    //Serial << "\nfreeBits: " << canBitBufferTest.getFreeBits() << endl;
-
-    //Serial << endl << endl;
-  }
-
-  Serial << "\nEnd BitBufferTest\n\n";
-  while (1)
-    delay(1000);
-  //*/
-
-  /////////////////////////////////////////////
-  /*/
-  //refer to AbstractedCanPacket.h to see how large nodeID and messagePriority can be
-  Serial << "setMessagePriority sucess: " << myCanPacket.setMessagePriority(7); //111
-  Serial << " message priority: " << myCanPacket.getMessagePriority() << endl;
-  Serial << "setNodeID success: " << myCanPacket.setNodeID(31); //11111
-  Serial << " nodeID: " << myCanPacket.getNodeID() << endl;
-  Serial << "free bits High Level: " << myCanPacket.getFreeBits() << endl;
-
-  myCanPacket.setExtendedID(true);
-
-  Serial << "free bits High Level: " << myCanPacket.getFreeBits() << endl;
-  //Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
-  Serial << "usedBits LowLevel: " << myCanPacket.msg.usedBits << endl;
-  Serial << "extID: " << myCanPacket.msg.msg.ext << endl;
-
-  MiniPacket a;
-  a.setDataLength(5);
-  a.setID_Length(4);
-  a.setData(0);
-  a.setID(1);
-  Serial << "a: ";
-  a.print();
-  Serial << endl
-         << "a size: " << a.getSize() << endl;
-
-  Serial << "canFit(a): " << myCanPacket.canFit(a) << endl;
-  delay(50);
-
-  Serial << "free bits High Level: " << myCanPacket.getFreeBits() << endl;
-  //Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
-  while (myCanPacket.canFit(a))
-  {
-    myCanPacket.add(a);
-    Serial << "highLevelFreeBits: " << myCanPacket.getFreeBits() << endl;
-    delay(50);
-
-    a.setData(a.getData() + 1);
-    a.setID((a.getID() +1));
-  }
-
-  MiniPacket *myBuffer = myCanPacket.getPacketBuffer();
-
-  for (int i = 0; i < myCanPacket.getBufferSize(); i++)
-  {
-    Serial << "myBuffer[" << i << "]: ";
-    myBuffer[i].print();
+           << "sensorData after truncation: ";
+    sensorData.print();
     Serial << endl;
-    delay(50);
-  }
-  Serial << "free bits High Level: " << myCanPacket.getFreeBits() << endl;
-  //Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
-  myCanPacket.writeToCAN();
-  Serial << "After write to can:" << endl;
-  Serial << "msg len: " << myCanPacket.msg.msg.len << endl;
-  myCanPacket.msg.printCanMessage();
-  Serial << endl;
 
-  // Serial << endl
-  //        << "free bits High Level: " << myCanPacket.getFreeBits() << endl;
-  //Serial << "free bits LowLevel: " << myCanPacket.getFreeBitsLowLevel() << endl;
-  //*/
-  ////////////////////////////////////////////
-  
-  /*/
-  Serial << "Begin CAN Frame -> AbstractedCanPacket TEST\nCopied CAN Frame:";
-  CAN_message_t shallowCopy = myCanPacket.getCanMessage();
-  printCanMessage(shallowCopy);
-  Serial << endl;
-      Serial << "shallowCopy extID: " << shallowCopy.ext << endl;
-
-
-  AbstractedCanPacket fromCanPacket(a.getID_Length(), shallowCopy);
-
-
-  Serial << "fromCan Message Priority: " << fromCanPacket.getMessagePriority() << endl;
-  Serial << "fromCan nodeID: " << fromCanPacket.getNodeID() << endl;
-
-
-  MiniPacket *fromCanBuffer = fromCanPacket.getPacketBuffer();
-
-  for (int i = 0; i < fromCanPacket.getBufferSize(); i++)
-  {
-    Serial << "myBuffer[" << i << "]: ";
-    fromCanBuffer[i].print();
+    Serial << "setID test: " << endl;
+    if (sensorData.setID(0)) //Zero is reserved NULL Address
+    {
+        Serial << "This shouldn't work\n";
+    }
+    else
+    {
+        Serial << "setting to 21 instead" << endl;
+        sensorData.setID(21);
+    }
+    Serial << "After setID: ";
+    sensorData.print();
     Serial << endl;
-    delay(100);
-  }
-  fromCanPacket.writeToCAN();
-  fromCanPacket.printCanMessage();
-//*/
-  /*
-  Serial << endl
-         << "a size: " << a.getSize() << endl;
-  Serial << "canFit(a): " << myCanPacket.canFit(a) << endl;
 
-  
-  uint32_t mask = (1 << 3) - 1; //build mask with resolution bits
-  mask = mask << 1;
-  Serial << "mask: ";
-  Serial.println(mask, BIN); ///01110
-  myCanPacket.setExtendedID(false);
-  //Serial << "get extended ID: " << myCanPacket.getExtendedID() << endl;
-  Serial << "bit boundary index: " << myCanPacket.getLowLevelBufferFreeSpace() << endl;
-*/
-  //myCanPacket.setLowLevelBufferBits(mask, 5);
+    Serial << "sensorData is now ready to send." << endl;
+    if (abstractCanPacket.canFit(sensorData))
+    {
+        abstractCanPacket.add(sensorData);
+        Serial << "Added sensorData to abstractCanPacket" << endl;
+    }
+    else //AbstractedCanPacket is full
+    {
+        Serial << "You'd normally send the abstractedCanPacket here";
+    }
 
-  //builds a = {010, 01110}
-  //uint32_t mask = (1 << 3) - 1; //build mask with resolution bits
-  //mask = mask << 1;
-  //b.setData(mask); //01110
-  //b.setID(10);     //01010
-  /*
-  mask = (1 << 1) - 1; //build mask with resolution bits
-  mask = mask << 1;
-  a.setID(mask); //010
-  Serial << "a: ";
-  a.print();
-  Serial << endl << endl;
-  */
+    Serial << "\nAdding sensorData to abstractedCanPacket until full: " << endl;
+    MiniPacket filler(idLength, dataLength);
+    filler.setID(1);   //remember zero ID is forbidden
+    filler.setData(0); //zero data is fine
 
-  /*
-  CAN_message_t shallowCopy = myCanPacket.getCanMessage();
+    while (abstractCanPacket.canFit(filler)) //add duplicates until full
+    {
+        abstractCanPacket.add(filler);
 
-  AbstractedCanPacket fromCanPacket(standardID_Length, shallowCopy);
+        //increment so we know written data is unique
+        filler.setData(filler.getData() + 1);
+        filler.setID(filler.getID() + 1);
+    }
 
-  Serial << "fromCan Message Priority: " << fromCanPacket.getMessagePriority();
-
-  MiniPacket *myBufferB = fromCanPacket.getPacketBuffer();
-
-  for (int i = 0; i < fromCanPacket.getBufferSize(); i++)
-  {
-    Serial << "myBuffer[" << i << "]: ";
-    myBufferB[i].print();
+    Serial << "after add loop, abstractedCanPacket contains: " << endl;
+    MiniPacket *packetArray = abstractCanPacket.getPacketBuffer();
+    for (int i = 0; i < abstractCanPacket.getBufferSize(); i++)
+    {
+        Serial << "packetArray[" << i << "]:";
+        packetArray[i].print();
+        Serial << endl;
+    }
     Serial << endl;
-    delay(100);
-  }
-  
-  printCanMessage(myCanPacket.getCanMessage());
-  Serial << "BitRead:" << endl;
-  delay(1500);
-  myCanPacket.reset();
-  uint8_t bitWidth = 12;
 
-  while (myCanPacket.canFit(bitWidth))
-  {
-    uint32_t data = myCanPacket.readLowLevelBits(bitWidth);
-    printBits(data,bitWidth);
-    delay(1500);
-  }
-  */
- waitHere();
+    Serial << "\nFree space in bits: " << abstractCanPacket.getFreeBits() << endl;
+
+    abstractCanPacket.setMessagePriority(7);
+
+    while (true)
+    {
+        delay(1000);
+    }
 }

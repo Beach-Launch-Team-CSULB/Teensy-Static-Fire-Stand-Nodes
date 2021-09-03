@@ -18,7 +18,7 @@
 
 #define smallestMiniPacketSize 5 //size of smallest possible MiniPacket to be sent
 
-#define standardID_Length 5 //this needs to be known beforehand for receiving CAN messages
+//#define standardID_Length 5 //this needs to be known beforehand for receiving CAN messages
 
 //IMPORTANT CONFIG #DEFINES
 
