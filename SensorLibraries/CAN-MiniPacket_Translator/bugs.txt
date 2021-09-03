@@ -1,15 +1,24 @@
 
+When setting the nodeID in AbstractCanPacket, a node ID of zero fails and spews an error message.
+This is because writing a zero to an ID field now is a fail condition, as zero is the
+reserved NULL ID. ALSO now, constructing a AbstractCanPacket from CAN_message_t prints 
+an error when during constuction, however, it build ostensibly fine. 
+Below Solution solves both problems
 
-Notes on separating this class into two classes. Ideally there would be a BitBuffer class,
-and an AbstractCanPacket class. 
+nodeID and Priority should not be bound by the same rules as a MiniPacket, so I might actually
+change their representation and instead of using them as MiniPacket, I might just represent
+them as uint32_t's and then read and write them directly to the buffer. 
 
-BitBuffer: Would handle all low level reads and writes to the CAN packet. Ideally, 
-this would only look at a CAN frame as a continuous buffer to be read from or written to.
+It doesn't really make sense to represent them as MiniPacket, because they only have one field
+and the other is just empty, confusing, and takes up space.
 
-AbstractCanPacket: Would contain the arrays of MiniPackets as well as Priority and nodeID.
-You can set the priority and nodeID, add MiniPackets, and sendCanMessage while writing,
-and while reading from CAN frame, can construct from CAN, get the priority and nodeID,
-and get the MiniPacket. 
+////////////////////////////////////////////////
 
 Setting and getting the extendedID shouldn't even be a thing, it should just figure that out
 before sending the CAN frame. 
+
+////////////////////////////////////////////////
+
+The CAN Frame returns a shallow copy. I can't forsee a use case where this could 
+be an issue, but I should probably make a CAN_message_t copy method just in case.
+Murphy's Law n.n

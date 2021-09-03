@@ -49,7 +49,7 @@ bool MiniPacket::setData(uint32_t data)
         Serial.println(" bits.");
         Serial.print("Data: \n");
         printBits(data, 32);
-        Serial.println("\nData compressed:");
+        Serial.println("\nData truncated:");
         printBits(data & mask, 32);
         Serial.print("\n\n");
         return false;
@@ -82,7 +82,7 @@ bool MiniPacket::setID(uint32_t ID)
         Serial.println(" bits.");
         Serial.print("ID: \n");
         printBits(data, 32);
-        Serial.println("\nID compressed:");
+        Serial.println("\nID truncated:");
         printBits(data & mask, 32);
         Serial.print("\n\n");
         return false;
