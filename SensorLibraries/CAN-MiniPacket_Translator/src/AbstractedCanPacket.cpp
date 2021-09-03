@@ -143,7 +143,7 @@ uint8_t AbstractedCanPacket::packetIdToDataLength(uint8_t nodeID, uint8_t packet
     {
         return 0;
     }
-    return 5;
+    return 12;
 }
 MiniPacket AbstractedCanPacket::read(uint8_t ID_Length)
 {
