@@ -17,13 +17,13 @@ void loop()
 	delay(50); //for some reason serial prints are getting cut off
 	//////////////////////////////////////////NodeID
 	Serial << "\n\nSetting the nodeID" << endl;
-	Serial << "max nodeID value is: " << ((1 << nodeID_ID_Length) - 1) << endl; //2^ID_length -1
+	Serial << "max nodeID value is: " << ((1 << nodeIDLength) - 1) << endl; //2^ID_length -1
 	abstractCanPacket.setNodeID(30);
 	Serial << "nodeID is now: " << abstractCanPacket.getNodeID() << endl;
 
 	//////////////////////////////////////////Priority
 	Serial << "Setting the Priority: " << endl;
-	Serial << "max Priority value is: " << ((1 << priorityDataLength) - 1) << endl; //2^ID_length -1
+	Serial << "max Priority value is: " << ((1 << priorityLength) - 1) << endl; //2^ID_length -1
 	abstractCanPacket.setMessagePriority(2);										//010
 	Serial << "Priority is now: " << abstractCanPacket.getMessagePriority() << endl;
 
@@ -86,7 +86,7 @@ void loop()
 
 	//////////////////////////////////////////Adding MiniPackets to AbstractedCanPacket
 	Serial << "sensorData is now ready to send." << endl;
-	Serial << "We have " << abstractCanPacket.getFreeBits() << " free bits before writing anything." << endl;
+	Serial << "We have " << abstractCanPacket.getFreeBits() << " free bits before writing anything (other than nodeID and priority)." << endl;
 
 	if (abstractCanPacket.canFit(sensorData))
 	{
@@ -103,10 +103,8 @@ void loop()
 	filler.setID(1);   //remember zero ID is forbidden
 	filler.setData(0); //zero data is fine
 
-	while (abstractCanPacket.canFit(filler)) //add duplicates until full
+	while (abstractCanPacket.add(filler)) //add duplicates until full
 	{
-		abstractCanPacket.add(filler);
-
 		//increment so we know written data is unique
 		filler.setData(filler.getData() + 1);
 		filler.setID(filler.getID() + 1);

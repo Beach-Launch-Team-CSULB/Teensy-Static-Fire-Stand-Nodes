@@ -10,11 +10,9 @@
 
 //IMPORTANT CONFIG #DEFINES, THIS IS ALL PEASANTS GET TO TOUCH IN HERE
 
-#define priorityID_Length 0
-#define priorityDataLength 3
+#define priorityLength 3
 
-#define nodeID_ID_Length 5
-#define nodeID_DataLength 0
+#define nodeIDLength 5
 
 #define smallestMiniPacketSize 5 //size of smallest possible MiniPacket to be sent
 
@@ -93,8 +91,8 @@ public:
     uint8_t usedBits; //current size of the high-level bit buffer
 
     //payload data
-    MiniPacket priority; //info contained in data field
-    MiniPacket nodeID;   //info contained in ID field
+    uint32_t priority; //info contained in data field
+    uint32_t nodeID;   //info contained in ID field
 
     /*
     This keeps track of the size of packetBuffer.
@@ -104,7 +102,7 @@ public:
     uint8_t packetBufferSize;
 
 //compiler pre-processing to figure out how big out array needs to be, in order to avoid dynamic allocation
-#define overheadBits (priorityID_Length + priorityDataLength + nodeID_ID_Length + nodeID_DataLength)
+#define overheadBits (priorityLength + nodeIDLength)
 #define maxPossibleBufferSize 29 + (8 * 8)
 #define maxWeCouldStore (maxPossibleBufferSize / smallestMiniPacketSize)
     MiniPacket packetBuffer[maxWeCouldStore]; //our array

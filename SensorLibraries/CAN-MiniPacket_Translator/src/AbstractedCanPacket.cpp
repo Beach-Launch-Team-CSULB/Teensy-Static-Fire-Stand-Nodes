@@ -4,11 +4,6 @@
 void AbstractedCanPacket::init()
 {
     //Configure priority and nodeID in header file
-    priority.setID_Length(priorityID_Length);
-    priority.setDataLength(priorityDataLength);
-
-    nodeID.setID_Length(nodeID_ID_Length);
-    nodeID.setDataLength(nodeID_DataLength);
 
     packetBufferSize = 0; 
     usedBits = 0;
@@ -23,18 +18,31 @@ AbstractedCanPacket::AbstractedCanPacket()
 //returns false if newPriority is too large for MiniPacket priority buffer, otherwise sets priority
 bool AbstractedCanPacket::setMessagePriority(uint32_t newPriority)
 {
-    return priority.setData(newPriority);
+    uint32_t maxPriorty = (1 << priorityLength) - 1;
+    if(newPriority>maxPriorty)
+    {
+        Serial << "ERROR, priorty can be set no larger than " << maxPriorty << " bits!" << endl;
+        return false;
+    }
+    priority = newPriority;
+
 }
 //returns the priority value of this AbstractedCanPacket
 uint32_t AbstractedCanPacket::getMessagePriority()
 {
-    return priority.getData();
+    return priority;
 }
 
 //returns false if newID is too large for MiniPacket ID buffer
 bool AbstractedCanPacket::setNodeID(uint32_t newID)
 {
-    return nodeID.setID(newID);
+    uint32_t maxNodeID = (1 << nodeIDLength) - 1;
+    if(newID>maxNodeID)
+    {
+        Serial << "ERROR, nodeID can be set no larger than " << maxNodeID << " bits!" << endl;
+        return false;
+    }
+    nodeID = newID;
 }
 
 /*
@@ -42,7 +50,7 @@ returns the ID of this AbstractedCanPacket.
 */
 uint32_t AbstractedCanPacket::getNodeID()
 {
-    return nodeID.getID();
+    return nodeID;
 }
 
 uint8_t AbstractedCanPacket::getMaxBufferSize()
@@ -217,8 +225,8 @@ AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t incomin
 {
     init();
 
-    priority = read(priorityID_Length, priorityDataLength);
-    nodeID = read(nodeID_ID_Length, nodeID_DataLength);
+    priority = msg.readBits(priorityLength);
+    nodeID = msg.readBits(nodeIDLength);
 
     while (msg.canFit(idLength))
     {
@@ -237,10 +245,10 @@ void AbstractedCanPacket::reset()
 void AbstractedCanPacket::writeToCAN()
 {
     msg.reset();
-    addLowLevel(priority, false); //false means no error checking
+    msg.writeBits(priority, priorityLength);
+    msg.writeBits(nodeID, nodeIDLength);
 
 
-    addLowLevel(nodeID, false);
 
     for (int i = 0; i < packetBufferSize; i++)
     {
