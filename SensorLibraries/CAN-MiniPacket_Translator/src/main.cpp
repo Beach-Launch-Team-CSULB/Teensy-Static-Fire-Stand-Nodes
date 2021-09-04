@@ -24,8 +24,8 @@ void loop()
 	//////////////////////////////////////////Priority
 	Serial << "Setting the Priority: " << endl;
 	Serial << "max Priority value is: " << ((1 << priorityLength) - 1) << endl; //2^ID_length -1
-	abstractCanPacket.setMessagePriority(2);										//010
-	Serial << "Priority is now: " << abstractCanPacket.getMessagePriority() << endl;
+	abstractCanPacket.setPriority(2);										//010
+	Serial << "Priority is now: " << abstractCanPacket.getPriority() << endl;
 
 	delay(500);
 	//////////////////////////////////////////Configuring MiniPackets
@@ -103,7 +103,7 @@ void loop()
 	filler.setID(1);   //remember zero ID is forbidden
 	filler.setData(0); //zero data is fine
 
-	while (abstractCanPacket.add(filler)) //add duplicates until full
+	while (abstractCanPacket.add(filler)) //add duplicates until full. Note add returns true if successful, false otherwise.
 	{
 		//increment so we know written data is unique
 		filler.setData(filler.getData() + 1);
@@ -139,7 +139,7 @@ void loop()
 	AbstractedCanPacket incomingCanPacket(idLength, shallowCopy);
 
 	Serial << "nodeID: " << incomingCanPacket.getNodeID();
-	Serial << ", Priority: " << incomingCanPacket.getMessagePriority() << endl;
+	Serial << ", Priority: " << incomingCanPacket.getPriority() << endl;
 
 	Serial << "\nReading incomingCanPacket MiniPackets:" << endl;
 	MiniPacket *incomingArray = incomingCanPacket.getPacketBuffer();
@@ -151,8 +151,14 @@ void loop()
 	}
 	Serial << endl;
 
-	while (true)
-	{
-		delay(1000);
-	}
+	/*
+	Rather than make a new AbstractCanPacket each time, simply reset them
+	so they can be reused without additional memory use. UNTESTED
+	*/
+	incomingCanPacket.reset();
+	abstractCanPacket.reset();
+
+	while(true)
+		delay(1000);//disable loop
+	
 }

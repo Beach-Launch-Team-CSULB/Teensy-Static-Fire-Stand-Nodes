@@ -1,13 +1,12 @@
 #include "AbstractedCanPacket.h"
-#include <Streaming.h> 
+#include <Streaming.h>
 
 void AbstractedCanPacket::init()
 {
     //Configure priority and nodeID in header file
 
-    packetBufferSize = 0; 
+    packetBufferSize = 0;
     usedBits = 0;
-
 }
 AbstractedCanPacket::AbstractedCanPacket()
 {
@@ -16,19 +15,19 @@ AbstractedCanPacket::AbstractedCanPacket()
 }
 
 //returns false if newPriority is too large for MiniPacket priority buffer, otherwise sets priority
-bool AbstractedCanPacket::setMessagePriority(uint32_t newPriority)
+bool AbstractedCanPacket::setPriority(uint32_t newPriority)
 {
     uint32_t maxPriorty = (1 << priorityLength) - 1;
-    if(newPriority>maxPriorty)
+    if (newPriority > maxPriorty)
     {
         Serial << "ERROR, priorty can be set no larger than " << maxPriorty << " bits!" << endl;
         return false;
     }
     priority = newPriority;
-
+    return true;
 }
 //returns the priority value of this AbstractedCanPacket
-uint32_t AbstractedCanPacket::getMessagePriority()
+uint32_t AbstractedCanPacket::getPriority()
 {
     return priority;
 }
@@ -37,12 +36,13 @@ uint32_t AbstractedCanPacket::getMessagePriority()
 bool AbstractedCanPacket::setNodeID(uint32_t newID)
 {
     uint32_t maxNodeID = (1 << nodeIDLength) - 1;
-    if(newID>maxNodeID)
+    if (newID > maxNodeID)
     {
         Serial << "ERROR, nodeID can be set no larger than " << maxNodeID << " bits!" << endl;
         return false;
     }
     nodeID = newID;
+    return true;
 }
 
 /*
@@ -97,24 +97,22 @@ bool AbstractedCanPacket::canFit(MiniPacket nextPacket)
 /*
 returns true if this AbstractedCanPacket can fit nextPacket, false otherwise. 
 */
-bool AbstractedCanPacket::canFitLowLevel(MiniPacket nextPacket, bool errorChecking)
+bool AbstractedCanPacket::canFitLowLevel(MiniPacket nextPacket)
 {
 
     //test for a malformed config file
     //should only skip error checking if adding a priority or nodeID MiniPacket
-    if (errorChecking)
+
+    if (nextPacket.getSize() < smallestMiniPacketSize)
     {
-        if (nextPacket.getSize() < smallestMiniPacketSize)
-        {
-            Serial.print("\n\nERROR, OVERFLOW POSSIBLE, ADJUST smallestMiniPacketSize to ");
-            Serial.print(nextPacket.getSize());
-            Serial.println(" in AbstractedCanPacket.h");
-            return false; //should fail hard rather than soft.
-        }
+        Serial.print("\n\nERROR, OVERFLOW POSSIBLE, ADJUST smallestMiniPacketSize to ");
+        Serial.print(nextPacket.getSize());
+        Serial.println(" in AbstractedCanPacket.h");
+        return false; //should fail hard rather than soft.
     }
+
     return msg.canFit(nextPacket.getSize());
 }
-
 
 //toRead must have ID_Length and dataLength set
 MiniPacket AbstractedCanPacket::read(uint8_t ID_Length, uint8_t dataLength)
@@ -195,16 +193,15 @@ bool AbstractedCanPacket::getExtendedID()
 //private send helper methods
 
 //This method adds a MiniPacket to
-bool AbstractedCanPacket::addLowLevel(MiniPacket nextPacket, bool errorChecking)
+bool AbstractedCanPacket::addLowLevel(MiniPacket nextPacket)
 {
-    if (canFitLowLevel(nextPacket, errorChecking))
+    if (canFitLowLevel(nextPacket))
     {
         msg.writeBits(nextPacket.getID(), nextPacket.getID_Length());
         msg.writeBits(nextPacket.getData(), nextPacket.getDataLength());
         return true;
-    } 
+    }
     return false;
-
 }
 
 bool AbstractedCanPacket::add(MiniPacket nextPacket)
@@ -236,19 +233,18 @@ AbstractedCanPacket::AbstractedCanPacket(uint8_t idLength, CAN_message_t incomin
             add(next);
     }
 }
-
+//testing, still untested!
 void AbstractedCanPacket::reset()
 {
     usedBits = 0;
     packetBufferSize = 0;
+    msg.reset();
 }
 void AbstractedCanPacket::writeToCAN()
 {
     msg.reset();
     msg.writeBits(priority, priorityLength);
     msg.writeBits(nodeID, nodeIDLength);
-
-
 
     for (int i = 0; i < packetBufferSize; i++)
     {
@@ -258,7 +254,7 @@ void AbstractedCanPacket::writeToCAN()
 
 CAN_message_t AbstractedCanPacket::getCanMessage()
 {
-    writeToCAN();//make sure to write to the low-level buffer before returning it.
+    writeToCAN(); //make sure to write to the low-level buffer before returning it.
     return msg.getCanMessage();
 }
 

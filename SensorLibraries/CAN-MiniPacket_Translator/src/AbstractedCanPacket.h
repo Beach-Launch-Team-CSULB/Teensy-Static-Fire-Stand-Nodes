@@ -40,7 +40,7 @@ public:
     bool getExtendedID();
 
     //for converting MiniPackets to CAN_Frames
-    bool setMessagePriority(uint32_t priority);
+    bool setPriority(uint32_t priority);
     bool setNodeID(uint32_t ID);
     uint8_t getFreeBits();              //returns free space in bits
     bool canFit(MiniPacket nextPacket); //returns true if it can fit the MiniPacket
@@ -51,7 +51,7 @@ public:
     AbstractedCanPacket(uint8_t idLength, CAN_message_t CAN_Message);
     MiniPacket *getPacketBuffer();
     uint8_t getBufferSize();
-    uint32_t getMessagePriority();
+    uint32_t getPriority();
     uint32_t getNodeID();
 
     void reset(); //resets CAN packet to be reused. However, old data is not deleted.
@@ -62,14 +62,14 @@ public:
     //MiniPacket ->CAN Frame
     bool canFit(uint8_t nBits);                                            //returns true if it can fit nBits more bits. Should be private
     bool canFitLowLevel(uint8_t nBits);                                    //returns true if it can fit nBits more bits into the CanBitBuffer. Should be private
-    bool canFitLowLevel(MiniPacket nextPacket, bool errorChecking = true); //returns true if it can fit the MiniPacket
+    bool canFitLowLevel(MiniPacket nextPacket); //returns true if it can fit the MiniPacket
     uint8_t getMaxBufferSize();
     /*
     public add function will update high level MiniPacket buffer, this function
     will update the private CAN_message_t within it. Also, this method updates
     usedBits.
     */
-    bool addLowLevel(MiniPacket nextPacket, bool errorChecking = true);
+    bool addLowLevel(MiniPacket nextPacket);
     void writeToCAN();
 
     //private:
