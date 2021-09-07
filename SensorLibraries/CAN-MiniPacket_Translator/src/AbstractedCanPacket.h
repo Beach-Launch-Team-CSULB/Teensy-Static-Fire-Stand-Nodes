@@ -12,7 +12,7 @@
 
 #define priorityLength 3
 
-#define nodeIDLength 5
+#define nodeIDLength 3
 
 #define smallestMiniPacketSize 5 //size of smallest possible MiniPacket to be sent
 
@@ -54,14 +54,14 @@ public:
     uint32_t getPriority();
     uint32_t getNodeID();
 
-    void reset(); //resets CAN packet to be reused. However, old data is not deleted.
-    void printCanMessage();//in binary format
+    void reset();           //resets CAN packet to be reused. However, old data is not deleted.
+    void printCanMessage(); //in binary format
 
-    private:
+private:
     //PRIVATE HELPER METHODS
     //MiniPacket ->CAN Frame
-    bool canFit(uint8_t nBits);                                            //returns true if it can fit nBits more bits. Should be private
-    bool canFitLowLevel(uint8_t nBits);                                    //returns true if it can fit nBits more bits into the CanBitBuffer. Should be private
+    bool canFit(uint8_t nBits);                 //returns true if it can fit nBits more bits. Should be private
+    bool canFitLowLevel(uint8_t nBits);         //returns true if it can fit nBits more bits into the CanBitBuffer. Should be private
     bool canFitLowLevel(MiniPacket nextPacket); //returns true if it can fit the MiniPacket
     uint8_t getMaxBufferSize();
     /*
@@ -75,6 +75,9 @@ public:
     //private:
     CanBitBuffer msg;
 
+    //payload data
+    uint32_t nodeID;   //info contained in ID field
+    uint32_t priority; //info contained in data field
     /*
     usedBits is essentially the high-level index of where we are in the abstract bit buffer
     Ie how many bits we've used out of the total number of bits we have considered continuously.
@@ -89,10 +92,6 @@ public:
     */
 
     uint8_t usedBits; //current size of the high-level bit buffer
-
-    //payload data
-    uint32_t priority; //info contained in data field
-    uint32_t nodeID;   //info contained in ID field
 
     /*
     This keeps track of the size of packetBuffer.

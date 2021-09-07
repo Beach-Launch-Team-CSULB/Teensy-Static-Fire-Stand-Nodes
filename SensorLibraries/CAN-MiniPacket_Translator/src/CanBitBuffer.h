@@ -3,7 +3,7 @@
     can be written to as if it were continuous, rather than an ID field and
     up to 8 separate bytes
 */
-
+// 29 + 8*8 bit 
 #include <Arduino.h>
 #include <FlexCAN.h>
 #include "BitChopper.h"

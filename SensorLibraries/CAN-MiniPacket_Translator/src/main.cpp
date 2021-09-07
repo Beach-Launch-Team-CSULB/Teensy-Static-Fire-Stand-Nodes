@@ -17,8 +17,9 @@ void loop()
 	delay(50); //for some reason serial prints are getting cut off
 	//////////////////////////////////////////NodeID
 	Serial << "\n\nSetting the nodeID" << endl;
-	Serial << "max nodeID value is: " << ((1 << nodeIDLength) - 1) << endl; //2^ID_length -1
-	abstractCanPacket.setNodeID(30);
+	uint8_t maxNodeID = ((1 << nodeIDLength) - 1);//2^ID_length -1
+	Serial << "max nodeID value is: " << maxNodeID << endl; //2^ID_length -1
+	abstractCanPacket.setNodeID(maxNodeID);
 	Serial << "nodeID is now: " << abstractCanPacket.getNodeID() << endl;
 
 	//////////////////////////////////////////Priority
