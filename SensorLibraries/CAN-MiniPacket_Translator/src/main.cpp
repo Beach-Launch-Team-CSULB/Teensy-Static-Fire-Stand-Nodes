@@ -17,7 +17,7 @@ void loop()
 	delay(50); //for some reason serial prints are getting cut off
 	//////////////////////////////////////////NodeID
 	Serial << "\n\nSetting the nodeID" << endl;
-	uint8_t maxNodeID = ((1 << nodeIDLength) - 1);//2^ID_length -1
+	uint8_t maxNodeID = ((1 << nodeIDLength) - 1);			//2^ID_length -1
 	Serial << "max nodeID value is: " << maxNodeID << endl; //2^ID_length -1
 	abstractCanPacket.setNodeID(maxNodeID);
 	Serial << "nodeID is now: " << abstractCanPacket.getNodeID() << endl;
@@ -25,7 +25,7 @@ void loop()
 	//////////////////////////////////////////Priority
 	Serial << "Setting the Priority: " << endl;
 	Serial << "max Priority value is: " << ((1 << priorityLength) - 1) << endl; //2^ID_length -1
-	abstractCanPacket.setPriority(2);										//010
+	abstractCanPacket.setPriority(2);											//010
 	Serial << "Priority is now: " << abstractCanPacket.getPriority() << endl;
 
 	delay(500);
@@ -123,7 +123,8 @@ void loop()
 	}
 	Serial << endl;
 
-	Serial << "Free space in bits after Write: " << abstractCanPacket.getFreeBits() << endl << endl;
+	Serial << "Free space in bits after Write: " << abstractCanPacket.getFreeBits() << endl
+		   << endl;
 	delay(500);
 
 	//////////////////////////////////////////Reading from CAN
@@ -159,7 +160,6 @@ void loop()
 	incomingCanPacket.reset();
 	abstractCanPacket.reset();
 
-	while(true)
-		delay(1000);//disable loop
-	
+	while (true)
+		delay(1000); //disable loop
 }
