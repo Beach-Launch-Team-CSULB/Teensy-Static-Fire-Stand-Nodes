@@ -1,4 +1,9 @@
 /*
+    Author Jacob Waters
+    fierywaters13@gmail.com
+    Designed for CSULB Beach Launch Team
+*/
+/*
     An abstracted CAN packet holds the priority of the CAN packet
     it represents, the Node ID, and an arbitrary number of
     MiniPackets.

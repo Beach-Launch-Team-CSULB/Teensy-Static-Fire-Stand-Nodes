@@ -1,4 +1,9 @@
 /*
+    Author Jacob Waters
+    fierywaters13@gmail.com
+    Designed for CSULB Beach Launch Team
+*/
+/*
     CanBitBuffer is is a tool that represents a CAN Packet as a bit buffer which
     can be written to as if it were continuous, rather than an ID field and
     up to 8 separate bytes

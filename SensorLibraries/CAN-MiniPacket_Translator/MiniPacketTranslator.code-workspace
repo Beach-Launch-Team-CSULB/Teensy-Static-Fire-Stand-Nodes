@@ -1,13 +1,8 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"files.associations": {
-			"utility": "cpp",
-			"type_traits": "cpp"
-		}
-	}
+    "folders": [
+        {
+            "name": "AbstractedCanPacket",
+            "path": "../AbstractedCanPacket"
+        }
+    ]
 }

@@ -1,3 +1,8 @@
+/*
+    Author Jacob Waters
+    fierywaters13@gmail.com
+    Designed for CSULB Beach Launch Team
+*/
 #ifndef MiniPacket_h
 #define MiniPacket_h
 #include <Arduino.h>

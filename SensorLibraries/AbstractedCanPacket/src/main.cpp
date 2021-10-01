@@ -1,3 +1,8 @@
+/*
+    Author Jacob Waters
+    fierywaters13@gmail.com
+    Designed for CSULB Beach Launch Team
+*/
 #include <Arduino.h>
 #include <Streaming.h>
 #include "AbstractedCanPacket.h"
