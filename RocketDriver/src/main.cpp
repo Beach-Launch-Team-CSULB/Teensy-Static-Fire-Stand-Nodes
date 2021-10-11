@@ -21,9 +21,9 @@ static CAN_message_t msg;
 // -------------------------------------------------------------
 void setup(void)
 {
+  while(!Serial);//wait for serial to connect
   CANbus0.begin();
 
-  delay(1000);
   Serial.println(F("Teensy 3.6 can bus READ test"));
 }
 
@@ -42,7 +42,7 @@ void printData(CAN_message_t &msg)
 void loop(void)
 {
   delay(1000);
-  Serial.println(CANbus0.available());
+  //Serial.println(CANbus0.available());
   if (CANbus0.available())
   {
     CANbus0.read(msg);

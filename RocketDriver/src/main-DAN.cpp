@@ -1,4 +1,4 @@
-
+/*
 #include <SensorHeader.h>
 #include <Arduino.h>
 #include <ADC.h>
@@ -202,3 +202,4 @@ delay(250);
 tempsensor.shutdown_wake(1);
 
 }
+*/
