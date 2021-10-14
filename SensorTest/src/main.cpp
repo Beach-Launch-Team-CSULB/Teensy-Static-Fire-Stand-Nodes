@@ -1,9 +1,19 @@
 #include <Arduino.h>
+#include "TempSensorMCP.h"
+#include "Thermocouple.h"
 
-void setup() {
-  // put your setup code here, to run once:
+TempSensorMCP tempSensor;
+Thermocouple thermocoupleOne;
+void setup()
+{
+  const uint8_t tempsensor_pin = 0;
+  tempSensor = TempSensorMCP(tempsensor_pin);
+
+  const uint8_t thermocouple_pin1 = 0, thermocouple_pin2 = 0;
+  thermocoupleOne = Thermocouple(thermocouple_pin1, thermocouple_pin2, tempSensor);
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void loop()
+{
+  float tempC = tempSensor.getTempC();
 }
