@@ -1,8 +1,8 @@
 // -------------------------------------------------------------
-// Can SPEED test
+// CAN Read Speed test
 // by Jacob Waters
 //
-// This test listens for a sample CAN frame over teensy 3.6 CAN0
+// This is a simple speed test for receiving CAN packets on a teensy 3.6
 // teensy pin 3 -> CAN TX
 // teensy pin 4 _> CAN RX
 // CANL -> CANL

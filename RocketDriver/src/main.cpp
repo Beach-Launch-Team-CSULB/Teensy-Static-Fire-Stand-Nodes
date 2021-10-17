@@ -1,17 +1,19 @@
 // -------------------------------------------------------------
-// Can SPEED test
+// Hello World CAN send test
 // by Jacob Waters
 //
-// This test listens for a sample CAN frame over teensy 3.6 CAN0
+// This test transmits a sample CAN frame over teensy CAN0
 // teensy pin 3 -> CAN TX
 // teensy pin 4 _> CAN RX
 // CANL -> CANL
 // CANH -> CANH
 // GND -> GND I.E. connect grounds of CAN Nodes
 
-#include <Arduino.h>
 #include <FlexCAN.h>
-#include <Streaming.h>
+
+#ifndef __MK66FX1M0__
+#error "Teensy 3.6 with dual CAN bus is required to run this example"
+#endif
 
 int busSpeed = 500000; //baudrate
 bool canBus = 0;       //use 0 CAN0 or 1 for CAN1
@@ -19,73 +21,56 @@ FlexCAN CANbus0(busSpeed, canBus);
 
 static CAN_message_t msg;
 
-uint32_t canCount = 0;
-uint32_t startTime, lastReceivedTime;
 // -------------------------------------------------------------
 void setup(void)
 {
-  while (!Serial)
-    ; //wait for serial to connect
   CANbus0.begin();
 
-  Serial.println(F("Teensy 3.6 can bus SPEED test"));
+  delay(1000);
+  Serial.println(F("Hello Teensy 3.6 dual CAN Test."));
 
-  startTime = millis();
-  lastReceivedTime = millis();
+  /*
+    msg.ext=0 -> 11 Bit ID field size, maximum size = 2^11 -1 = 2047
+    msg.ext=1 -> 29 Bit ID field size, maximum size = 2^29 -1 = some big number use a calculator bruh
+    Note that values larger than the respective max sizes will result in overflow
+  */
+  msg.ext = 1;
+  msg.id = 2048; //will overflow to 0 in regular ID mode,
+                 //but not in extended ID Mode
+
+  msg.timeout = 1000; //How long to keep trying before message failure in milliseconds
+
+  msg.len = 8; //length in bytes of message, up to 8 bytes
+
+  msg.buf[0] = (uint8_t)0x0A; //assigning hex values to bytes, can use decimal too
+  msg.buf[1] = (uint8_t)0x0B;
+  msg.buf[2] = (uint8_t)0x0C;
+  msg.buf[3] = (uint8_t)0x00;
+  msg.buf[4] = (uint8_t)0x00;
+  msg.buf[5] = (uint8_t)0x01;
+  msg.buf[6] = (uint8_t)0x02;
+  msg.buf[7] = (uint8_t)0x03;
 }
 
 // -------------------------------------------------------------
-void printData(CAN_message_t &msg)
-{
-  for (int i = 0; i < msg.len - 1; i++)
-  {
-    Serial.print(msg.buf[i], HEX);
-    Serial.print(".");
-  }
-  Serial.print(msg.buf[msg.len - 1], HEX);
-  Serial.println();
-}
-// -------------------------------------------------------------
-void putBreakPointHere() {}
 void loop(void)
 {
-  //delay(1000);
-  //Serial.println(CANbus0.available());
-  if (millis() - lastReceivedTime > 100)
-  {
-    if (canCount > 0)
-    {
-      double secondsElapsed = (millis() - startTime) / 1000.0;
-      Serial << "canCount: " << canCount << endl;
-      Serial << "seconds: " << secondsElapsed << endl;
-      double framesPerSecond = canCount / secondsElapsed;
-      Serial << "Frames/S: " << framesPerSecond << endl;
-      Serial << "effectiveBitrate: " << (64+31)*framesPerSecond << endl << endl;
-      Serial << "Teensy 3.6 can bus SPEED test" << endl;
+  //CANbus0.write returns a 1 if successful and zero if not.
+  bool writeSuccessful = CANbus0.write(msg);
+  if (writeSuccessful)
+    Serial.println("write successful!");
+  else
+    Serial.println("Write failed, check hardware config");
 
+  delay(1000);
+  /*On a pi, if msg.ext == 0, should output:
 
-      canCount = 0;
-    }
+    can0   000   [8]    0A 0B 0C 00 00 01 02 03  
+    bus  | ID  | size | data in HEX format
+    
+  else if msg.ext == 1, should output:
 
-    startTime = millis();
-  }
-
-  if (CANbus0.available())
-  {
-    CANbus0.read(msg);
-    lastReceivedTime = millis();
-    canCount++;
-    //Serial.print("CAN bus 0: ");
-    //printData(msg);
-    if(msg.id != 0x666)
-      Serial << "ERROR, ID Doesn't match" << endl;
-    bool copyError = false;
-    for(int i =0; i<msg.len;i++)
-      if(msg.buf[i]!=128)
-        copyError = true;
-    if(copyError)
-      Serial << "ERROR IN DATA" << endl;
-    //Serial.print("ID: ");
-    //Serial.println(msg.id, HEX);
-  }
+    can0   00000800   [8]    0A 0B 0C 00 00 01 02 03
+    bus  | ID       | size | data in HEX format
+*/
 }
