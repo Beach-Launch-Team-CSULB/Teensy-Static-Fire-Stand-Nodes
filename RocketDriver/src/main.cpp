@@ -29,24 +29,19 @@ void setup(void)
     while (!Serial)
         ; //wait for serial bus to be available
 
-    Serial.println(F("Teensy to Pi CAN Speed test"));
+    Serial.println(F("Teensy CAN Speed test WRITE"));
 
     msg.ext = 1;
-    msg.id = 2048; //will overflow to 0 in regular ID mode,
+    msg.id = 0x666; //will overflow to 0 in regular ID mode,
                    //but not in extended ID Mode
 
     msg.timeout = 1000; //How long to keep trying before message failure in milliseconds
 
     msg.len = 8; //length in bytes of message, up to 8 bytes
-
-    msg.buf[0] = (uint8_t)0x0A; //assigning hex values to bytes, can use decimal too
-    msg.buf[1] = (uint8_t)0x0B;
-    msg.buf[2] = (uint8_t)0x0C;
-    msg.buf[3] = (uint8_t)0x00;
-    msg.buf[4] = (uint8_t)0x00;
-    msg.buf[5] = (uint8_t)0x01;
-    msg.buf[6] = (uint8_t)0x02;
-    msg.buf[7] = (uint8_t)0x03;
+   for (int i = 0; i < msg.len; i++)
+    {
+      msg.buf[i] = i;
+    }
 }
 
 // -------------------------------------------------------------
