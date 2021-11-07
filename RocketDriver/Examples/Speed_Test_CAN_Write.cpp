@@ -29,7 +29,7 @@ void setup(void)
     while (!Serial)
         ; //wait for serial bus to be available
 
-    Serial.println(F("Teensy to Pi CAN Speed test"));
+    Serial.println(F("Teensy CAN Speed test WRITE"));
 
     msg.ext = 1;
     msg.id = 2048; //will overflow to 0 in regular ID mode,

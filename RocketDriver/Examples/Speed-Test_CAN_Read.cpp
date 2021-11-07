@@ -28,7 +28,7 @@ void setup(void)
     ; //wait for serial to connect
   CANbus0.begin();
 
-  Serial.println(F("Teensy 3.6 can bus SPEED test"));
+  Serial.println(F("Teensy 3.6 can bus Speed test READ"));
 
   startTime = millis();
   lastReceivedTime = millis();
