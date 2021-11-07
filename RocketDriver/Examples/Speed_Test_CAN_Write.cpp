@@ -62,6 +62,7 @@ void loop(void)
             Serial.println("Write failed, check hardware config");
         //}
     }
+    
     while (1) //wait forever
         delay(1000);
 }

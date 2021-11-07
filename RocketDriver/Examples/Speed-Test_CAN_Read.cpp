@@ -46,7 +46,6 @@ void printData(CAN_message_t &msg)
   Serial.println();
 }
 // -------------------------------------------------------------
-void putBreakPointHere() {}
 void loop(void)
 {
   //delay(1000);
