@@ -48,7 +48,7 @@ void setup(void)
 void loop(void)
 {
     bool writeSuccessful;
-    for (int i = 0; i < 50000; i++)
+    for (int i = 0; i < 500; i++)
     {
         //if(CANbus0.available())
         //{
