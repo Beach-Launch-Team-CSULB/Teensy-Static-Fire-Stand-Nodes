@@ -84,6 +84,7 @@ int64_t currentCountdownForMain;
 
 // Set EEPROM address for storing states
 uint8_t stateAddress{0};
+uint8_t nodeIDAddress{1};
 
 ///// Temp Sensor for TC Cold Junction /////
 //Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
@@ -92,13 +93,13 @@ int roundedtemp;
 
 // -------------------------------------------------------------
 // abort reset function -- NOT TESTED IN CURRENT VERSION, needs to be worked on
-void abortReset()
+/* void abortReset()
 {
   cli();
   EEPROM.update(stateAddress, static_cast<uint8_t>(State::abort)); // write abort code to the EEPROM to be read on restart
   sei();
   digitalWrite(pin::reset, 0);                                       // set reset pin low to restart
-}
+} */
 
 
 // -------------------------------------------------------------
@@ -106,12 +107,10 @@ uint8_t NodeIDDetect(uint8_t nodeID, bool startup, bool nodeIDdetermine, uint8_t
 {
   if (startup)                          //only on startup assign the pins
     {
-    delay(250);   //I want to get rid of this but previously I needed at least some delay before doing the detect to get a valid read
     pinMode(pin::NodeAddress0, INPUT);
     pinMode(pin::NodeAddress1, INPUT);
     pinMode(pin::NodeAddress2, INPUT);
     pinMode(pin::NodeAddress3, INPUT);
-    delay(250);   //I want to get rid of this but previously I needed at least some delay before doing the detect to get a valid read
     }
   
   if (nodeIDdetermine)
@@ -127,7 +126,7 @@ uint8_t NodeIDDetect(uint8_t nodeID, bool startup, bool nodeIDdetermine, uint8_t
     nodeID = NodeIDAddressRead;     //Setting the Global NodeID to detected NodeID
     }
   else
-    nodeID = nodeIDfromEEPROM;
+    nodeID = nodeIDfromEEPROM;      //Need to ADD FEATURE where the nodeIDdetermine is variable so on a quick power cycle it doesn't reset, but a manual "shutdown" can
   return nodeID;
 
   //Need to tweak structure of passing in and returning nodeID
@@ -142,6 +141,11 @@ void setup() {
   startup = true;   // Necessary to set startup to true for the code loop so it does one startup loop for the state machine before entering regular loop behavior
   //nodeID = 3;       //For manually assigning NodeID isntead of the address read, make sure to comment out for operational use
 
+  // -----Read Last State off eeprom and update -----
+  currentState = static_cast<State>(EEPROM.read(stateAddress));
+  nodeIDfromEEPROM = EEPROM.read(nodeIDAddress);
+  startupStateCheck(currentState, currentCommand);
+
   // ----- Run the Node ID Detection Function -----
   nodeID = NodeIDDetect(nodeID, startup, nodeIDdetermine, nodeIDfromEEPROM);
   //I would like to write this into EEPROM and check on startup with state to make this not able to flip on a power cycle mid test/launch and cutout the setup time
@@ -155,9 +159,6 @@ void setup() {
 
 
 
-  // -----Read Last State off eeprom and update -----
-  currentState = static_cast<State>(EEPROM.read(stateAddress));
-  startupStateCheck(currentState, currentCommand);
 
   // -----Run Valve NodeID Check-----
   ValveNodeIDCheck(valveArray, nodeID);
@@ -208,7 +209,7 @@ void setup() {
   adc->adc1->setSamplingSpeed(ADC_SAMPLING_SPEED::HIGH_SPEED);     // change the sampling speed
   //adc->adc1->recalibrate();
 
-  delay(500);
+  //delay(500);
 
 ///// CAN0 and CAN1 Initialize /////
   Can0.begin(busSpeed0);
@@ -217,7 +218,7 @@ void setup() {
 
 
 ///// Temp Sensor for TC Cold Junction /////
-// Setting alt I2C pins
+// Setting alt I2C pins because I used default I2C pins
 Wire.setSDA(38);
 Wire.setSCL(37);
 
@@ -256,18 +257,6 @@ void loop()
   //Serial.print("NodeID: ");
   //Serial.println(nodeID);
 
-  //LED status indicator to show program is running
-  if (sinceLED >= 100) 
-    {
-      if (ledstate == true)
-      {
-        digitalWrite(pin::led, 0);
-        ledstate = false;
-      } else {
-        digitalWrite(pin::led, 1);
-        ledstate = true;
-      }
-    }
 
   // --- Read CAN bus and update current command ---
   if(CANread(Can0, currentCommand) && !startup) // do not execute on the first loop
@@ -300,7 +289,7 @@ void loop()
   // -----Process Commands Here-----
   //currentCommand = command_vent;    //TESTING COMMAND INPUT ONLY
   commandExecute(currentState, priorState, currentCommand, valveArray, pyroArray, valveEnableArray, autoSequenceArray, sensorArray, abortHaltFlag);
-    
+
 
   ////// ABORT FUNCTIONALITY!!!///// This is what overrides main valve and igniter processes! /////
   ////// DO NOT MOVE BEFORE "commandExecute" or after "valveTasks"/"pyroTasks"!!! /////
@@ -323,7 +312,8 @@ void loop()
 
   // -----Update State on EEPROM -----
   cli(); // disables interrupts to protect write command
-  EEPROM.update(stateAddress, static_cast<uint8_t>(currentState)); // Never use .write()
+  EEPROM.update(stateAddress, static_cast<uint8_t>(currentState));      // Never use .write()
+  EEPROM.update(nodeIDAddress, nodeID);                                 // Never use .write()
   sei(); // reenables interrupts after write is completed
 
   //CAN State Report and Sensor data send Functions
@@ -331,7 +321,7 @@ void loop()
   CAN2AutosequenceTimerReport(Can0, autoSequenceArray, abortHaltFlag, nodeID);
   SensorArrayCANSend(Can0, sensorArray);
 
-  if (sinceRead1 >= 1000000) ///// If Using the old functional sensor reads this WILL BREAK them via resetting the same timer
+  /* if (sinceRead1 >= 1000000) ///// If Using the old functional sensor reads this WILL BREAK them via resetting the same timer
   {
   //Main Loop state and command print statements - for testing only
   Serial.print("currentState :");
@@ -340,7 +330,9 @@ void loop()
   Serial.println(currentCommand);
 
   sinceRead1 = 0; //resets timer to zero each time the ADC is read
-  }
+  //Serial.print("EEPROM Node ID Read :");
+  //Serial.println(EEPROM.read(nodeIDAddress));
+  } */
 
 startup = false;
 

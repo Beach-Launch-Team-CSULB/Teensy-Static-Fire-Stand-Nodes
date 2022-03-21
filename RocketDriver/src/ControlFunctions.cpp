@@ -115,6 +115,7 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             sensorArray.at(13)->setState(SensorState::Slow);
             sensorArray.at(14)->setState(SensorState::Slow);
             sensorArray.at(15)->setState(SensorState::Slow);
+            sensorArray.at(16)->setState(SensorState::Slow);
             currentState = State::passive;
             haltFlag = false;
             break;
@@ -132,22 +133,23 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(7)->setState(ValveEnableState::On);        // Pasafire
             valveEnableArray.at(8)->setState(ValveEnableState::On);        // Pasafire
             valveEnableArray.at(9)->setState(ValveEnableState::On);        // Pasafire */
-            sensorArray.at(0)->setState(SensorState::Off);
-            sensorArray.at(1)->setState(SensorState::Off);
-            sensorArray.at(2)->setState(SensorState::Off);
-            sensorArray.at(3)->setState(SensorState::Off);
-            sensorArray.at(4)->setState(SensorState::Off);
-            sensorArray.at(5)->setState(SensorState::Off);
-            sensorArray.at(6)->setState(SensorState::Off);
-            sensorArray.at(7)->setState(SensorState::Off);
-            sensorArray.at(8)->setState(SensorState::Off);
-            sensorArray.at(9)->setState(SensorState::Off);
-            sensorArray.at(10)->setState(SensorState::Off);
-            sensorArray.at(11)->setState(SensorState::Off);
-            sensorArray.at(12)->setState(SensorState::Off);
-            sensorArray.at(13)->setState(SensorState::Off);
-            sensorArray.at(14)->setState(SensorState::Off);
-            sensorArray.at(15)->setState(SensorState::Off);
+/*             sensorArray.at(0)->setState(SensorState::Slow);
+            sensorArray.at(1)->setState(SensorState::Slow);
+            sensorArray.at(2)->setState(SensorState::Slow);
+            sensorArray.at(3)->setState(SensorState::Slow);
+            sensorArray.at(4)->setState(SensorState::Slow);
+            sensorArray.at(5)->setState(SensorState::Slow);
+            sensorArray.at(6)->setState(SensorState::Slow);
+            sensorArray.at(7)->setState(SensorState::Slow);
+            sensorArray.at(8)->setState(SensorState::Slow);
+            sensorArray.at(9)->setState(SensorState::Slow);
+            sensorArray.at(10)->setState(SensorState::Slow);
+            sensorArray.at(11)->setState(SensorState::Slow);
+            sensorArray.at(12)->setState(SensorState::Slow);
+            sensorArray.at(13)->setState(SensorState::Slow);
+            sensorArray.at(14)->setState(SensorState::Slow);
+            sensorArray.at(15)->setState(SensorState::Slow);
+            sensorArray.at(16)->setState(SensorState::Slow); */
             }
             break;
         case command_EnterOffNominal:
@@ -169,7 +171,7 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(2)->setState(ValveEnableState::On);
             valveEnableArray.at(3)->setState(ValveEnableState::On);
             valveEnableArray.at(4)->setState(ValveEnableState::On);
-            valveEnableArray.at(5)->setState(ValveEnableState::On);   */                      
+            valveEnableArray.at(5)->setState(ValveEnableState::On);   */
             }
             break;        
         case command_abort:
@@ -203,22 +205,23 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(8)->setState(ValveEnableState::Off);        // Pasafire
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire */
             autoSequenceArray.at(0)->setState(AutoSequenceState::Hold);            
-            sensorArray.at(0)->setState(SensorState::Slow);
-            sensorArray.at(1)->setState(SensorState::Slow);
-            sensorArray.at(2)->setState(SensorState::Slow);
+            sensorArray.at(0)->setState(SensorState::Medium);
+            sensorArray.at(1)->setState(SensorState::Medium);
+            sensorArray.at(2)->setState(SensorState::Medium);
             sensorArray.at(3)->setState(SensorState::Slow);
             sensorArray.at(4)->setState(SensorState::Slow);
             sensorArray.at(5)->setState(SensorState::Slow);
             sensorArray.at(6)->setState(SensorState::Slow);
             sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Slow);
-            sensorArray.at(9)->setState(SensorState::Slow);
-            sensorArray.at(10)->setState(SensorState::Slow);
-            sensorArray.at(11)->setState(SensorState::Slow);
-            sensorArray.at(12)->setState(SensorState::Slow);
-            sensorArray.at(13)->setState(SensorState::Slow);
-            sensorArray.at(14)->setState(SensorState::Slow);
+            sensorArray.at(8)->setState(SensorState::Medium);
+            sensorArray.at(9)->setState(SensorState::Medium);
+            sensorArray.at(10)->setState(SensorState::Medium);
+            sensorArray.at(11)->setState(SensorState::Fast);
+            sensorArray.at(12)->setState(SensorState::Fast);
+            sensorArray.at(13)->setState(SensorState::Fast);
+            sensorArray.at(14)->setState(SensorState::Medium);
             sensorArray.at(15)->setState(SensorState::Slow);
+            sensorArray.at(16)->setState(SensorState::Slow);
             currentState = State::vent;
             break;
 // Fire Sequence commands will only be executed from the proper state
@@ -250,22 +253,23 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(8)->setState(ValveEnableState::Off);        // Pasafire
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire */
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);
-            sensorArray.at(0)->setState(SensorState::Slow);
-            sensorArray.at(1)->setState(SensorState::Slow);
-            sensorArray.at(2)->setState(SensorState::Slow);
+            sensorArray.at(0)->setState(SensorState::Medium);
+            sensorArray.at(1)->setState(SensorState::Medium);
+            sensorArray.at(2)->setState(SensorState::Medium);
             sensorArray.at(3)->setState(SensorState::Slow);
             sensorArray.at(4)->setState(SensorState::Slow);
             sensorArray.at(5)->setState(SensorState::Slow);
             sensorArray.at(6)->setState(SensorState::Slow);
             sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Slow);
-            sensorArray.at(9)->setState(SensorState::Slow);
-            sensorArray.at(10)->setState(SensorState::Slow);
-            sensorArray.at(11)->setState(SensorState::Slow);
-            sensorArray.at(12)->setState(SensorState::Slow);
-            sensorArray.at(13)->setState(SensorState::Slow);
-            sensorArray.at(14)->setState(SensorState::Slow);
+            sensorArray.at(8)->setState(SensorState::Medium);
+            sensorArray.at(9)->setState(SensorState::Fast);
+            sensorArray.at(10)->setState(SensorState::Fast);
+            sensorArray.at(11)->setState(SensorState::Medium);
+            sensorArray.at(12)->setState(SensorState::Medium);
+            sensorArray.at(13)->setState(SensorState::Fast);
+            sensorArray.at(14)->setState(SensorState::Fast);
             sensorArray.at(15)->setState(SensorState::Slow);
+            sensorArray.at(16)->setState(SensorState::Slow);
             currentState = State::HiPressArm;
             }
             break;
@@ -297,22 +301,23 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(8)->setState(ValveEnableState::Off);        // Pasafire
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire */
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);
-            sensorArray.at(0)->setState(SensorState::Slow);
-            sensorArray.at(1)->setState(SensorState::Slow);
-            sensorArray.at(2)->setState(SensorState::Slow);
+            sensorArray.at(0)->setState(SensorState::Medium);
+            sensorArray.at(1)->setState(SensorState::Medium);
+            sensorArray.at(2)->setState(SensorState::Medium);
             sensorArray.at(3)->setState(SensorState::Slow);
             sensorArray.at(4)->setState(SensorState::Slow);
             sensorArray.at(5)->setState(SensorState::Slow);
             sensorArray.at(6)->setState(SensorState::Slow);
             sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Slow);
-            sensorArray.at(9)->setState(SensorState::Slow);
-            sensorArray.at(10)->setState(SensorState::Slow);
-            sensorArray.at(11)->setState(SensorState::Slow);
-            sensorArray.at(12)->setState(SensorState::Slow);
-            sensorArray.at(13)->setState(SensorState::Slow);
-            sensorArray.at(14)->setState(SensorState::Slow);
+            sensorArray.at(8)->setState(SensorState::Medium);
+            sensorArray.at(9)->setState(SensorState::Fast);
+            sensorArray.at(10)->setState(SensorState::Fast);
+            sensorArray.at(11)->setState(SensorState::Medium);
+            sensorArray.at(12)->setState(SensorState::Medium);
+            sensorArray.at(13)->setState(SensorState::Fast);
+            sensorArray.at(14)->setState(SensorState::Fast);
             sensorArray.at(15)->setState(SensorState::Slow);
+            sensorArray.at(16)->setState(SensorState::Slow);
             currentState = State::HiPressPressurized;
             }
             break;
@@ -344,22 +349,23 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(8)->setState(ValveEnableState::Off);        // Pasafire
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire */
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);
-            sensorArray.at(0)->setState(SensorState::Slow);
-            sensorArray.at(1)->setState(SensorState::Slow);
-            sensorArray.at(2)->setState(SensorState::Slow);
+            sensorArray.at(0)->setState(SensorState::Medium);
+            sensorArray.at(1)->setState(SensorState::Medium);
+            sensorArray.at(2)->setState(SensorState::Medium);
             sensorArray.at(3)->setState(SensorState::Slow);
             sensorArray.at(4)->setState(SensorState::Slow);
             sensorArray.at(5)->setState(SensorState::Slow);
             sensorArray.at(6)->setState(SensorState::Slow);
             sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Slow);
-            sensorArray.at(9)->setState(SensorState::Slow);
-            sensorArray.at(10)->setState(SensorState::Slow);
-            sensorArray.at(11)->setState(SensorState::Slow);
-            sensorArray.at(12)->setState(SensorState::Slow);
-            sensorArray.at(13)->setState(SensorState::Slow);
-            sensorArray.at(14)->setState(SensorState::Slow);
+            sensorArray.at(8)->setState(SensorState::Medium);
+            sensorArray.at(9)->setState(SensorState::Medium);
+            sensorArray.at(10)->setState(SensorState::Medium);
+            sensorArray.at(11)->setState(SensorState::Fast);
+            sensorArray.at(12)->setState(SensorState::Fast);
+            sensorArray.at(13)->setState(SensorState::Fast);
+            sensorArray.at(14)->setState(SensorState::Medium);
             sensorArray.at(15)->setState(SensorState::Slow);
+            sensorArray.at(16)->setState(SensorState::Slow);
             currentState = State::TankPressArm;
             }
             break;
@@ -391,22 +397,23 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(8)->setState(ValveEnableState::Off);        // Pasafire
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire */
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);
-            sensorArray.at(0)->setState(SensorState::Slow);
-            sensorArray.at(1)->setState(SensorState::Slow);
-            sensorArray.at(2)->setState(SensorState::Slow);
+            sensorArray.at(0)->setState(SensorState::Medium);
+            sensorArray.at(1)->setState(SensorState::Medium);
+            sensorArray.at(2)->setState(SensorState::Medium);
             sensorArray.at(3)->setState(SensorState::Slow);
             sensorArray.at(4)->setState(SensorState::Slow);
             sensorArray.at(5)->setState(SensorState::Slow);
             sensorArray.at(6)->setState(SensorState::Slow);
             sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Slow);
-            sensorArray.at(9)->setState(SensorState::Slow);
-            sensorArray.at(10)->setState(SensorState::Slow);
-            sensorArray.at(11)->setState(SensorState::Slow);
-            sensorArray.at(12)->setState(SensorState::Slow);
-            sensorArray.at(13)->setState(SensorState::Slow);
-            sensorArray.at(14)->setState(SensorState::Slow);
+            sensorArray.at(8)->setState(SensorState::Medium);
+            sensorArray.at(9)->setState(SensorState::Medium);
+            sensorArray.at(10)->setState(SensorState::Medium);
+            sensorArray.at(11)->setState(SensorState::Fast);
+            sensorArray.at(12)->setState(SensorState::Fast);
+            sensorArray.at(13)->setState(SensorState::Fast);
+            sensorArray.at(14)->setState(SensorState::Medium);
             sensorArray.at(15)->setState(SensorState::Slow);
+            sensorArray.at(16)->setState(SensorState::Slow);
             currentState = State::TankPressPressurized;
             }
             break;
@@ -438,22 +445,23 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(8)->setState(ValveEnableState::Off);        // Pasafire
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire */
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);
-            sensorArray.at(0)->setState(SensorState::Slow);
-            sensorArray.at(1)->setState(SensorState::Slow);
-            sensorArray.at(2)->setState(SensorState::Slow);
-            sensorArray.at(3)->setState(SensorState::Slow);
-            sensorArray.at(4)->setState(SensorState::Slow);
-            sensorArray.at(5)->setState(SensorState::Slow);
-            sensorArray.at(6)->setState(SensorState::Slow);
-            sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Slow);
-            sensorArray.at(9)->setState(SensorState::Slow);
-            sensorArray.at(10)->setState(SensorState::Slow);
-            sensorArray.at(11)->setState(SensorState::Slow);
-            sensorArray.at(12)->setState(SensorState::Slow);
-            sensorArray.at(13)->setState(SensorState::Slow);
-            sensorArray.at(14)->setState(SensorState::Slow);
+            sensorArray.at(0)->setState(SensorState::Fast);
+            sensorArray.at(1)->setState(SensorState::Fast);
+            sensorArray.at(2)->setState(SensorState::Fast);
+            sensorArray.at(3)->setState(SensorState::Fast);
+            sensorArray.at(4)->setState(SensorState::Fast);
+            sensorArray.at(5)->setState(SensorState::Fast);
+            sensorArray.at(6)->setState(SensorState::Fast);
+            sensorArray.at(7)->setState(SensorState::Fast);
+            sensorArray.at(8)->setState(SensorState::Medium);
+            sensorArray.at(9)->setState(SensorState::Medium);
+            sensorArray.at(10)->setState(SensorState::Medium);
+            sensorArray.at(11)->setState(SensorState::Fast);
+            sensorArray.at(12)->setState(SensorState::Fast);
+            sensorArray.at(13)->setState(SensorState::Fast);
+            sensorArray.at(14)->setState(SensorState::Medium);
             sensorArray.at(15)->setState(SensorState::Slow);
+            sensorArray.at(16)->setState(SensorState::Slow);
             currentState = State::fireArmed;
             }
             break;
@@ -493,14 +501,15 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             sensorArray.at(5)->setState(SensorState::Fast);
             sensorArray.at(6)->setState(SensorState::Fast);
             sensorArray.at(7)->setState(SensorState::Fast);
-            sensorArray.at(8)->setState(SensorState::Fast);
-            sensorArray.at(9)->setState(SensorState::Fast);
-            sensorArray.at(10)->setState(SensorState::Fast);
+            sensorArray.at(8)->setState(SensorState::Medium);
+            sensorArray.at(9)->setState(SensorState::Medium);
+            sensorArray.at(10)->setState(SensorState::Medium);
             sensorArray.at(11)->setState(SensorState::Fast);
             sensorArray.at(12)->setState(SensorState::Fast);
             sensorArray.at(13)->setState(SensorState::Fast);
-            sensorArray.at(14)->setState(SensorState::Slow);
+            sensorArray.at(14)->setState(SensorState::Medium);
             sensorArray.at(15)->setState(SensorState::Slow);
+            sensorArray.at(16)->setState(SensorState::Slow);
             currentState = State::fire;
             }
             break;

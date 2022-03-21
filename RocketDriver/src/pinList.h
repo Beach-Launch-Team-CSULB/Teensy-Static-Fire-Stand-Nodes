@@ -14,9 +14,7 @@ namespace pin
 
     // abort interrupt pins - Not fully implemented, need to test and check
     const int abort{};
-    const int reset{};
-/*     const int abort{29};         //Need to find the pins I want to use for these two
-    const int reset{30};
+/*     const int abort{};         //Need to find the pins I want to use for this
 
     const int Node2Node1{};  //These are for a non CAN bus digital I/O pin.
     const int Node2Node2{}; */

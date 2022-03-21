@@ -29,10 +29,10 @@ Valve LoxMV{24, 2, NormalClosed, 7, 25000, false, -1, 50};
 Valve FuelMV{25, 2, NormalClosed, 6, 25000, false, -1, 50};
 // On Renegade SF Prop Node
 Valve LoxVent{18, 3, NormalOpen, 9, 500000, false, 166};
-Valve LoxDomeReg{19, 3, NormalClosed, 10, 25000, false};
-Valve LoxDomeRegVent{20, 3, NormalClosed, 29, 25000, false};
-Valve FuelVent{21, 3, NormalClosed, 30, 25000, false};               //WRONG PIN - INSPECT WIRING, was set to 2 and changed for breadboard testing
-Valve FuelDomeReg{22, 3, NormalClosed, 38, 25000, false};
+Valve LoxDomeReg{19, 3, NormalClosed, 5, 25000, false};
+Valve LoxDomeRegVent{20, 3, NormalClosed, 6, 25000, false};
+Valve FuelVent{21, 3, NormalClosed, 2, 25000, false};               //WRONG PIN - INSPECT WIRING, was set to 2 and changed for breadboard testing, (was now 30?)
+Valve FuelDomeReg{22, 3, NormalClosed, 7, 25000, false};
 Valve FuelDomeRegVent{23, 3, NormalClosed, 8, 25000, false};
 
 

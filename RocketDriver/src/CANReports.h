@@ -232,10 +232,10 @@ void SensorArrayCANSend(FlexCAN& CANbus, const std::array<MCU_SENSOR*, NUM_SENSO
             // write message to bus
             CANbus.write(msgOut);
             sensor->setNewSensorValueCheck(false);
-            Serial.print("Sensor ID");
+/*             Serial.print("Sensor ID");
             Serial.print(msgOut.id);
             Serial.print("Sensor Value");
-            Serial.println(sensorValueToSend);
+            Serial.println(sensorValueToSend); */
             {
                 // add write error handling here, for now it does nothing
             }
