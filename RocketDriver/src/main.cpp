@@ -104,7 +104,7 @@ int roundedtemp;
 #define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
 #define WRITE_RESTART(val) ((*(volatile uint32_t *)RESTART_ADDR) = (val))
 
-void TeensyInternalReset (Command CurrentCommand)
+void TeensyInternalReset (Command CurrentCommand, uint8_t nodeID)
 {
   if (CurrentCommand == command_GLOBALRESET)
   {
@@ -115,14 +115,31 @@ void TeensyInternalReset (Command CurrentCommand)
     sei(); // reenables interrupts after write is completed
     WRITE_RESTART(0x5FA0004);
   }
-  if (CurrentCommand == command_nodeRESET)
+  else if (CurrentCommand == command_node2RESET)
   {
-    Serial.println("wtf why restart (Local Node)");
-    Serial.println(CurrentCommand);
-    cli(); // disables interrupts to protect write command
-    EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()
-    sei(); // reenables interrupts after write is completed
-    WRITE_RESTART(0x5FA0004);
+    if (nodeID == 2)
+    {
+      Serial.println("wtf why restart (Local Node2)");
+      Serial.println(CurrentCommand);
+      cli(); // disables interrupts to protect write command
+      EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()
+      sei(); // reenables interrupts after write is completed
+      WRITE_RESTART(0x5FA0004);
+    }
+    else;
+  }
+  else if (CurrentCommand == command_node3RESET)
+  {
+    if (nodeID == 3)
+    {
+      Serial.println("wtf why restart (Local Node3)");
+      Serial.println(CurrentCommand);
+      cli(); // disables interrupts to protect write command
+      EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()
+      sei(); // reenables interrupts after write is completed
+      WRITE_RESTART(0x5FA0004);
+    }
+    else;
   }
   else; //nothing else but it feels right
 }
@@ -356,7 +373,7 @@ void loop()
   CAN2AutosequenceTimerReport(Can0, autoSequenceArray, abortHaltFlag, nodeID);
   SensorArrayCANSend(Can0, sensorArray);
 
-  TeensyInternalReset(currentCommand);
+  TeensyInternalReset(currentCommand, nodeID);
 
   /* if (sinceRead1 >= 1000000) ///// If Using the old functional sensor reads this WILL BREAK them via resetting the same timer
   {

@@ -60,7 +60,10 @@ enum Command
     command_disableMainValvesSafety = 74,
     command_enableMainValvesSafety = 75,                //End of safety enables
     command_propProgSetting = 237,                      // placeholder to use for sending specific program
-    command_nodeRESET = 238,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
+    command_node1RESET = 238,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
+    command_node2RESET = 239,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
+    command_node3RESET = 240,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
+    command_node4RESET = 241,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
     command_GLOBALRESET = 254,                          // Use for reset command that writes to internal reset register
     command_reseved = 255,                              // 255 Reserved for future use
     command_SIZE, // not a valid command but it is useful for checking if recieved messages are valid commands, see CANRead. Always leave this at the end of the enum listcomm
