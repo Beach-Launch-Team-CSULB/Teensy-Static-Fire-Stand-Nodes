@@ -42,7 +42,7 @@ bool abortHaltFlag; //creates halt flag
 //default sets to max nodeID intentionally to be bogus until otherwise set
 uint8_t nodeID;       //engine node = 2, prop node = 3, Pasafire node = 8
 uint8_t nodeIDfromEEPROM;   //nodeID read out of EEPROM
-bool nodeIDdetermine = true;   //boolean flag for if startup is to run the nodeID detect read
+bool nodeIDdeterminefromEEPROM;   //boolean flag for if startup is to run the nodeID detect read
 
 
 ///// ADC /////
@@ -54,8 +54,6 @@ elapsedMillis sinceReadRTD;
 ///// LED /////
 elapsedMillis sinceLED;
 
-bool ledstate = 0;
-
 ///// CAN /////
 CAN_message_t message;
 CAN_message_t rxmsg;
@@ -65,10 +63,9 @@ int value = 0;
 int counter = 0;
 int MCUtempPIN = 70;  //?? Not sure, I was trying to figure out how to read direct from the non Teensy MCU pin
 int MCUtempraw;
-int MCUtempCANID = 100; 
 
-int busSpeed0 = 500000; //baudrate
-int busSpeed1 = 500000; //baudrate
+int busSpeed0 = 500000; //baudrate - do not set above 500000 for full distance run bunker to pad
+int busSpeed1 = 500000; //baudrate - do not set above 500000 for full distance run bunker to pad
 
 bool startup{true}; // bool for storing if this is the first loop on startup
 
@@ -83,8 +80,11 @@ State priorState;
 int64_t currentCountdownForMain;
 
 // Set EEPROM address for storing states
-uint8_t stateAddress{0};
-uint8_t nodeIDAddress{1};
+// Change these up occasionally to reduce write cycle wear on the same bytes
+// I could use EEPROM itself to store current start byte of my data and automate iterating this. Good idea for future upgrade.
+uint8_t stateAddress{1};
+uint8_t nodeIDAddress{2};
+uint8_t nodeIDDetermineAddress{3};
 
 ///// Temp Sensor for TC Cold Junction /////
 //Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
@@ -100,18 +100,43 @@ int roundedtemp;
   sei();
   digitalWrite(pin::reset, 0);                                       // set reset pin low to restart
 } */
+#define RESTART_ADDR       0xE000ED0C
+#define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
+#define WRITE_RESTART(val) ((*(volatile uint32_t *)RESTART_ADDR) = (val))
 
+void TeensyInternalReset (Command CurrentCommand)
+{
+  if (CurrentCommand == command_GLOBALRESET)
+  {
+    Serial.println("wtf why restart (Global)");
+    Serial.println(CurrentCommand);
+    cli(); // disables interrupts to protect write command
+    EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()
+    sei(); // reenables interrupts after write is completed
+    WRITE_RESTART(0x5FA0004);
+  }
+  if (CurrentCommand == command_nodeRESET)
+  {
+    Serial.println("wtf why restart (Local Node)");
+    Serial.println(CurrentCommand);
+    cli(); // disables interrupts to protect write command
+    EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()
+    sei(); // reenables interrupts after write is completed
+    WRITE_RESTART(0x5FA0004);
+  }
+  else; //nothing else but it feels right
+}
 
 // -------------------------------------------------------------
 uint8_t NodeIDDetect(uint8_t nodeID, bool startup, bool nodeIDdetermine, uint8_t nodeIDfromEEPROM)       //Function to run the nodeID hardware addressing
 {
-  if (startup)                          //only on startup assign the pins
-    {
+  //if (startup)                          //only on startup assign the pins, not needed if running this in setup
+    //{
     pinMode(pin::NodeAddress0, INPUT);
     pinMode(pin::NodeAddress1, INPUT);
     pinMode(pin::NodeAddress2, INPUT);
     pinMode(pin::NodeAddress3, INPUT);
-    }
+    //}
   
   if (nodeIDdetermine)
     {
@@ -124,14 +149,20 @@ uint8_t NodeIDDetect(uint8_t nodeID, bool startup, bool nodeIDdetermine, uint8_t
     uint8_t NodeIDAddressRead;
     NodeIDAddressRead = NodeAddressBit0 + NodeAddressBit1 + NodeAddressBit2 + NodeAddressBit3;
     nodeID = NodeIDAddressRead;     //Setting the Global NodeID to detected NodeID
+    cli(); // disables interrupts to protect write command
+    EEPROM.update(nodeIDDetermineAddress, 0);                                 // Never use .write()
+    sei(); // reenables interrupts after write is completed
     }
   else
     nodeID = nodeIDfromEEPROM;      //Need to ADD FEATURE where the nodeIDdetermine is variable so on a quick power cycle it doesn't reset, but a manual "shutdown" can
   return nodeID;
+    
 
-  //Need to tweak structure of passing in and returning nodeID
-  //Need to implememt any behavior for start up, reset et cetera.
-  //Do I need any delays? I did use one in the past but I'd like to eliminate or minimize it
+  // I am thinking I program the nodes to only read nodeID pins on a reset commant
+  // Get reset command via the register write implemented
+  // Setup a global reset command over CAN for all nodes and put in ops to do this at setup for any test/launch
+  // Needs to also read pins on a directly commanded reset? Meh, if after a reset pin direct pull down CAN bus doesn't come back node has other issue and scrubs current op
+  
 }
 // -------------------------------------------------------------
 
@@ -144,11 +175,16 @@ void setup() {
   // -----Read Last State off eeprom and update -----
   currentState = static_cast<State>(EEPROM.read(stateAddress));
   nodeIDfromEEPROM = EEPROM.read(nodeIDAddress);
+  nodeIDdeterminefromEEPROM = EEPROM.read(nodeIDDetermineAddress);
   startupStateCheck(currentState, currentCommand);
 
   // ----- Run the Node ID Detection Function -----
-  nodeID = NodeIDDetect(nodeID, startup, nodeIDdetermine, nodeIDfromEEPROM);
-  //I would like to write this into EEPROM and check on startup with state to make this not able to flip on a power cycle mid test/launch and cutout the setup time
+  nodeID = NodeIDDetect(nodeID, startup, nodeIDdeterminefromEEPROM, nodeIDfromEEPROM);
+  // Write 0 to byte for nodeIDDetermineAddress after reading it after a reset
+  cli(); // disables interrupts to protect write command
+  EEPROM.update(nodeIDDetermineAddress, 0);                                 // Never use .write()
+  sei(); // reenables interrupts after write is completed
+
 
   // ----- Hardware Abort Pin Setup ----- NOT CURRENTLY IN USE
   // This hardware abort allows us to command the Teensy to reboot itself by pulling the reset pin to ground
@@ -287,7 +323,6 @@ void loop()
 
 
   // -----Process Commands Here-----
-  //currentCommand = command_vent;    //TESTING COMMAND INPUT ONLY
   commandExecute(currentState, priorState, currentCommand, valveArray, pyroArray, valveEnableArray, autoSequenceArray, sensorArray, abortHaltFlag);
 
 
@@ -295,7 +330,7 @@ void loop()
   ////// DO NOT MOVE BEFORE "commandExecute" or after "valveTasks"/"pyroTasks"!!! /////
   haltFlagCheck(abortHaltFlag, valveArray, pyroArray, valveEnableArray);
 
-  // -----Advance needed propulsion system tasks (valve, valve enables, pyro, autosequences) -----
+  // -----Advance needed propulsion system tasks (valve, valve enables, pyro, autosequences) ----- //
   autoSequenceTasks(autoSequenceArray,nodeID);
   currentCountdownForMain = IgnitionAutoSequence.getCurrentCountdown();
   autoSequenceValveUpdate(valveArray, currentCountdownForMain);
@@ -320,6 +355,8 @@ void loop()
   CAN2PropSystemStateReport(Can0, currentState, currentCommand, valveArray, pyroArray, valveEnableArray, abortHaltFlag, nodeID);
   CAN2AutosequenceTimerReport(Can0, autoSequenceArray, abortHaltFlag, nodeID);
   SensorArrayCANSend(Can0, sensorArray);
+
+  TeensyInternalReset(currentCommand);
 
   /* if (sinceRead1 >= 1000000) ///// If Using the old functional sensor reads this WILL BREAK them via resetting the same timer
   {
