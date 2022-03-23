@@ -155,23 +155,23 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
         case command_EnterOffNominal:
             priorState = currentState; //for remembering the state the system was in when entering Off Nominal
             currentState = State::offNominal;
-/*             valveEnableArray.at(0)->setState(ValveEnableState::On);
+            valveEnableArray.at(0)->setState(ValveEnableState::On);
             valveEnableArray.at(1)->setState(ValveEnableState::On);
             valveEnableArray.at(2)->setState(ValveEnableState::On);
             valveEnableArray.at(3)->setState(ValveEnableState::On);
             valveEnableArray.at(4)->setState(ValveEnableState::On);
-            valveEnableArray.at(5)->setState(ValveEnableState::On);   */
+            valveEnableArray.at(5)->setState(ValveEnableState::On);  
             break;            
         case command_ExitOffNominal:
             if(currentState == State::offNominal)
             {
             currentState = priorState;
-/*             valveEnableArray.at(0)->setState(ValveEnableState::On);
+            valveEnableArray.at(0)->setState(ValveEnableState::On);
             valveEnableArray.at(1)->setState(ValveEnableState::On);
             valveEnableArray.at(2)->setState(ValveEnableState::On);
             valveEnableArray.at(3)->setState(ValveEnableState::On);
             valveEnableArray.at(4)->setState(ValveEnableState::On);
-            valveEnableArray.at(5)->setState(ValveEnableState::On);   */
+            valveEnableArray.at(5)->setState(ValveEnableState::On);  
             }
             break;        
         case command_abort:

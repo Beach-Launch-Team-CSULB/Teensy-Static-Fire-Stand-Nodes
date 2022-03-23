@@ -70,7 +70,7 @@ std::array<Valve*, NUM_VALVES> valveArray{&HiPress, &HiPressVent, &LoxVent, &Lox
 
 // On Engine Node
 ValveEnable HiPressHiVentSafe{32, 24, 2};
-ValveEnable MainValvesSafe{37, 25, 2};
+ValveEnable MainValvesSafe{37, 26, 2}; //was 25 but I think wired to 26
 // On Prop Node
 ValveEnable FuelVentSafe{33, 24, 3};
 ValveEnable LoxDomeRegVentSafe{34, 25, 3};

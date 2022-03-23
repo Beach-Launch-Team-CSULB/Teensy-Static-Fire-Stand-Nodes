@@ -41,7 +41,7 @@ void ValveEnable::begin()
     if (nodeIDCheck)
     {
         pinMode(valveEnablePin, OUTPUT);
-        digitalWrite(valveEnablePin, 0);
+        digitalWrite(valveEnablePin, LOW);
     }
 }
 
@@ -125,6 +125,7 @@ void Valve::stateOperations()
         if(timer >= fullDutyTime)
         {
             analogWrite(pin, holdDuty);
+            //digitalWrite(pin,1);
             timer = 0;
             state = ValveState::Open;
         }
@@ -170,11 +171,11 @@ void ValveEnable::stateOperations()
         Serial.println(valveEnablePin); */
             case ValveEnableState::On:
                 {
-                digitalWrite(valveEnablePin, 1);
+                digitalWrite(valveEnablePin, HIGH);
                 }
             case ValveEnableState::Off:
                 {
-                digitalWrite(valveEnablePin, 0);
+                digitalWrite(valveEnablePin, LOW);
                 }
         default:
             break;

@@ -187,7 +187,6 @@ uint8_t NodeIDDetect(uint8_t nodeID, bool startup, bool nodeIDdetermine, uint8_t
 //-------------------------------------------------------//
 void setup() {
   startup = true;   // Necessary to set startup to true for the code loop so it does one startup loop for the state machine before entering regular loop behavior
-  //nodeID = 3;       //For manually assigning NodeID isntead of the address read, make sure to comment out for operational use
 
   // -----Read Last State off eeprom and update -----
   currentState = static_cast<State>(EEPROM.read(stateAddress));
@@ -197,6 +196,7 @@ void setup() {
 
   // ----- Run the Node ID Detection Function -----
   nodeID = NodeIDDetect(nodeID, startup, nodeIDdeterminefromEEPROM, nodeIDfromEEPROM);
+  //nodeID = 3;       //For manually assigning NodeID isntead of the address read, make sure to comment out for operational use
   // Write 0 to byte for nodeIDDetermineAddress after reading it after a reset
   cli(); // disables interrupts to protect write command
   EEPROM.update(nodeIDDetermineAddress, 0);                                 // Never use .write()
@@ -390,5 +390,8 @@ void loop()
 
 startup = false;
 
-
+digitalWrite(24, HIGH);
+digitalWrite(25, HIGH);
+digitalWrite(26, HIGH);
+digitalWrite(27, HIGH);
 }
