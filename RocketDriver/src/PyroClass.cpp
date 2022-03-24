@@ -27,7 +27,7 @@ void Pyro::begin()
     if (nodeIDCheck)
     {
         pinMode(firePin, OUTPUT);
-        digitalWrite(firePin, 0);
+        digitalWriteFast(firePin, 0);
     }
 }
 
@@ -60,7 +60,7 @@ void Pyro::stateOperations()
         break;
 
     case PyroState::On:
-        digitalWrite(firePin, 1);
+        digitalWriteFast(firePin, 1);
         if(timer >= liveOutTime)
         {
             state = PyroState::Off;
@@ -75,7 +75,7 @@ void Pyro::stateOperations()
         break;
         
     case PyroState::Off:
-        digitalWrite(firePin, 0);
+        digitalWriteFast(firePin, 0);
         timer = 0;
         break;        
     

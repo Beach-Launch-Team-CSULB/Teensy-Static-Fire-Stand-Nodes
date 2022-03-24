@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 
-Valve::Valve(uint32_t setValveID, uint32_t setValveNodeID, ValveType setValveType, uint8_t setPin, uint32_t setFullDutyTime, bool setFireCommandBool, int32_t setFireSequenceTime, uint8_t setHoldDuty,  bool setNodeIDCheck)
+Valve::Valve(uint32_t setValveID, uint8_t setValveNodeID, ValveType setValveType, uint8_t setPin, uint32_t setFullDutyTime, bool setFireCommandBool, int32_t setFireSequenceTime, uint8_t setHoldDuty,  bool setNodeIDCheck)
                 : valveID{setValveID}, valveNodeID{setValveNodeID}, valveType{setValveType}, pin{setPin}, fullDutyTime{setFullDutyTime}, fireCommandBool{setFireCommandBool}, fireSequenceTime{setFireSequenceTime}, holdDuty{setHoldDuty}, nodeIDCheck{setNodeIDCheck}
 {
     switch (valveType)
@@ -41,7 +41,7 @@ void ValveEnable::begin()
     if (nodeIDCheck)
     {
         pinMode(valveEnablePin, OUTPUT);
-        digitalWrite(valveEnablePin, LOW);
+        digitalWriteFast(valveEnablePin, LOW);
     }
 }
 
@@ -82,41 +82,49 @@ void Valve::stateOperations()
 
     // if a valve is commanded open, if its normal closed it needs to fully actuate, if normal open it needs to drop power to zero
     case ValveState::OpenCommanded:
-        switch (valveType)
+        if (priorState != ValveState::Open)
         {
-            case NormalClosed:
-                analogWrite(pin, fullDuty);
-                timer = 0;
-                state = ValveState::OpenProcess;
-                //Serial.print("NC OpenCommanded: ");
-                //Serial.println(valveID);
-                break;
-            case NormalOpen:
-                analogWrite(pin, 0);
-                timer = 0;
-                state = ValveState::Open;
-                //Serial.print("NO OpenCommanded: ");
-                //Serial.println(valveID);                
-                break;
-            default:
-                break;
+            switch (valveType)
+            {
+                case NormalClosed:
+                    analogWrite(pin, fullDuty);
+                    timer = 0;
+                    state = ValveState::OpenProcess;
+                    //Serial.print("NC OpenCommanded: ");
+                    //Serial.println(valveID);
+                    break;
+                case NormalOpen:
+                    analogWrite(pin, 0);
+                    timer = 0;
+                    state = ValveState::Open;
+                    //Serial.print("NO OpenCommanded: ");
+                    //Serial.println(valveID);                
+                    break;
+                default:
+                    break;
+            }
         }
         break;
 
     // if a valve is commanded closed, a normal closed removes power, normal open starts activation sequence
     case ValveState::CloseCommanded:
-        switch (valveType)
+        if (priorState != ValveState::Closed)
         {
-            case NormalClosed:
-                analogWrite(pin, 0);
-                timer = 0;
-                state = ValveState::Closed;
-                break;
-            case NormalOpen:
-                analogWrite(pin, fullDuty);
-                timer = 0;
-                state = ValveState::CloseProcess;
-                break;
+            switch (valveType)
+            {
+                case NormalClosed:
+                    analogWrite(pin, 0);
+                    timer = 0;
+                    state = ValveState::Closed;
+                    break;
+                case NormalOpen:
+                    analogWrite(pin, fullDuty);
+                    timer = 0;
+                    state = ValveState::CloseProcess;
+                    break;
+                default:
+                    break;
+            }
         }
         break;
 
@@ -146,12 +154,13 @@ void Valve::stateOperations()
             case NormalClosed:
                 analogWrite(pin, 0);
                 break;
-/*             case NormalOpen:
-                analogWrite(pin, holdDuty); */
+            case NormalOpen:
+                analogWrite(pin, holdDuty);
             default:
                 break;
         }
-    
+        break;
+
     // All other states require no action
     default:
         break;
@@ -171,11 +180,13 @@ void ValveEnable::stateOperations()
         Serial.println(valveEnablePin); */
             case ValveEnableState::On:
                 {
-                digitalWrite(valveEnablePin, HIGH);
+                digitalWriteFast(valveEnablePin, HIGH);
+                break;
                 }
             case ValveEnableState::Off:
                 {
-                digitalWrite(valveEnablePin, LOW);
+                digitalWriteFast(valveEnablePin, LOW);
+                break;
                 }
         default:
             break;

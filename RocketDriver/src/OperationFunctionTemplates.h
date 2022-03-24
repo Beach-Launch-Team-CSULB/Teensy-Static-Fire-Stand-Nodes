@@ -37,27 +37,16 @@ void valveEnableTasks(const std::array<T, size>& valveEnableArray, uint8_t& node
     // iterate through valve array and run the stateOperations method
     for(auto valveEnable : valveEnableArray)
     {
-/*         Serial.print("valveEnableID: ");
-        Serial.print(valveEnable->getValveEnableID());
-        Serial.print(", valve NodeIDCheck bool: ");
-        Serial.println(valveEnable->getNodeIDCheck()); */
-        
         if (valveEnable->getValveEnableNodeID() == nodeIDReadIn)
-/*             Serial.println("valve node ID");
-            Serial.println(valveEnable->getValveEnableNodeID());
-            Serial.print("nodeID");
-            Serial.println(nodeIDReadIn);
-            
-            Serial.print("valveEnableID: ");
-            Serial.print(valveEnable->getValveEnableID());
-            Serial.print(" valveEnablePin: ");
-            Serial.println(valveEnable->getValveEnablePin()); */
-            
-            //Serial.print("LoopRan");
+        {  
+            if (valveEnable->getState() != (valveEnable->getPriorState()))
             {
-            valveEnable->stateOperations();
-            //Serial.print("LoopRan");
-            }        
+                //Serial.print("sup");
+                //Serial.print(valveEnable->getValveEnableID());
+                //Serial.print("LoopRan");
+                valveEnable->stateOperations();
+            }
+        }
     }
 }
 

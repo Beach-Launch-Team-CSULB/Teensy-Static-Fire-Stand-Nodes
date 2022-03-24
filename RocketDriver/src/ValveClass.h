@@ -7,10 +7,12 @@
 // This class defines the Valve Object that will be used to represent and actuate the valves
 // Run begin to set the pins
 
+
 enum ValveType
 {
     NormalClosed,
     NormalOpen,
+    NCFourWay,
 };
 
 
@@ -20,7 +22,7 @@ class Valve
 
     private:
         const uint32_t valveID;                          // Valve ID number 
-        const uint32_t valveNodeID;                      // NodeID the valve is controlled by
+        const uint8_t valveNodeID;                      // NodeID the valve is controlled by
         const ValveType valveType;                  // sets the valve type, either normal closed or normal open
         const uint8_t pin;                              // Valve PWM pin for actuation
         const uint32_t fullDutyTime;                // Time PWM needs to be at full duty for actuation, in MICROS
@@ -28,7 +30,7 @@ class Valve
         ValveState state;
         ValveState priorState;                           // Tracks the valve state
         elapsedMicros timer;                        // timer for the valve, used for changing duty cycles, in MICROS
-        const uint8_t fullDuty{255};                // full duty cycle for servo initial actuation
+        const uint16_t fullDuty{256};                // full duty cycle for servo initial actuation
         const uint8_t holdDuty{};                   // partial duty cycle to hold valve in actuated state
         bool fireCommandBool;                       // Whether this valve is on the Ignition AutoSequence for FireCommand timer check
         bool nodeIDCheck;                           // Whether this object should operate on this node
@@ -36,7 +38,7 @@ class Valve
     public:
     
     // constructor, define the valve ID here, and the pin that controls the valve, setFireDelay is only parameter that can be left blank
-        Valve(uint32_t setValveID, uint32_t setValveNodeID, ValveType setValveType, uint8_t setPin, uint32_t setFullDutyTime, bool setFireCommandBool, int32_t setFireSequenceTime = 2147483648, uint8_t setHoldDuty = 64, bool setNodeIDCheck = false);
+        Valve(uint32_t setValveID, uint8_t setValveNodeID, ValveType setValveType, uint8_t setPin, uint32_t setFullDutyTime, bool setFireCommandBool, int32_t setFireSequenceTime = 2147483647, uint8_t setHoldDuty = 64, bool setNodeIDCheck = false);
 
     // a start up method, to set pins from within setup()
         void begin();
@@ -45,19 +47,30 @@ class Valve
 
     // get functions, return the current value of that variable
         uint32_t getValveID(){return valveID;}
-        uint32_t getValveNodeID(){return valveNodeID;}
+        uint8_t getValveNodeID(){return valveNodeID;}
         ValveType getValveType(){return valveType;}
         uint8_t getPin(){return pin;}
         uint32_t getFullDutyTime(){return fullDutyTime;}
         uint8_t getHoldDuty(){return holdDuty;}
         int32_t getFireSequenceTime(){return fireSequenceTime;}
         ValveState getState(){return state;}
+        ValveState getPriorState(){return priorState;}
         uint32_t getTimer(){return timer;}
         bool getFireCommandBool(){return fireCommandBool;}
         bool getNodeIDCheck(){return nodeIDCheck;}
 
     // set functions, allows the setting of a variable
-        void setState(ValveState newState) {priorState = state; state = newState;} //every time a state is set, the timer should reset
+        void setState(ValveState newState) 
+            {
+                if (newState != state)
+                {
+                    priorState = state;
+                }
+                state = newState;
+            } 
+
+            
+        //every time a state is set, the timer should reset
         //void setState(ValveState newState) {priorState = state; state = newState; timer = 0;} //every time a state is set, the timer should reset
         //void setPriorState(ValveState oldState) {priorState = oldState;} //every time a state is set, store previous state
 
@@ -87,8 +100,10 @@ class ValveEnable
         const uint8_t valveEnableNodeID;
         const uint32_t valveEnablePin;
         ValveEnableState state;
+        ValveEnableState priorState;
         bool nodeIDCheck;                           // Whether this object should operate on this node
-
+        //uint16_t currentEnablePinSet;               // shouldn't use a value greater than 256 for PWM max output in default 8bit PWM mode
+    
     public:
         
     // constructor
@@ -101,16 +116,21 @@ class ValveEnable
 
     // get functions, return the current value of that variable
         uint32_t getValveEnableID(){return valveEnableID;}
-        uint32_t getValveEnableNodeID(){return valveEnableNodeID;}
+        uint8_t getValveEnableNodeID(){return valveEnableNodeID;}
         uint8_t getValveEnablePin(){return valveEnablePin;}
+        //uint16_t getCurrentEnablePinSet(){return currentEnablePinSet;}
         ValveEnableState getState(){return state;}   
+        ValveEnableState getPriorState(){return priorState;}   
         bool getNodeIDCheck(){return nodeIDCheck;}
 
     // set functions, allows the setting of a variable
-        void setState(ValveEnableState newState) {state = newState;}
-    
+        void setState(ValveEnableState newState) {priorState = state; state = newState;}
+
     // set the Node ID Check bool function
         void setNodeIDCheck(bool updatedNodeIDCheck) {nodeIDCheck = updatedNodeIDCheck;}
+    
+    // HMMM
+        //void setCurrentEnablePinSet(uint16_t justsetitplz){currentEnablePinSet = justsetitplz;}
     
     // samesies as above
         void stateOperations();
