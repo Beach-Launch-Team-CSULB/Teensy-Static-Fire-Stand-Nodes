@@ -51,16 +51,27 @@ class MCU_SENSOR
     const uint32_t sampleRateMedMode;         //the sample rate this given sensor will be read at
     const uint32_t sampleRateFastMode;        //the sample rate this given sensor will be read at
     uint32_t currentSampleRate;
-    elapsedMicros timer;                      // timer for future sensor timing operations
+    elapsedMicros timer;                      // timer for sensor timing operations
     uint32_t currentRawValue{};               // holds the current value for the sensor
     bool newSensorValueCheck;                      // Is the current raw value a new read that hasn't been sent yet?
     uint32_t currentCalibratedValue{};               // holds the current value for the sensor
     //const uint8_t bitDepth;                   // bit depth of the sample, for output chopping?
     bool nodeIDCheck;                           // Whether this object should operate on this node
     bool internalMCUTemp;                       // Is this sensor the MCU internal temp
+    
+    uint32_t currentConvertedValue{};
+    bool newConversionCheck;                      // Is the current raw value a new read that hasn't been sent yet?
+    
+    float linConvCoef1_m;                     // Base calibration coefficients
+    float linConvCoef1_b;                     // Base calibration coefficients
+    float linConvCoef2_m;                     // adjustment calibration coefficients (intended for application specifics like angle load cell mounting)
+    float linConvCoef2_b;                     // adjustment calibration coefficients (intended for application specifics like angle load cell mounting)
 
   public:
-    MCU_SENSOR(uint32_t setSensorID, uint32_t setSensorNodeID, uint8_t setADCinput, uint32_t setSampleRateSlowMode, uint32_t setSampleRateMedMode, uint32_t setSampleRateFastMode, bool internalMCUTemp, uint32_t setCurrentSampleRate = 0, SensorState setSensorState = Off, bool setNodeIDCheck = false, bool setNewSensorValueCheck = false);
+    // constructor 1,
+    //MCU_SENSOR(uint32_t setSensorID, uint32_t setSensorNodeID, uint8_t setADCinput, uint32_t setSampleRateSlowMode, uint32_t setSampleRateMedMode, uint32_t setSampleRateFastMode, bool internalMCUTemp, uint32_t setCurrentSampleRate = 0, SensorState setSensorState = Off, bool setNodeIDCheck = false, bool setNewSensorValueCheck = false);
+    // constructor 2, define attributes for conversions, gui updates, et cetera
+    MCU_SENSOR(uint32_t setSensorID, uint32_t setSensorNodeID, uint8_t setADCinput, uint32_t setSampleRateSlowMode, uint32_t setSampleRateMedMode, uint32_t setSampleRateFastMode, bool internalMCUTemp, float setLinConvCoef1_m = 1, float setLinConvCoef1_b = 0, float setLinConvCoef2_m = 1, float setLinConvCoef2_b = 0, uint32_t setCurrentSampleRate = 0, SensorState setSensorState = Off, bool setNodeIDCheck = false, bool setNewSensorValueCheck = false, bool setNewConversionCheck = false);
 
     // Access functions defined in place
     uint32_t getSensorID(){return sensorID;}
@@ -90,6 +101,7 @@ class MCU_SENSOR
 
     void stateOperations();
 
+    void linearConversion();          //Runs a linear sensor conversion 
 
 };
 

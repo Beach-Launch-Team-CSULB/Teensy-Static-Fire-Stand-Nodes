@@ -39,7 +39,6 @@ class Valve
     
     // constructor, define the valve ID here, and the pin that controls the valve, setFireDelay is only parameter that can be left blank
         Valve(uint32_t setValveID, uint8_t setValveNodeID, ValveType setValveType, uint8_t setPin, uint32_t setFullDutyTime, bool setFireCommandBool, int32_t setFireSequenceTime = 2147483647, uint8_t setHoldDuty = 64, bool setNodeIDCheck = false);
-
     // a start up method, to set pins from within setup()
         void begin();
 

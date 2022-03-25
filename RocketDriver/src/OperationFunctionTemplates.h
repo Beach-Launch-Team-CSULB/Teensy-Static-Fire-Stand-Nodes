@@ -93,6 +93,7 @@ void sensorTasks(const std::array<T, size>& sensorArray, ADC*adc, uint8_t& nodeI
             //Serial.print("LoopRan");
             sensor->read(adc);
             // Could add simple CAN send here, but should be a later function for more flexibility
+            sensor->linearConversion();
             }
     }
 }

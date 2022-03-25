@@ -19,6 +19,7 @@
 #include <list>
 using std::string;
 
+#include "ToMillisTimeTracker.h"
 #include "CANRead.h"
 #include "CANWrite.h"
 #include "CANReports.h"
@@ -30,8 +31,8 @@ using std::string;
 #include "SensorDefinitions.h"
 
 //Trying to figure out RTC stuff with these libs
-/* #include <TimeLib.h>
-#include <DS1307RTC.h> */
+#include <TimeLib.h>
+#include <DS1307RTC.h>
 
 //For use in doing serial inputs as CAN commands for testing
 uint8_t fakeCANmsg;
@@ -310,6 +311,12 @@ void loop()
   //Serial.print("NodeID: ");
   //Serial.println(nodeID);
 
+myTimeTrackingFunction();
+/* Serial.print(second());
+Serial.print(" : ");
+Serial.println(timeSubSecondsMicros); */
+
+
 
   // --- Read CAN bus and update current command ---
   if(CANread(Can0, currentCommand) && !startup) // do not execute on the first loop
@@ -318,12 +325,26 @@ void loop()
     Serial.println(currentCommand);
   }
 
-  if(Serial.available()) {
-      String in = Serial.readString();
-      currentCommand = static_cast<Command>(in.toInt());
-      Serial.println("Received Command: ");
-      Serial.println(currentCommand);
-  }
+  while (Serial.available()) 
+    {
+    fakeCANmsg = Serial.read();
+      if(fakeCANmsg  < command_SIZE) //enter 0 inter serial to trigger command read
+      {
+          //add in code here to prompt for command code and update current command from this
+          //Serial.println("Enter Command Byte");
+          //CurrentCommand = Serial.read();
+
+              
+              //if(fakeCANmsg < command_SIZE)                                           // this checks if the message at that location in the buffer could be a valid command
+              //{
+                  currentCommand = static_cast<Command>(fakeCANmsg);
+              //}
+
+          Serial.println("Command Entered");
+
+        }
+    }
+
 
   // -----Process Commands Here-----
   commandExecute(currentState, priorState, currentCommand, valveArray, pyroArray, valveEnableArray, autoSequenceArray, sensorArray, abortHaltFlag);
@@ -376,8 +397,4 @@ void loop()
 
 startup = false;
 
-digitalWrite(24, HIGH);
-digitalWrite(25, HIGH);
-digitalWrite(26, HIGH);
-digitalWrite(27, HIGH);
 }
