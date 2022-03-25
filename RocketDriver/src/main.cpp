@@ -318,26 +318,12 @@ void loop()
     Serial.println(currentCommand);
   }
 
-  while (Serial.available()) 
-    {
-    fakeCANmsg = Serial.read();
-      if(fakeCANmsg  < command_SIZE) //enter 0 inter serial to trigger command read
-      {
-          //add in code here to prompt for command code and update current command from this
-          //Serial.println("Enter Command Byte");
-          //CurrentCommand = Serial.read();
-
-              
-              //if(fakeCANmsg < command_SIZE)                                           // this checks if the message at that location in the buffer could be a valid command
-              //{
-                  currentCommand = static_cast<Command>(fakeCANmsg);
-              //}
-
-          Serial.println("Command Entered");
-
-        }
-    }
-
+  if(Serial.available()) {
+      String in = Serial.readString();
+      currentCommand = static_cast<Command>(in.toInt());
+      Serial.println("Received Command: ");
+      Serial.println(currentCommand);
+  }
 
   // -----Process Commands Here-----
   commandExecute(currentState, priorState, currentCommand, valveArray, pyroArray, valveEnableArray, autoSequenceArray, sensorArray, abortHaltFlag);
