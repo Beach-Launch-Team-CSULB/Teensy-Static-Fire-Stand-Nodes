@@ -379,6 +379,7 @@ Serial.println(timeSubSecondsMicros); */
   CAN2PropSystemStateReport(Can0, currentState, currentCommand, valveArray, pyroArray, valveEnableArray, abortHaltFlag, nodeID);
   CAN2AutosequenceTimerReport(Can0, autoSequenceArray, abortHaltFlag, nodeID);
   SensorArrayCANSend(Can0, sensorArray);
+  
 
   TeensyInternalReset(currentCommand, nodeID);
 

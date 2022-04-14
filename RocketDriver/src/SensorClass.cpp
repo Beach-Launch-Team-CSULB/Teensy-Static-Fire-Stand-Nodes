@@ -98,11 +98,11 @@ void MCU_SENSOR::linearConversion()
     currentConvertedValue = linConvCoef2_m*currentConvertedValue + linConvCoef2_b;    //Secondary Calibration
     newConversionCheck = true;
 
-            Serial.print("sensorID: ");
+/*             Serial.print("sensorID: ");
             Serial.print(sensorID);
             Serial.print(", currentRawValue: ");
             Serial.println(currentRawValue);
             Serial.print(", currentConvertedValue: ");
-            Serial.println(currentConvertedValue);
+            Serial.println(currentConvertedValue); */
     }
 }

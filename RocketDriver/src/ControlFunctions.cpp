@@ -240,8 +240,8 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveArray.at(9)->setState(ValveState::CloseCommanded);         // Renegade SF Stand
             pyroArray.at(0)->setState(PyroState::OffCommanded);             // Renegade SF Igniter1
             pyroArray.at(1)->setState(PyroState::OffCommanded);             // Renegade SF Igniter2            
-/*             pyroArray.at(2)->setState(PyroState::OffCommanded);             // Pasafire Igniter1
-            pyroArray.at(3)->setState(PyroState::OffCommanded);             // Pasafire Igniter2 */
+            //pyroArray.at(2)->setState(PyroState::OffCommanded);             // Pasafire Igniter1
+            //pyroArray.at(3)->setState(PyroState::OffCommanded);             // Pasafire Igniter2
             valveEnableArray.at(0)->setState(ValveEnableState::On);
             valveEnableArray.at(1)->setState(ValveEnableState::Off);
             valveEnableArray.at(2)->setState(ValveEnableState::Off);

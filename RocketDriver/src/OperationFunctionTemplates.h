@@ -7,7 +7,7 @@
 #include <array>
 #include <bitset>
 #include <FlexCAN.h>
-#include <ADC.h>
+//#include <ADC.h>
 
 
 
@@ -95,6 +95,10 @@ void sensorTasks(const std::array<T, size>& sensorArray, ADC*adc, uint8_t& nodeI
             // Could add simple CAN send here, but should be a later function for more flexibility
             sensor->linearConversion();
             }
+        else if (nodeIDReadIn == 6)
+        {
+            sensor->linearConversion();
+        }
     }
 }
 
@@ -211,7 +215,7 @@ void ValveNodeIDCheck(const std::array<T, size>& valveArray, uint8_t nodeIDfromM
 template <typename T, std::size_t size>
 void ValveEnableNodeIDCheck(const std::array<T, size>& valveEnableArray, uint8_t nodeIDfromMain)
 {
-    // iterate through valve array and run the stateOperations method
+    // iterate through valveEnable array and run the stateOperations method
     for (auto valveEnable : valveEnableArray)
     {
         if (valveEnable->getValveEnableNodeID() == nodeIDfromMain)
@@ -224,7 +228,7 @@ void ValveEnableNodeIDCheck(const std::array<T, size>& valveEnableArray, uint8_t
 template <typename T, std::size_t size>
 void PyroNodeIDCheck(const std::array<T, size>& pyroArray, uint8_t nodeIDfromMain)
 {
-    // iterate through valve array and run the stateOperations method
+    // iterate through pyro array and run the stateOperations method
     for (auto pyro : pyroArray)
     {
         if (pyro->getPyroNodeID() == nodeIDfromMain)
@@ -237,10 +241,14 @@ void PyroNodeIDCheck(const std::array<T, size>& pyroArray, uint8_t nodeIDfromMai
 template <typename T, std::size_t size>
 void SensorNodeIDCheck(const std::array<T, size>& sensorArray, uint8_t nodeIDfromMain)
 {
-    // iterate through valve array and run the stateOperations method
+    // iterate through sensor array and run the stateOperations method
     for (auto sensor : sensorArray)
     {
         if (sensor->getSensorNodeID() == nodeIDfromMain)
+        {
+            sensor->setNodeIDCheck(true);
+        }
+        else if (nodeIDfromMain == 6)    //Logger nodeID so it generates array for all sensors
         {
             sensor->setNodeIDCheck(true);
         }
@@ -272,30 +280,5 @@ std::bitset<BITFLAG_SIZE> setValveFlags(const std::array<T, size>& valveArray)
     
     return valveStatus;
 } */
-
-/* // this runs the begin method for each sensor
-template <std::size_t size>
-void sensorSetUp(const std::array<SENSOR*, size>& sensorArray, uint8_t& nodeID)
-{
-    
-    for(auto sensor : sensorArray)
-    {
-        sensor->begin();
-    }
-}
-
-// This function reads all the sensor values
-template <std::size_t size>
-void readSensors(const std::array<SENSOR*, size>& sensorArray, ADC* adc, uint8_t& nodeID)
-{
-    if (sensorArray[0]->getSensorNodeID() == nodeID)
-    {
-        for(auto sensor : sensorArray)
-        {
-            sensor->read(adc);
-        }
-    }    
-}
- */
 
 #endif

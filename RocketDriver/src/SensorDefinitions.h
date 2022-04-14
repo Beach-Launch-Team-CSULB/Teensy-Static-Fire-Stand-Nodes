@@ -3,7 +3,7 @@
 
 #include "SensorClass.h"
 #include <array>
-#include <ADC.h>
+//#include <ADC.h>
 
 
 // define number of sensors here

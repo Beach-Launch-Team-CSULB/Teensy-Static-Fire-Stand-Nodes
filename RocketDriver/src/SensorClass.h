@@ -55,6 +55,7 @@ class MCU_SENSOR
     uint32_t currentRawValue{};               // holds the current value for the sensor
     bool newSensorValueCheck;                      // Is the current raw value a new read that hasn't been sent yet?
     uint32_t currentCalibratedValue{};               // holds the current value for the sensor
+    uint16_t currentCANtimestamp = 0;
     //const uint8_t bitDepth;                   // bit depth of the sample, for output chopping?
     bool nodeIDCheck;                           // Whether this object should operate on this node
     bool internalMCUTemp;                       // Is this sensor the MCU internal temp
@@ -79,8 +80,12 @@ class MCU_SENSOR
     uint32_t getADCinput(){return ADCinput;}
     uint32_t getCurrentSampleRate(){return currentSampleRate;}
     uint32_t getCurrentRawValue(){return currentRawValue;}
+    uint32_t getCurrentConvertedValue(){return currentConvertedValue;}
+    uint16_t getCANTimestamp(){return currentCANtimestamp;}
     bool getNodeIDCheck(){return nodeIDCheck;}
     bool getNewSensorValueCheck(){return newSensorValueCheck;}
+    bool getNewSensorConversionCheck(){return newConversionCheck;}
+
 
     // further fuctions defined in SensorClass.cpp
     void begin();                     // run in setup to get pins going
@@ -91,9 +96,15 @@ class MCU_SENSOR
     // set the Node ID Check bool function
     void setNodeIDCheck(bool updatedNodeIDCheck) {nodeIDCheck = updatedNodeIDCheck;}
 
+    void setCurrentRawValue(uint32_t updateCurrentRawValue){currentRawValue = updateCurrentRawValue;}
+
     void setNewSensorValueCheck(bool updateNewSensorValueCheck){newSensorValueCheck = updateNewSensorValueCheck;}
 
-    void setCurrentSampleRate(uint32_t updateCurrentSampleRate) {currentSampleRate = updateCurrentSampleRate;}
+    void setNewConversionCheck(bool updateNewConversionCheck){newConversionCheck = updateNewConversionCheck;}
+
+    void setCANTimestamp(uint16_t CANTimestamp){currentCANtimestamp = CANTimestamp;}
+
+    void setCurrentSampleRate(uint32_t updateCurrentSampleRate) {currentSampleRate = updateCurrentSampleRate; newSensorValueCheck = true; newConversionCheck = false;}
 
     void resetTimer();                // resets timer to zero
 

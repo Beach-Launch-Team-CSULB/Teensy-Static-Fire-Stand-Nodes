@@ -27,6 +27,7 @@ void CAN2PropSystemStateReport(FlexCAN& CANbus, State& currentState, Command& cu
 {
 if (PropSysReportTimer >= 1000000)
 {
+    Serial.println(now());
     //Hardcoded array iterator sizes because I'm not smart enough to fix the auto arrays yet
     if (nodeID == 2)
     {
@@ -243,6 +244,39 @@ void SensorArrayCANSend(FlexCAN& CANbus, const std::array<MCU_SENSOR*, NUM_SENSO
     }
 }
 
+void SensorArrayConvertedCANSend(FlexCAN& CANbus, const std::array<MCU_SENSOR*, NUM_SENSORS>& sensorArray)
+{
+    static CAN_message_t msgOut;
+    msgOut.ext = 1;                 // Turn ON Extended ID to pack timestamp in the extra bits
+    msgOut.len = 2;
+    uint32_t sensorValueToSend;
+    
+    for(auto sensor : sensorArray)
+    {
+        if (sensor->getNewSensorConversionCheck())
+        {
+            msgOut.id = sensor->getSensorID() + (sensor->getCANTimestamp())<<11; //packing IDA as normal CAN ID/sensorID and IDB as CAN timestamp
+            
+            sensorValueToSend = sensor->getCurrentConvertedValue();
+            msgOut.buf[0] = sensorValueToSend;
+            msgOut.buf[1] = (sensorValueToSend >> 8);
+
+            // write message to bus
+            CANbus.write(msgOut);
+
+            // For now don't reset the conversion check, let GUI repeat messages
+            //sensor->setNewConversionCheck(false);
+            //sensor->setNewSensorValueCheck(false);
+/*             Serial.print("Sensor ID");
+            Serial.print(msgOut.id);
+            Serial.print("Sensor Value");
+            Serial.println(sensorValueToSend); */
+            {
+                // add write error handling here, for now it does nothing
+            }
+        }
+    }
+}
 /* bool CAN2ValveStateReport()
 {
     
