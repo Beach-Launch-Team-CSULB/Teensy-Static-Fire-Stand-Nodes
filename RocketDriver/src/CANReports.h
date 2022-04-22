@@ -12,8 +12,11 @@
 
 uint8_t engineNodeValveNum = 4;
 uint8_t propNodeValveNum = 6;
+uint8_t PasafireNodeValveNum = 6;
 uint8_t engineNodePyroNum = 2;
 uint8_t propNodePyroNum = 0;
+uint8_t PasafireNodePyroNum = 2;
+
 uint8_t vavleArrayCount;
 uint8_t pyroArrayCount;
 
@@ -39,6 +42,11 @@ if (PropSysReportTimer >= 1000000)
         vavleArrayCount = propNodeValveNum;
         pyroArrayCount = propNodePyroNum;
     }
+    else if (nodeID == 8)
+    {
+        vavleArrayCount = PasafireNodeValveNum;
+        pyroArrayCount = PasafireNodePyroNum;
+    }    
     else
     {
         vavleArrayCount = 7;
@@ -174,7 +182,7 @@ if (PropSysReportTimer >= 1000000)
 
 void CAN2AutosequenceTimerReport(FlexCAN& CANbus, const std::array<AutoSequence*, NUM_AUTOSEQUENCES>& autoSequenceArray, bool & haltFlag, int nodeID)
 {
-    if (AutoSequenceReportTimer >= 1000000)
+    if (AutoSequenceReportTimer >= 100000)
     {
     // build message
         static CAN_message_t msgOut;
@@ -222,7 +230,10 @@ void SensorArrayCANSend(FlexCAN& CANbus, const std::array<MCU_SENSOR*, NUM_SENSO
     
     for(auto sensor : sensorArray)
     {
-        if (sensor->getNewSensorValueCheck())
+        //Serial.println("Assballs");
+        //Serial.println(sensor->getNewSensorValueCheck());
+        //Serial.print(sensor->getSensorID());
+                if (sensor->getNewSensorValueCheck())
         {
             msgOut.id = sensor->getSensorID();
             
@@ -232,7 +243,10 @@ void SensorArrayCANSend(FlexCAN& CANbus, const std::array<MCU_SENSOR*, NUM_SENSO
 
             // write message to bus
             CANbus.write(msgOut);
+            //Serial.println("Fuck you you fucking fuck");
+            //Serial.println(sensor->getNewSensorValueCheck());
             sensor->setNewSensorValueCheck(false);
+            //Serial.println(sensor->getNewSensorValueCheck());
 /*             Serial.print("Sensor ID");
             Serial.print(msgOut.id);
             Serial.print("Sensor Value");

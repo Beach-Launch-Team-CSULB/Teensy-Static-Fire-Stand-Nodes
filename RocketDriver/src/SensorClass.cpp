@@ -37,6 +37,7 @@ void MCU_SENSOR::read(ADC* adc)
     //Add in sample rate code here to check if a sensor is up to be read
     //This is also where alternate ADC sources would be used - I do have the RTD sensors over ITC right now
     //I'll have to change how it's written though, right now it's ADC* adc which is specific to Teensy MCU ADC
+    
     if (currentSampleRate != 0)     //math says no divide by zero, use separate conditional for sample rate of 0
     {
     if (timer >= (1000000/currentSampleRate))   // Divides 1 second in microseconds by current sample rate in Hz
@@ -58,9 +59,13 @@ void MCU_SENSOR::read(ADC* adc)
             Serial.println(currentRawValue);
             Serial.print(", currentConvertedValue: ");
             Serial.println(currentConvertedValue); */
-            
+            //Serial.println("newSensorREADbefore");
+            //Serial.println(newSensorValueCheck);
             newSensorValueCheck = true;
+            //newSensorValueCheck = false;
             newConversionCheck = false;
+            //Serial.println("newSensorinREADafter");
+            //Serial.println(newSensorValueCheck);
             timer = 0;
         }
     }

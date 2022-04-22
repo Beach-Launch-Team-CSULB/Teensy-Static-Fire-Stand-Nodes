@@ -104,6 +104,10 @@ void Valve::stateOperations()
                     break;
             }
         }
+        else
+        {
+            state = ValveState::Open;
+        }
         break;
 
     // if a valve is commanded closed, a normal closed removes power, normal open starts activation sequence
@@ -125,6 +129,10 @@ void Valve::stateOperations()
                 default:
                     break;
             }
+        }
+        else
+        {
+            state = ValveState::Closed;
         }
         break;
 

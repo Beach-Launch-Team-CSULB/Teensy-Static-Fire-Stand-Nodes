@@ -98,13 +98,20 @@ class MCU_SENSOR
 
     void setCurrentRawValue(uint32_t updateCurrentRawValue){currentRawValue = updateCurrentRawValue;}
 
-    void setNewSensorValueCheck(bool updateNewSensorValueCheck){newSensorValueCheck = updateNewSensorValueCheck;}
+    void setNewSensorValueCheck(bool updateNewSensorValueCheck)
+    {
+    newSensorValueCheck = updateNewSensorValueCheck;
+    //Serial.println("Brandon is awesome");
+    //Serial.println(newSensorValueCheck);
+
+    }
 
     void setNewConversionCheck(bool updateNewConversionCheck){newConversionCheck = updateNewConversionCheck;}
 
     void setCANTimestamp(uint16_t CANTimestamp){currentCANtimestamp = CANTimestamp;}
 
-    void setCurrentSampleRate(uint32_t updateCurrentSampleRate) {currentSampleRate = updateCurrentSampleRate; newSensorValueCheck = true; newConversionCheck = false;}
+    //void setCurrentSampleRate(uint32_t updateCurrentSampleRate) {currentSampleRate = updateCurrentSampleRate; newSensorValueCheck = true; newConversionCheck = false;}
+    void setCurrentSampleRate(uint32_t updateCurrentSampleRate) {currentSampleRate = updateCurrentSampleRate;}
 
     void resetTimer();                // resets timer to zero
 

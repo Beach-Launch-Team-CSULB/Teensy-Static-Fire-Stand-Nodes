@@ -21,7 +21,7 @@ using std::string;
 
 #include "ToMillisTimeTracker.h"
 #include "CANRead.h"
-#include "CANWrite.h"
+#include "CANWrite.h"+
 #include "CANReports.h"
 #include "OperationFunctionTemplates.h"
 #include "pinList.h"
@@ -33,6 +33,8 @@ using std::string;
 //Trying to figure out RTC stuff with these libs
 #include <TimeLib.h>
 #include <DS1307RTC.h>
+
+#define NODEIDPRESET 2;
 
 //For use in doing serial inputs as CAN commands for testing
 uint8_t fakeCANmsg;
@@ -197,10 +199,10 @@ void setup() {
 
   // ----- Run the Node ID Detection Function -----
   nodeID = NodeIDDetect(nodeID, startup, nodeIDdeterminefromEEPROM, nodeIDfromEEPROM);
-  //nodeID = 3;       //For manually assigning NodeID isntead of the address read, make sure to comment out for operational use
+  //nodeID = NODEIDPRESET;       //For manually assigning NodeID isntead of the address read, make sure to comment out for operational use
   // Write 0 to byte for nodeIDDetermineAddress after reading it after a reset
   cli(); // disables interrupts to protect write command
-  EEPROM.update(nodeIDDetermineAddress, 0);                                 // Never use .write()
+  EEPROM.update(nodeIDDetermineAddress, 0);                                 // Never use .write()+
   sei(); // reenables interrupts after write is completed
 
 
