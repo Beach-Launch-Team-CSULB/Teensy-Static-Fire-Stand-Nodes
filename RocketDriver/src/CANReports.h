@@ -189,34 +189,37 @@ void CAN2AutosequenceTimerReport(FlexCAN& CANbus, const std::array<AutoSequence*
         msgOut.ext = 0;
         //change ID format to be better and match my updated plan
         for(auto autoSequence : autoSequenceArray)
+        if (autoSequence->getHostNodeID() == nodeID)
         {
-            msgOut.id = nodeID + 16;  // with 16 possible nodes in ID format this makes the CAN ID possible go up to 31, lowest sensor ID in current format is 50.
-            msgOut.len = 8;
-            int64_t autosequenceTimer = autoSequence->getCurrentCountdown();
-            uint8_t autosequenceTimerStateEnumToInt = static_cast<uint8_t>(autoSequence->getAutoSequenceState());
+            {
+                msgOut.id = nodeID + 16;  // with 16 possible nodes in ID format this makes the CAN ID possible go up to 31, lowest sensor ID in current format is 50.
+                msgOut.len = 8;
+                int64_t autosequenceTimer = autoSequence->getCurrentCountdown();
+                uint8_t autosequenceTimerStateEnumToInt = static_cast<uint8_t>(autoSequence->getAutoSequenceState());
 
-            Serial.print("Autosequence: State : ");
-            Serial.print(autosequenceTimerStateEnumToInt);
-            Serial.print(" Timer : ");
-            Serial.print(autosequenceTimer);
-            Serial.println();
+                Serial.print("Autosequence: State : ");
+                Serial.print(autosequenceTimerStateEnumToInt);
+                Serial.print(" Timer : ");
+                Serial.print(autosequenceTimer);
+                Serial.println();
 
-            msgOut.buf[0] = autosequenceTimerStateEnumToInt;
-            msgOut.buf[1] = autosequenceTimer;
-            msgOut.buf[2] = (autosequenceTimer >> 8);
-            msgOut.buf[3] = (autosequenceTimer >> 16);
-            msgOut.buf[4] = (autosequenceTimer >> 24);
-            msgOut.buf[5] = (autosequenceTimer >> 32);
-            msgOut.buf[6] = (autosequenceTimer >> 40);
-            msgOut.buf[7] = (autosequenceTimer >> 48);
-            
-            // write message to bus
-            CANbus.write(msgOut);
-        }    
-        {
-            // add write error handling here, for now it does nothing
+                msgOut.buf[0] = autosequenceTimerStateEnumToInt;
+                msgOut.buf[1] = autosequenceTimer;
+                msgOut.buf[2] = (autosequenceTimer >> 8);
+                msgOut.buf[3] = (autosequenceTimer >> 16);
+                msgOut.buf[4] = (autosequenceTimer >> 24);
+                msgOut.buf[5] = (autosequenceTimer >> 32);
+                msgOut.buf[6] = (autosequenceTimer >> 40);
+                msgOut.buf[7] = (autosequenceTimer >> 48);
+                
+                // write message to bus
+                CANbus.write(msgOut);
+            }    
+            {
+                // add write error handling here, for now it does nothing
+            }
+            AutoSequenceReportTimer = 0;
         }
-        AutoSequenceReportTimer = 0;
         }
 }
 

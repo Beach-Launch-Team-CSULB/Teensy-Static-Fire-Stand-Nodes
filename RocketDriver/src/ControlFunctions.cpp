@@ -803,11 +803,11 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
         case command_closeLoxMV:
             if(currentState == State::test)
             {
-                valveArray.at(8)->setState(ValveState::CloseCommanded);
+                valveArray.at(9)->setState(ValveState::CloseCommanded);
             }
             else if (currentState == State::offNominal)
             {
-                valveArray.at(8)->setState(ValveState::CloseCommanded);
+                valveArray.at(9)->setState(ValveState::CloseCommanded);
             }              
             break;
         case command_openLoxMV:
@@ -833,11 +833,11 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
         case command_openFuelMV:
              if(currentState == State::test)
             {
-                valveArray.at(9)->setState(ValveState::OpenCommanded);
+                valveArray.at(8)->setState(ValveState::OpenCommanded);
             }
             else if (currentState == State::offNominal)
             {
-                valveArray.at(9)->setState(ValveState::OpenCommanded);
+                valveArray.at(8)->setState(ValveState::OpenCommanded);
             }              
             break;
         case command_disableHiPressHiVentSafety:
