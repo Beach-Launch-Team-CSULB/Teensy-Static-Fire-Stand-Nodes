@@ -34,7 +34,7 @@ using std::string;
 #include <TimeLib.h>
 #include <DS1307RTC.h>
 
-#define NODEIDPRESET 2;
+#define NODEIDPRESET 2;     //NOT in use normally, for testing with the address IO register inactive
 
 //For use in doing serial inputs as CAN commands for testing
 uint8_t fakeCANmsg;
@@ -136,6 +136,19 @@ void TeensyInternalReset (Command CurrentCommand, uint8_t nodeID)
     if (nodeID == 3)
     {
       Serial.println("wtf why restart (Local Node3)");
+      Serial.println(CurrentCommand);
+      cli(); // disables interrupts to protect write command
+      EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()
+      sei(); // reenables interrupts after write is completed
+      WRITE_RESTART(0x5FA0004);
+    }
+    else;
+  }
+  else if (CurrentCommand == command_node7RESET)
+  {
+    if (nodeID == 7)
+    {
+      Serial.println("wtf why restart (Local Node7)");
       Serial.println(CurrentCommand);
       cli(); // disables interrupts to protect write command
       EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()

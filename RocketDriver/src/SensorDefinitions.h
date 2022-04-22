@@ -32,16 +32,16 @@ MCU_SENSOR MCUtempNode3{300, 3, 70, 2, 10, 100, true};                          
 
 // initialize all sensor objects here (PINS NOT CORRECT?, calibrations definitely not correct)
 // Pasafire config
-MCU_SENSOR PasafireChamberPT1{214, 8, A14, 10, 100, 1000, false, 0.0185, -128.88};      // 17
-MCU_SENSOR PasafireFuelTankPT{215, 8, A15, 2, 10, 100, false, 0.0186, -126.67};         // 18
-MCU_SENSOR PasafireLOXTankPT{216, 8, A16, 2, 10, 100, false, 0.0186, -126.67};          // 19
-MCU_SENSOR PasafireFuelRegPT{217, 8, A17, 2, 10, 100, false, 0.0186, -126.67};          // 20
-MCU_SENSOR PasafireLOXRegPT{218, 8, A18, 2, 10, 100, false, 0.0186, -126.67};           // 21
-MCU_SENSOR PasafireFuelLinePT{219, 8, A19, 2, 10, 100, false, 0.0186, -126.67};         // 22
-MCU_SENSOR PasafireLOXLinePT{220, 8, A20, 2, 10, 100, false, 0.0186, -126.67};          // 23
-MCU_SENSOR PasafirePneumaticPT{221, 8, A21, 2, 10, 100, false, 0.0186, -126.56};        // 24
-MCU_SENSOR PasafireThrustMountLoadCell1{222, 8, A22, 2, 10, 150, false};                // 25
-MCU_SENSOR MCUtempNode8{800, 8, 70, 2, 10, 100, true};                                  // 26
+MCU_SENSOR PasafireChamberPT1{189, 7, A14, 10, 100, 1000, false, 0.0185, -128.88};      // 17
+MCU_SENSOR PasafireFuelTankPT{190, 7, A15, 2, 10, 100, false, 0.0186, -126.67};         // 18
+MCU_SENSOR PasafireLOXTankPT{191, 7, A16, 2, 10, 100, false, 0.0186, -126.67};          // 19
+MCU_SENSOR PasafireFuelRegPT{192, 7, A17, 2, 10, 100, false, 0.0186, -126.67};          // 20
+MCU_SENSOR PasafireLOXRegPT{193, 7, A18, 2, 10, 100, false, 0.0186, -126.67};           // 21
+MCU_SENSOR PasafireFuelLinePT{194, 7, A19, 2, 10, 100, false, 0.0186, -126.67};         // 22
+MCU_SENSOR PasafireLOXLinePT{195, 7, A20, 2, 10, 100, false, 0.0186, -126.67};          // 23
+MCU_SENSOR PasafirePneumaticPT{196, 7, A21, 2, 10, 100, false, 0.0186, -126.56};        // 24
+MCU_SENSOR PasafireThrustMountLoadCell1{197, 7, A22, 2, 10, 150, false};                // 25
+MCU_SENSOR MCUtempNode8{700, 7, 70, 2, 10, 100, true};                                  // 26
 
 // Sensor Array including Renegade SF only
 //std::array<MCU_SENSOR*, NUM_SENSORS> sensorArray{&ThrustMountLoadCell1, &ThrustMountLoadCell2, &ThrustMountLoadCell3, &ChamberPT2, &ChamberPT1, &FuelInletPropSidePT, &FuelInjectorPT, &LoxInletPropSidePT, &MVPneumaticsPT, &DomeRegFuelPT, &DomeRegLoxPT, &FuelTankPT, &LoxTankPT, &HiPressFuelPT, &HiPressLoxPT, &MCUtempNode2, &MCUtempNode3};

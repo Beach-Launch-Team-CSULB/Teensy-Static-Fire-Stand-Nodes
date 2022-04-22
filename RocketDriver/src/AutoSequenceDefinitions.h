@@ -9,7 +9,7 @@
 
 
 AutoSequence IgnitionAutoSequence{-15000000, 2}; // X seconds in micros to set the countdownStart
-AutoSequence PasafireIgnitionAutoSequence{-15000000, 8}; // X seconds in micros to set the countdownStart
+AutoSequence PasafireIgnitionAutoSequence{-15000000, 7}; // X seconds in micros to set the countdownStart
 
 std::array<AutoSequence*, NUM_AUTOSEQUENCES> autoSequenceArray{&IgnitionAutoSequence, &PasafireIgnitionAutoSequence};
 

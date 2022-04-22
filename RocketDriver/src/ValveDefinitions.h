@@ -35,12 +35,12 @@ Valve FuelVent{21, 3, NormalClosed, 2, 25000, false};               //WRONG PIN 
 Valve FuelDomeReg{22, 3, NormalClosed, 7, 25000, false};
 Valve FuelDomeRegVent{23, 3, NormalClosed, 8, 25000, false};
 // On Pasafire Node
-Valve PasaLoxVent{18, 8, NormalOpen, 2, 500000, false, 166};
-Valve PasaLoxDomeReg{19, 8, NormalOpen, 5, 25000, false};
-Valve PasaFuelVent{21, 8, NormalClosed, 2, 25000, false};
-Valve PasaFuelDomeReg{22, 8, NormalClosed, 7, 25000, false};
-Valve PasaLoxMV{24, 8, NormalClosed, 7, 25000, false, -1, 50};
-Valve PasaFuelMV{25, 8, NormalClosed, 6, 25000, false, -1, 50};
+Valve PasaLoxVent{18, 7, NormalOpen, 2, 500000, false, 166};        //18
+Valve PasaLoxDomeReg{19, 7, NormalOpen, 5, 25000, false};           //19
+Valve PasaFuelVent{21, 7, NormalClosed, 2, 25000, false};           //21
+Valve PasaFuelDomeReg{22, 7, NormalClosed, 7, 25000, false};        //22
+Valve PasaLoxMV{24, 7, NormalClosed, 7, 25000, false, -1, 50};      //24
+Valve PasaFuelMV{25, 7, NormalClosed, 6, 25000, false, -1, 50};     //25
 
 // On BabyShark Pad Node
 /* Valve HiPress{16, 2, NormalClosed, 2, 25000, false};
@@ -73,10 +73,10 @@ ValveEnable LoxDomeRegVentSafe{34, 25, 3};
 ValveEnable FuelDomeRegVentSafe{35, 26, 3};
 ValveEnable LoxVentSafe{36, 27, 3};
 // On Pasafire Node
-ValveEnable PasaFuelVentSafe{33, 24, 8};
-ValveEnable PasaLoxVentSafe{36, 27, 8};
-ValveEnable PasaMainValvesSafe{37, 25, 8};
-ValveEnable PasaLoxFuelDomesSafe{38, 25, 8}; 
+ValveEnable PasaFuelVentSafe{33, 24, 7};
+ValveEnable PasaLoxVentSafe{36, 27, 7};
+ValveEnable PasaMainValvesSafe{37, 25, 7};
+ValveEnable PasaLoxFuelDomesSafe{38, 25, 7}; 
 
 // BabyShark should be one to one Valve Enables to outputs with planned ALARA design
 

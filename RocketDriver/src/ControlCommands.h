@@ -64,6 +64,9 @@ enum Command
     command_node2RESET = 239,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
     command_node3RESET = 240,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
     command_node4RESET = 241,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
+    command_node5RESET = 242,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
+    command_node6RESET = 243,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
+    command_node7RESET = 244,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
     command_GLOBALRESET = 254,                          // Use for reset command that writes to internal reset register
     command_reseved = 255,                              // 255 Reserved for future use
     command_SIZE, // not a valid command but it is useful for checking if recieved messages are valid commands, see CANRead. Always leave this at the end of the enum listcomm
