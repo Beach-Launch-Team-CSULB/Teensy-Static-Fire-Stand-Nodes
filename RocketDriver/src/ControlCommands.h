@@ -59,6 +59,11 @@ enum Command
     command_enableLoxVentSafety = 73,
     command_disableMainValvesSafety = 74,
     command_enableMainValvesSafety = 75,                //End of safety enables
+    command_allSensorsOff = 126,                        //For Calibration Routines/testing
+    command_allSensorsSlow = 127,                       //For Calibration Routines/testing
+    command_allSensorsMedium = 128,                     //For Calibration Routines/testing
+    command_allSensorsFast = 129,                       //For Calibration Routines/testing
+    command_allSensorsCalibration = 130,                //For Calibration Routines/testing
     command_propProgSetting = 237,                      // placeholder to use for sending specific program
     command_node1RESET = 238,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid
     command_node2RESET = 239,                            // Use for reset command that writes to internal reset register, needs a following byte to ID the node to be valid

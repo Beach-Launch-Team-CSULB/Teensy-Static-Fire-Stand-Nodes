@@ -21,7 +21,7 @@ using std::string;
 
 #include "ToMillisTimeTracker.h"
 #include "CANRead.h"
-#include "CANWrite.h"+
+#include "CANWrite.h"
 #include "CANReports.h"
 #include "OperationFunctionTemplates.h"
 #include "pinList.h"
@@ -64,8 +64,8 @@ CAN_message_t extended;
 
 int value = 0;
 int counter = 0;
-int MCUtempPIN = 70;  //?? Not sure, I was trying to figure out how to read direct from the non Teensy MCU pin
-int MCUtempraw;
+//int MCUtempPIN = 70;  //?? Not sure, I was trying to figure out how to read direct from the non Teensy MCU pin
+//int MCUtempraw;
 
 int busSpeed0 = 500000; //baudrate - do not set above 500000 for full distance run bunker to pad
 int busSpeed1 = 500000; //baudrate - do not set above 500000 for full distance run bunker to pad
@@ -146,7 +146,7 @@ void TeensyInternalReset (Command CurrentCommand, uint8_t nodeID)
   }
   else if (CurrentCommand == command_node7RESET)
   {
-    if (nodeID == 7)
+    if (nodeID == 15)
     {
       Serial.println("wtf why restart (Local Node7)");
       Serial.println(CurrentCommand);
@@ -288,8 +288,8 @@ void setup() {
 
 ///// Temp Sensor for TC Cold Junction /////
 // Setting alt I2C pins because I used default I2C pins
-Wire.setSDA(38);
-Wire.setSCL(37);
+//Wire.setSDA(38);
+//Wire.setSCL(37);
 
 /* if(!tempsensor.begin(0x19))
 {
@@ -371,13 +371,26 @@ Serial.println(timeSubSecondsMicros); */
 
   // -----Advance needed propulsion system tasks (valve, valve enables, pyro, autosequences) ----- //
   autoSequenceTasks(autoSequenceArray,nodeID);
+  
+  if (nodeID != 15)
+  {
   currentCountdownForMain = IgnitionAutoSequence.getCurrentCountdown();
+  }
+  else if (nodeID = (15))
+  {
+  currentCountdownForMain = PasafireIgnitionAutoSequence.getCurrentCountdown();
+  }
+  
+
+  
+  
+  
   autoSequenceValveUpdate(valveArray, currentCountdownForMain);
   autoSequencePyroUpdate(pyroArray, currentCountdownForMain);  
   valveTasks(valveArray, nodeID);
   valveEnableTasks(valveEnableArray, nodeID);
   pyroTasks(pyroArray, nodeID);
-  sensorTasks(sensorArray, adc, nodeID);
+  sensorTasks(sensorArray, adc, rocketDriverSeconds, rocketDriverMicros, nodeID);
   
 
 /*     Serial.print("abortHaltFlag: ");
@@ -412,5 +425,7 @@ Serial.println(timeSubSecondsMicros); */
   } */
 
 startup = false;
+
+
 
 }

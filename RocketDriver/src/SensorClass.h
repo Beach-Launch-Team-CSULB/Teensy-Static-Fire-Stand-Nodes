@@ -37,6 +37,7 @@ enum SensorState
   Slow,
   Medium,
   Fast,
+  Calibration,
 };
 
 class MCU_SENSOR
@@ -50,12 +51,14 @@ class MCU_SENSOR
     const uint32_t sampleRateSlowMode;        //the sample rate this given sensor will be read at
     const uint32_t sampleRateMedMode;         //the sample rate this given sensor will be read at
     const uint32_t sampleRateFastMode;        //the sample rate this given sensor will be read at
+    const uint32_t sampleRateCalibrationMode = 10;        //the sample rate this given sensor will be read at
     uint32_t currentSampleRate;
     elapsedMicros timer;                      // timer for sensor timing operations
     uint32_t currentRawValue{};               // holds the current value for the sensor
     bool newSensorValueCheck;                      // Is the current raw value a new read that hasn't been sent yet?
-    uint32_t currentCalibratedValue{};               // holds the current value for the sensor
     uint16_t currentCANtimestamp = 0;
+    uint32_t currentTimestampSeconds = 0;
+    uint32_t currentTimestampMicros = 0;
     //const uint8_t bitDepth;                   // bit depth of the sample, for output chopping?
     bool nodeIDCheck;                           // Whether this object should operate on this node
     bool internalMCUTemp;                       // Is this sensor the MCU internal temp
@@ -67,6 +70,10 @@ class MCU_SENSOR
     float linConvCoef1_b;                     // Base calibration coefficients
     float linConvCoef2_m;                     // adjustment calibration coefficients (intended for application specifics like angle load cell mounting)
     float linConvCoef2_b;                     // adjustment calibration coefficients (intended for application specifics like angle load cell mounting)
+    uint16_t rollingSensorArrayRaw[10];       // Array for doing averages of readings
+    uint8_t currentRollingArrayPosition = 0;
+    uint32_t currentCalibrationValue{};               // holds the current value for the sensor
+    uint32_t currentRunningSUM = 0;
 
   public:
     // constructor 1,
@@ -82,6 +89,10 @@ class MCU_SENSOR
     uint32_t getCurrentRawValue(){return currentRawValue;}
     uint32_t getCurrentConvertedValue(){return currentConvertedValue;}
     uint16_t getCANTimestamp(){return currentCANtimestamp;}
+    uint32_t getTimestampSeconds(){return currentTimestampSeconds;}
+    uint32_t getTimestampMicros(){return currentTimestampMicros;}
+    uint8_t getCurrentRollingArrayPosition(){return currentRollingArrayPosition;}
+    uint32_t getCurrentRollingAverage(){return currentCalibrationValue;}
     bool getNodeIDCheck(){return nodeIDCheck;}
     bool getNewSensorValueCheck(){return newSensorValueCheck;}
     bool getNewSensorConversionCheck(){return newConversionCheck;}
@@ -98,17 +109,13 @@ class MCU_SENSOR
 
     void setCurrentRawValue(uint32_t updateCurrentRawValue){currentRawValue = updateCurrentRawValue;}
 
-    void setNewSensorValueCheck(bool updateNewSensorValueCheck)
-    {
-    newSensorValueCheck = updateNewSensorValueCheck;
-    //Serial.println("Brandon is awesome");
-    //Serial.println(newSensorValueCheck);
-
-    }
+    void setNewSensorValueCheck(bool updateNewSensorValueCheck){newSensorValueCheck = updateNewSensorValueCheck;}
 
     void setNewConversionCheck(bool updateNewConversionCheck){newConversionCheck = updateNewConversionCheck;}
 
     void setCANTimestamp(uint16_t CANTimestamp){currentCANtimestamp = CANTimestamp;}
+    
+    void setSYSTimestamp(uint32_t timestampSeconds, uint32_t timestampMicros){currentTimestampSeconds = timestampSeconds; currentTimestampMicros = timestampMicros;}
 
     //void setCurrentSampleRate(uint32_t updateCurrentSampleRate) {currentSampleRate = updateCurrentSampleRate; newSensorValueCheck = true; newConversionCheck = false;}
     void setCurrentSampleRate(uint32_t updateCurrentSampleRate) {currentSampleRate = updateCurrentSampleRate;}
@@ -120,6 +127,22 @@ class MCU_SENSOR
     void stateOperations();
 
     void linearConversion();          //Runs a linear sensor conversion 
+
+    //void setRollingSensorArrayRaw(uint8_t arrayPosition, uint16_t sensorValueToArray)
+    void setRollingSensorArrayRaw(uint8_t arrayPosition, uint16_t sensorValueToArray)
+      {
+        rollingSensorArrayRaw[arrayPosition] = sensorValueToArray;
+        arrayPosition++;
+      }
+
+    void setCurrentCalibrationValue()
+    {
+    for (size_t i = 0; i < 10; i++)
+    {
+      currentRunningSUM = currentRunningSUM + rollingSensorArrayRaw[i];
+    }
+    currentCalibrationValue = currentRunningSUM / 10;
+    }
 
 };
 

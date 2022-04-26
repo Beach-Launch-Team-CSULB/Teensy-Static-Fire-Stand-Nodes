@@ -16,10 +16,11 @@ time_t inProgramTime;
 int32_t inProgramSECS;
 int32_t updateProgramSECS;
 
-elapsedMicros timeSubSecondsMicros;
-uint32_t runningOffsetMicros;
+elapsedMicros timerSubSecondsMicros;
 uint8_t calibrationLoopIterator = 0;        //when for loop condition is true, sets timer to 0 at system clock rollover, make sure to reset this if I ever set system time
 
+uint32_t rocketDriverSeconds;
+uint32_t rocketDriverMicros;
 
 void myTimeTrackingFunction()
 {
@@ -28,14 +29,16 @@ void myTimeTrackingFunction()
     {
         if (second() != inProgramSECS)
         {
-            timeSubSecondsMicros = 0;
+            timerSubSecondsMicros = 0;
             inProgramSECS = second();
             calibrationLoopIterator++;
         }
     }
     inProgramSECS = second();
-    timeSubSecondsMicros = (timeSubSecondsMicros % 1000000);
-            
+    timerSubSecondsMicros = (timerSubSecondsMicros % 1000000);
+    
+    rocketDriverSeconds = second();
+    rocketDriverMicros = timerSubSecondsMicros;
 }
 
 #endif

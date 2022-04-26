@@ -45,10 +45,12 @@ void MCU_SENSOR::read(ADC* adc)
             if (internalMCUTemp)
             {
                 currentRawValue = InternalTemperature.readTemperatureC();
+                setRollingSensorArrayRaw(currentRollingArrayPosition, currentRawValue);
             }
             else
             {
                 currentRawValue = adc->analogRead(ADCinput);
+                setRollingSensorArrayRaw(currentRollingArrayPosition, currentRawValue);
                 /////linear conversions here, y = m*x + b
                 // This automatically stores converted value for the on board nodes
                 //currentConvertedValue = linConvCoef1_m*currentRawValue + linConvCoef1_b;
@@ -59,6 +61,12 @@ void MCU_SENSOR::read(ADC* adc)
             Serial.println(currentRawValue);
             Serial.print(", currentConvertedValue: ");
             Serial.println(currentConvertedValue); */
+            Serial.print("sensorID: ");
+            Serial.print(sensorID);
+            Serial.print(", currentRawValue: ");
+            Serial.println(currentRawValue);
+            Serial.print(", currentRollingAverage: ");
+            Serial.println(getCurrentRollingAverage());
             //Serial.println("newSensorREADbefore");
             //Serial.println(newSensorValueCheck);
             newSensorValueCheck = true;

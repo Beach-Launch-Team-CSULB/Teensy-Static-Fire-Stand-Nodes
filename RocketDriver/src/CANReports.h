@@ -30,7 +30,7 @@ void CAN2PropSystemStateReport(FlexCAN& CANbus, State& currentState, Command& cu
 {
 if (PropSysReportTimer >= 1000000)
 {
-    Serial.println(now());
+    //Serial.println(now());
     //Hardcoded array iterator sizes because I'm not smart enough to fix the auto arrays yet
     if (nodeID == 2)
     {
@@ -42,7 +42,7 @@ if (PropSysReportTimer >= 1000000)
         vavleArrayCount = propNodeValveNum;
         pyroArrayCount = propNodePyroNum;
     }
-    else if (nodeID == 8)
+    else if (nodeID == 15)
     {
         vavleArrayCount = PasafireNodeValveNum;
         pyroArrayCount = PasafireNodePyroNum;
@@ -55,9 +55,12 @@ if (PropSysReportTimer >= 1000000)
 
 
     // build message
-        static CAN_message_t msgOut;
-        msgOut.ext = 0;
-        msgOut.id = nodeID;  //Make this more specific later
+        static CAN_message_t msgOut1;
+        static CAN_message_t msgOut2;
+        msgOut1.ext = 0;
+        msgOut2.ext = 0;
+        msgOut1.id = nodeID;            //Make this more specific later
+        msgOut2.id = nodeID + 16;       //Make this more specific later
 
         // CAN BYTE - System state and Valve Safety Enable States
         int8_t currentStateEnumToInt = static_cast<int8_t>(currentState);
@@ -90,7 +93,7 @@ if (PropSysReportTimer >= 1000000)
         }
 
         //valveEnableArray;
-        msgOut.buf[0] = currentStateEnumToInt + ShiftedValveSafetyEnableStateArray;
+        msgOut1.buf[0] = currentStateEnumToInt + ShiftedValveSafetyEnableStateArray;
         //msgOut.buf[0] = 111;
 
         //Valve State information bytes
@@ -119,7 +122,16 @@ if (PropSysReportTimer >= 1000000)
                     uint8_t ValveStateEnumToInt = static_cast<uint8_t>(valve->getState());
                     uint8_t ShiftedValveStateEnumToInt = (ValveStateEnumToInt<<5);
                     
-                    msgOut.buf[canByte] = valveID + ShiftedValveStateEnumToInt;
+                    if (canByte <= 7)
+                    {
+                    msgOut1.buf[canByte] = valveID + ShiftedValveStateEnumToInt;
+                    }
+                    else if (canByte <= 14&&canByte > 7)
+                    {
+                    msgOut2.buf[canByte-7] = valveID + ShiftedValveStateEnumToInt;
+                    }
+                    
+                    //msgOut1.buf[canByte] = valveID + ShiftedValveStateEnumToInt;
                     Serial.print("ValveID: ");
                     Serial.print(valveID);
                     Serial.print( ": ValveState: ");
@@ -143,8 +155,17 @@ if (PropSysReportTimer >= 1000000)
                     uint8_t pyroID = static_cast<uint8_t>(pyro->getPyroID());    
                     uint8_t PyroStateEnumToInt = static_cast<uint8_t>(pyro->getState());
                     uint8_t ShiftedPyroStateEnumToInt = (PyroStateEnumToInt<<5);
-                    
-                    msgOut.buf[canByte] = pyroID + ShiftedPyroStateEnumToInt;
+
+                    if (canByte <= 7)
+                    {
+                    msgOut1.buf[canByte] = pyroID + ShiftedPyroStateEnumToInt;
+                    }
+                    else if (canByte <= 14&&canByte > 7)
+                    {
+                    msgOut2.buf[canByte-7] = pyroID + ShiftedPyroStateEnumToInt;
+                    }
+
+                    //msgOut1.buf[canByte] = pyroID + ShiftedPyroStateEnumToInt;
                     Serial.print("PyroID: ");
                     Serial.print(pyroID);
                     Serial.print( ": PyroState: ");
@@ -159,16 +180,26 @@ if (PropSysReportTimer >= 1000000)
         
         // write message to bus
         Serial.print("ID: ");
-        Serial.print(msgOut.id);
+        Serial.print(msgOut1.id);
         Serial.print(": ");
         for (size_t ii = 0; ii < 8; ii++)
         {
-            Serial.print(msgOut.buf[ii]);
+            Serial.print(msgOut1.buf[ii]);
+            Serial.print(": ");
+        }        Serial.print("ID: ");
+        Serial.print(msgOut2.id);
+        Serial.print(": ");
+        for (size_t ii = 0; ii < 8; ii++)
+        {
+            Serial.print(msgOut2.buf[ii]);
             Serial.print(": ");
         }
+        
         Serial.println();
-        msgOut.len = 8;
-        CANbus.write(msgOut);
+        msgOut1.len = 8;
+        msgOut2.len = 2;
+        CANbus.write(msgOut1);
+        CANbus.write(msgOut2);
         canByte = 1;
         
         PropSysReportTimer = 0;
@@ -182,7 +213,7 @@ if (PropSysReportTimer >= 1000000)
 
 void CAN2AutosequenceTimerReport(FlexCAN& CANbus, const std::array<AutoSequence*, NUM_AUTOSEQUENCES>& autoSequenceArray, bool & haltFlag, int nodeID)
 {
-    if (AutoSequenceReportTimer >= 100000)
+    if (AutoSequenceReportTimer >= 1000000)
     {
     // build message
         static CAN_message_t msgOut;
@@ -192,7 +223,7 @@ void CAN2AutosequenceTimerReport(FlexCAN& CANbus, const std::array<AutoSequence*
         if (autoSequence->getHostNodeID() == nodeID)
         {
             {
-                msgOut.id = nodeID + 16;  // with 16 possible nodes in ID format this makes the CAN ID possible go up to 31, lowest sensor ID in current format is 50.
+                msgOut.id = nodeID + 32;  // with 16 possible nodes in ID format this makes the CAN ID possible go up to 31, lowest sensor ID in current format is 50.
                 msgOut.len = 8;
                 int64_t autosequenceTimer = autoSequence->getCurrentCountdown();
                 uint8_t autosequenceTimerStateEnumToInt = static_cast<uint8_t>(autoSequence->getAutoSequenceState());
@@ -228,9 +259,14 @@ void SensorArrayCANSend(FlexCAN& CANbus, const std::array<MCU_SENSOR*, NUM_SENSO
 {
     static CAN_message_t msgOut;
     msgOut.ext = 0;
-    msgOut.len = 2;
+    //msgOut.len = 2;
+    msgOut.len = 5;
     uint32_t sensorValueToSend;
-    
+    uint32_t sensorTimeSeconds;
+    uint32_t sensorTimeMicros;
+    uint8_t sensorTimeSecondsChopped;
+    uint16_t sensorTimeMillis;
+
     for(auto sensor : sensorArray)
     {
         //Serial.println("Assballs");
@@ -241,8 +277,16 @@ void SensorArrayCANSend(FlexCAN& CANbus, const std::array<MCU_SENSOR*, NUM_SENSO
             msgOut.id = sensor->getSensorID();
             
             sensorValueToSend = sensor->getCurrentRawValue();
+            sensorTimeSeconds = sensor->getTimestampSeconds();
+            sensorTimeMicros = sensor->getTimestampMicros();
+            sensorTimeSecondsChopped = sensorTimeSeconds % 256;
+            sensorTimeMillis = sensorTimeMicros/1000;
+
             msgOut.buf[0] = sensorValueToSend;
             msgOut.buf[1] = (sensorValueToSend >> 8);
+            msgOut.buf[2] = sensorTimeSecondsChopped;
+            msgOut.buf[3] = sensorTimeMillis;
+            msgOut.buf[4] = (sensorTimeMillis >> 8);
 
             // write message to bus
             CANbus.write(msgOut);
@@ -250,10 +294,16 @@ void SensorArrayCANSend(FlexCAN& CANbus, const std::array<MCU_SENSOR*, NUM_SENSO
             //Serial.println(sensor->getNewSensorValueCheck());
             sensor->setNewSensorValueCheck(false);
             //Serial.println(sensor->getNewSensorValueCheck());
-/*             Serial.print("Sensor ID");
+/*             Serial.print("Sensor ID: ");
             Serial.print(msgOut.id);
-            Serial.print("Sensor Value");
-            Serial.println(sensorValueToSend); */
+            Serial.print(" Sensor Value: ");
+            Serial.print(sensorValueToSend);
+            Serial.print(" Seconds: ");
+            Serial.print(sensorTimeSeconds);
+            Serial.print(" Micros: ");
+            Serial.print(sensorTimeMicros);
+            Serial.print(" Millis: ");
+            Serial.println(sensorTimeMillis); */
             {
                 // add write error handling here, for now it does nothing
             }

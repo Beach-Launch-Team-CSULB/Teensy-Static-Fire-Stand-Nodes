@@ -81,7 +81,7 @@ void autoSequenceTasks(const std::array<T, size>& autoSequenceArray, uint8_t& no
 }
 
 template <typename T, std::size_t size>
-void sensorTasks(const std::array<T, size>& sensorArray, ADC*adc, uint8_t& nodeIDReadIn)
+void sensorTasks(const std::array<T, size>& sensorArray, ADC*adc, uint32_t& secondsRD,uint32_t& microsecondsRD, uint8_t& nodeIDReadIn)
 {
     // iterate through valve array and run the stateOperations method
     for(auto sensor : sensorArray)
@@ -92,7 +92,7 @@ void sensorTasks(const std::array<T, size>& sensorArray, ADC*adc, uint8_t& nodeI
             sensor->stateOperations();
             //Serial.print("LoopRan");
             sensor->read(adc);
-            // Could add simple CAN send here, but should be a later function for more flexibility
+            sensor->setSYSTimestamp(secondsRD, microsecondsRD);
             sensor->linearConversion();
             }
         else if (nodeIDReadIn == 6)
@@ -192,6 +192,11 @@ void autoSequencePyroUpdate(const std::array<T, size>& pyroArray, int64_t& fireC
         }
         if (fireCurrentCountdown >= pyro->getFireSequenceTime())
         {
+/*         Serial.print("fireCurrentCountdown >= ");
+        Serial.print(fireCurrentCountdown);
+        Serial.print(", getFireSequenceTime");
+        Serial.println(pyro->getFireSequenceTime()); */
+        
             pyro->setFireCommandBool(true);
         }
         
