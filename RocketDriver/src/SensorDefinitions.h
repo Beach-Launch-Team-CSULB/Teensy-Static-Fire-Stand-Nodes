@@ -32,14 +32,14 @@ MCU_SENSOR MCUtempNode3{300, 3, 70, 2, 5, 10, true};                            
 
 // initialize all sensor objects here (PINS NOT CORRECT?, calibrations definitely not correct)
 // Pasafire config
-MCU_SENSOR PasafireChamberPT1{189, 8, A14, 10, 100, 1000, false, 0.0185, -128.88};      // 17
-MCU_SENSOR PasafireFuelTankPT{190, 15, A18, 2, 10, 100, false, 0.0186, -126.67};         // 18
-MCU_SENSOR PasafireLOXTankPT{191, 15, A20, 2, 10, 100, false, 0.0186, -126.67};          // 19
-MCU_SENSOR PasafireFuelRegPT{192, 15, A17, 2, 10, 100, false, 0.0186, -126.67};          // 20
-MCU_SENSOR PasafireLOXRegPT{193, 15, A16, 2, 10, 100, false, 0.0186, -126.67};           // 21
-MCU_SENSOR PasafireFuelLinePT{194, 15, A21, 2, 10, 100, false, 0.0186, -126.67};         // 22
-MCU_SENSOR PasafireLOXLinePT{195, 15, A22, 2, 10, 100, false, 0.0186, -126.67};          // 23
-MCU_SENSOR PasafirePneumaticPT{196, 15, A15, 2, 10, 100, false, 0.0186, -126.56};        // 24
+MCU_SENSOR PasafireChamberPT1{189, 8, A14, 10, 100, 1000, false, 0.0125, -123.5};      // 17
+MCU_SENSOR PasafireFuelTankPT{190, 15, A20, 2, 10, 100, false, 0.0125, -124.90};         // 18
+MCU_SENSOR PasafireLOXTankPT{191, 15, A18, 2, 10, 100, false, 0.0125, -123.57};          // 19
+MCU_SENSOR PasafireFuelRegPT{192, 15, A17, 2, 10, 100, false, 0.0124, -123.43};          // 20
+MCU_SENSOR PasafireLOXRegPT{193, 15, A16, 2, 10, 100, false, 0.0123, -123.11};           // 21
+MCU_SENSOR PasafireFuelLinePT{194, 15, A21, 2, 10, 100, false, 0.0124, -123.17};         // 22
+MCU_SENSOR PasafireLOXLinePT{195, 15, A22, 2, 10, 100, false, 0.0124, -126.80};          // 23
+MCU_SENSOR PasafirePneumaticPT{196, 15, A15, 2, 10, 100, false, 0.0119, -119.32};        // 24
 MCU_SENSOR PasafireThrustMountLoadCell1{197, 15, A14, 2, 10, 150, false};                // 25
 MCU_SENSOR MCUtempNode8{700, 15, 70, 2, 5, 10, true};                                  // 26
 

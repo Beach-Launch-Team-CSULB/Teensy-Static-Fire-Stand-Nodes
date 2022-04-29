@@ -34,7 +34,7 @@ using std::string;
 #include <TimeLib.h>
 #include <DS1307RTC.h>
 
-#define NODEIDPRESET 2;     //NOT in use normally, for testing with the address IO register inactive
+#define NODEIDPRESET 3;     //NOT in use normally, for testing with the address IO register inactive
 
 //For use in doing serial inputs as CAN commands for testing
 uint8_t fakeCANmsg;
@@ -265,18 +265,20 @@ void setup() {
   // reference can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 or ADC_REFERENCE::REF_EXT.
   //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
 
+  adc->adc0->setReference(ADC_REFERENCE::REF_3V3);
   adc->adc0->setAveraging(8);                                    // set number of averages
   adc->adc0->setResolution(16);                                   // set bits of resolution
   adc->adc0->setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED_16BITS); // change the conversion speed
   adc->adc0->setSamplingSpeed(ADC_SAMPLING_SPEED::HIGH_SPEED);     // change the sampling speed
-  //adc->adc0->recalibrate();
+  adc->adc0->recalibrate();
 
 ///// ADC1 /////
+  adc->adc1->setReference(ADC_REFERENCE::REF_3V3);
   adc->adc1->setAveraging(8);                                    // set number of averages
   adc->adc1->setResolution(16);                                   // set bits of resolution
   adc->adc1->setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED_16BITS); // change the conversion speed
   adc->adc1->setSamplingSpeed(ADC_SAMPLING_SPEED::HIGH_SPEED);     // change the sampling speed
-  //adc->adc1->recalibrate();
+  adc->adc1->recalibrate();
 
   //delay(500);
 

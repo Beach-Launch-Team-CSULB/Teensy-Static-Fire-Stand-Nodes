@@ -7,12 +7,12 @@
 //Igniter outputs - setting up almost the same as valves but no PWM
 #define NUM_PYROS 4
 
-Pyro EngineIgniter0{32, 2, Solo, 11, 2000000, false, -4000000};
-Pyro EngineIgniter1{33, 2, Solo, 12, 2000000, false, -4000000};
+Pyro EngineIgniter0{26, 2, Solo, 31, 2000000, false, -4000000}; // was firepin 11
+Pyro EngineIgniter1{27, 2, Solo, 32, 2000000, false, -4000000}; // was firepin 12
 
 //Pasafire Versions - Same setup but different node/settings possibly
-Pyro PasaEngineIgniter0{32, 15, Solo, 31, 2000000, false, -4000000};
-Pyro PasaEngineIgniter1{33, 15, Solo, 32, 2000000, false, -4000000};
+Pyro PasaEngineIgniter0{26, 15, Solo, 31, 2000000, false, -4000000};
+Pyro PasaEngineIgniter1{27, 15, Solo, 32, 2000000, false, -4000000};
 
 
 // ADD PYROS TO THIS VALVE ARRAY IN THE FORM: &PYRO

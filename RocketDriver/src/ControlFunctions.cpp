@@ -27,7 +27,7 @@ void startupStateCheck(const State& currentState, Command& currentCommand)
         currentCommand = command_fireArm;
         break;
     case State::fire: // if we powercycle mid fire, we just vent (maybe shouldn't always be true with multinode systems)
-        currentCommand = command_vent;
+        currentCommand = command_abort;
         break;
     case State::abort:
         currentCommand = command_abort;
@@ -93,9 +93,9 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(2)->setState(ValveEnableState::Off);        // Renegade SF Stand
             valveEnableArray.at(3)->setState(ValveEnableState::Off);        // Renegade SF Stand
             valveEnableArray.at(4)->setState(ValveEnableState::Off);        // Renegade SF Stand
-            valveEnableArray.at(5)->setState(ValveEnableState::Off);        // Renegade SF Stand
+            valveEnableArray.at(5)->setState(ValveEnableState::On);        // Renegade SF Stand
             valveEnableArray.at(6)->setState(ValveEnableState::Off);        // Pasafire
-            valveEnableArray.at(7)->setState(ValveEnableState::Off);        // Pasafire
+            valveEnableArray.at(7)->setState(ValveEnableState::On);        // Pasafire
             valveEnableArray.at(8)->setState(ValveEnableState::Off);        // Pasafire
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);  // Reengade, Global? Not sure how I want to handle multinode autosequence yet
@@ -117,16 +117,16 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             sensorArray.at(14)->setState(SensorState::Slow);        // Renegade SF Stand
             sensorArray.at(15)->setState(SensorState::Slow);        // Renegade SF Stand
             sensorArray.at(16)->setState(SensorState::Slow);        // Renegade SF Stand
-            sensorArray.at(17)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(18)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(19)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(20)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(21)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(22)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(23)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(24)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(25)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(26)->setState(SensorState::Slow);        // Pasafire
+            sensorArray.at(17)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(18)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(19)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(21)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(22)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(23)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(24)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(25)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(26)->setState(SensorState::Medium);        // Pasafire
             currentState = State::passive;
             haltFlag = false;
             break;
@@ -139,9 +139,9 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(2)->setState(ValveEnableState::On);        // Renegade SF Stand
             valveEnableArray.at(3)->setState(ValveEnableState::On);        // Renegade SF Stand
             valveEnableArray.at(4)->setState(ValveEnableState::On);        // Renegade SF Stand
-            valveEnableArray.at(5)->setState(ValveEnableState::On);        // Renegade SF Stand                        
+            //valveEnableArray.at(5)->setState(ValveEnableState::On);        // Renegade SF Stand                        
             valveEnableArray.at(6)->setState(ValveEnableState::On);        // Pasafire
-            valveEnableArray.at(7)->setState(ValveEnableState::On);        // Pasafire
+            //valveEnableArray.at(7)->setState(ValveEnableState::On);        // Pasafire
             valveEnableArray.at(8)->setState(ValveEnableState::On);        // Pasafire
             valveEnableArray.at(9)->setState(ValveEnableState::On);        // Pasafire
             }
@@ -154,9 +154,9 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(2)->setState(ValveEnableState::On);
             valveEnableArray.at(3)->setState(ValveEnableState::On);
             valveEnableArray.at(4)->setState(ValveEnableState::On);
-            valveEnableArray.at(5)->setState(ValveEnableState::On);  
+            //valveEnableArray.at(5)->setState(ValveEnableState::On);  
             valveEnableArray.at(6)->setState(ValveEnableState::On);        // Pasafire
-            valveEnableArray.at(7)->setState(ValveEnableState::On);        // Pasafire
+            //valveEnableArray.at(7)->setState(ValveEnableState::On);        // Pasafire
             valveEnableArray.at(8)->setState(ValveEnableState::On);        // Pasafire
             valveEnableArray.at(9)->setState(ValveEnableState::On);        // Pasafire
             break;            
@@ -498,7 +498,7 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
         case command_fireArm:
             if(currentState == State::TankPressPressurized)
             {
-            valveArray.at(0)->setState(ValveState::OpenCommanded);          // Renegade SF Stand
+            valveArray.at(0)->setState(ValveState::CloseCommanded);          // Renegade SF Stand
             valveArray.at(1)->setState(ValveState::CloseCommanded);         // Renegade SF Stand
             valveArray.at(2)->setState(ValveState::CloseCommanded);         // Renegade SF Stand
             valveArray.at(3)->setState(ValveState::OpenCommanded);          // Renegade SF Stand
@@ -518,7 +518,7 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             pyroArray.at(1)->setState(PyroState::OffCommanded);             // Renegade SF Igniter2         
             pyroArray.at(2)->setState(PyroState::OffCommanded);             // Pasafire Igniter1
             pyroArray.at(3)->setState(PyroState::OffCommanded);             // Pasafire Igniter2
-            valveEnableArray.at(0)->setState(ValveEnableState::On);
+            valveEnableArray.at(0)->setState(ValveEnableState::Off);
             valveEnableArray.at(1)->setState(ValveEnableState::On);
             valveEnableArray.at(2)->setState(ValveEnableState::Off);
             valveEnableArray.at(3)->setState(ValveEnableState::On);
@@ -547,23 +547,23 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             sensorArray.at(14)->setState(SensorState::Medium);
             sensorArray.at(15)->setState(SensorState::Slow);
             sensorArray.at(16)->setState(SensorState::Slow);
-            sensorArray.at(17)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(18)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(19)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(20)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(21)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(22)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(23)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(24)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(25)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(26)->setState(SensorState::Slow);        // Pasafire
+            sensorArray.at(17)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(18)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(19)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(21)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(22)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(23)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(24)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(25)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(26)->setState(SensorState::Medium);        // Pasafire
             currentState = State::fireArmed;
             }
             break;
         case command_fire:
             if(currentState == State::fireArmed)
             {
-            valveArray.at(0)->setState(ValveState::OpenCommanded);          // Renegade SF Stand
+            valveArray.at(0)->setState(ValveState::CloseCommanded);          // Renegade SF Stand
             valveArray.at(1)->setState(ValveState::CloseCommanded);         // Renegade SF Stand
             valveArray.at(2)->setState(ValveState::CloseCommanded);         // Renegade SF Stand
             valveArray.at(3)->setState(ValveState::OpenCommanded);          // Renegade SF Stand
@@ -577,13 +577,13 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveArray.at(11)->setState(ValveState::OpenCommanded);        // Pasafire
             valveArray.at(12)->setState(ValveState::CloseCommanded);        // Pasafire
             valveArray.at(13)->setState(ValveState::OpenCommanded);        // Pasafire
-            valveArray.at(14)->setState(ValveState::OpenCommanded);        // Pasafire
-            valveArray.at(15)->setState(ValveState::OpenCommanded);        // Pasafire
+            valveArray.at(14)->setState(ValveState::FireCommanded);        // Pasafire
+            valveArray.at(15)->setState(ValveState::FireCommanded);        // Pasafire
             pyroArray.at(0)->setState(PyroState::FireCommanded);             // Renegade SF Igniter1
             pyroArray.at(1)->setState(PyroState::FireCommanded);             // Renegade SF Igniter2
             pyroArray.at(2)->setState(PyroState::FireCommanded);             // Pasafire Igniter1
             pyroArray.at(3)->setState(PyroState::FireCommanded);             // Pasafire Igniter2
-            valveEnableArray.at(0)->setState(ValveEnableState::On);
+            valveEnableArray.at(0)->setState(ValveEnableState::Off);
             valveEnableArray.at(1)->setState(ValveEnableState::On);
             valveEnableArray.at(2)->setState(ValveEnableState::Off);
             valveEnableArray.at(3)->setState(ValveEnableState::On);
@@ -672,11 +672,15 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             {
                 valveArray.at(2)->setState(ValveState::CloseCommanded);
                 valveArray.at(10)->setState(ValveState::CloseCommanded);
+                valveEnableArray.at(5)->setState(ValveEnableState::On);        // Renegade SF Stand                        
+                valveEnableArray.at(7)->setState(ValveEnableState::On);        // Pasafire Stand                        
             }
             else if (currentState == State::offNominal)
             {
                 valveArray.at(2)->setState(ValveState::CloseCommanded);
                 valveArray.at(10)->setState(ValveState::CloseCommanded);
+                valveEnableArray.at(5)->setState(ValveEnableState::On);        // Renegade SF Stand                        
+                valveEnableArray.at(7)->setState(ValveEnableState::On);        // Pasafire Stand                        
             }              
             break;
         case command_openLoxVent:
@@ -684,11 +688,15 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             {
                 valveArray.at(2)->setState(ValveState::OpenCommanded);
                 valveArray.at(10)->setState(ValveState::OpenCommanded);
+                valveEnableArray.at(5)->setState(ValveEnableState::Off);        // Renegade SF Stand                        
+                valveEnableArray.at(7)->setState(ValveEnableState::Off);        // Pasafire Stand                        
             }
             else if (currentState == State::offNominal)
             {
                 valveArray.at(2)->setState(ValveState::OpenCommanded);
                 valveArray.at(10)->setState(ValveState::OpenCommanded);
+                valveEnableArray.at(5)->setState(ValveEnableState::Off);        // Renegade SF Stand                        
+                valveEnableArray.at(7)->setState(ValveEnableState::Off);        // Pasafire Stand                        
             }              
             break;
         case command_closeLoxDomeReg:
@@ -972,6 +980,55 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
                 valveEnableArray.at(5)->setState(ValveEnableState::On);
             }              
             break;
+        case command_engineIgniterPyro1_Off:
+            if(currentState == State::test)
+            {
+            pyroArray.at(0)->setState(PyroState::OffCommanded);             // Renegade SF Igniter1
+            pyroArray.at(2)->setState(PyroState::OffCommanded);             // Pasafire Igniter1
+            }
+            else if (currentState == State::offNominal)
+            {
+            pyroArray.at(0)->setState(PyroState::OffCommanded);             // Renegade SF Igniter1
+            pyroArray.at(2)->setState(PyroState::OffCommanded);             // Pasafire Igniter1
+            }              
+            break;
+        case command_engineIgniterPyro1_On:
+            if(currentState == State::test)
+            {
+            pyroArray.at(0)->setState(PyroState::OnCommanded);             // Renegade SF Igniter1
+            pyroArray.at(2)->setState(PyroState::OnCommanded);             // Pasafire Igniter1
+            }
+            else if (currentState == State::offNominal)
+            {
+            pyroArray.at(0)->setState(PyroState::OnCommanded);             // Renegade SF Igniter1
+            pyroArray.at(2)->setState(PyroState::OnCommanded);             // Pasafire Igniter1
+            }              
+            break;
+        case command_engineIgniterPyro2_Off:
+            if(currentState == State::test)
+            {
+            pyroArray.at(1)->setState(PyroState::OffCommanded);             // Renegade SF Igniter1
+            pyroArray.at(3)->setState(PyroState::OffCommanded);             // Pasafire Igniter1
+            }
+            else if (currentState == State::offNominal)
+            {
+            pyroArray.at(1)->setState(PyroState::OffCommanded);             // Renegade SF Igniter1
+            pyroArray.at(3)->setState(PyroState::OffCommanded);             // Pasafire Igniter1
+            }              
+            break;
+        case command_engineIgniterPyro2_On:
+            if(currentState == State::test)
+            {
+            pyroArray.at(1)->setState(PyroState::OnCommanded);             // Renegade SF Igniter1
+            pyroArray.at(3)->setState(PyroState::OnCommanded);             // Pasafire Igniter1
+            }
+            else if (currentState == State::offNominal)
+            {
+            pyroArray.at(1)->setState(PyroState::OnCommanded);             // Renegade SF Igniter1
+            pyroArray.at(3)->setState(PyroState::OnCommanded);             // Pasafire Igniter1
+            }              
+            break;
+
         case command_allSensorsOff:
             if(currentState == State::test)
             {

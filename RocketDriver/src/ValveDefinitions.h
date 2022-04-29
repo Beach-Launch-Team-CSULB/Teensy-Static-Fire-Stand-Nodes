@@ -35,12 +35,12 @@ Valve FuelVent{21, 3, NormalClosed, 2, 25000, false};               //WRONG PIN 
 Valve FuelDomeReg{22, 3, NormalClosed, 7, 25000, false};
 Valve FuelDomeRegVent{23, 3, NormalClosed, 8, 25000, false};
 // On Pasafire Node
-Valve PasaLoxVent{18, 15, NormalOpen, 5, 500000, false, 166};        //18
-Valve PasaLoxDomeReg{19, 15, NormalClosed, 6, 25000, false};           //19
-Valve PasaFuelVent{21, 15, NormalClosed, 7, 25000, false};           //21
-Valve PasaFuelDomeReg{22, 15, NormalClosed, 8, 25000, false};        //22
-Valve PasaLoxMV{24, 15, NormalClosed, 9, 25000, false, -1, 50};      //24
-Valve PasaFuelMV{25, 15, NormalClosed, 10, 25000, false, -1, 50};     //25
+Valve PasaLoxVent{18, 15, NormalOpen, 5, 500000, false, 166};           //10
+Valve PasaLoxDomeReg{19, 15, NormalClosed, 6, 25000, false};            //11
+Valve PasaFuelVent{21, 15, NormalClosed, 7, 25000, false};              //12
+Valve PasaFuelDomeReg{22, 15, NormalClosed, 8, 25000, false};           //13
+Valve PasaLoxMV{24, 15, NormalClosed, 9, 25000, false, -1, 50};         //14
+Valve PasaFuelMV{25, 15, NormalClosed, 10, 25000, false, -1, 50};       //15
 
 // On BabyShark Pad Node
 /* Valve HiPress{16, 2, NormalClosed, 2, 25000, false};
@@ -64,18 +64,18 @@ std::array<Valve*, NUM_VALVES> valveArray{&HiPress, &HiPressVent, &LoxVent, &Lox
 // LISTED AS {ValveEnableID, Pin, ValveEnableNodeID}
 
 // On Engine Node
-ValveEnable HiPressHiVentSafe{32, 24, 2};
-ValveEnable MainValvesSafe{37, 26, 2}; //was 25 but I think wired to 26
+ValveEnable HiPressHiVentSafe{32, 24, 2};      // 0
+ValveEnable MainValvesSafe{37, 26, 2};         // 1         //was 25 but I think wired to 26
 // On Prop Node
-ValveEnable FuelVentSafe{33, 24, 3};
-ValveEnable LoxDomeRegVentSafe{34, 25, 3};
-ValveEnable FuelDomeRegVentSafe{35, 26, 3};
-ValveEnable LoxVentSafe{36, 27, 3};
+ValveEnable FuelVentSafe{33, 24, 3};            // 2
+ValveEnable LoxDomeRegVentSafe{34, 25, 3};      // 3
+ValveEnable FuelDomeRegVentSafe{35, 26, 3};     // 4
+ValveEnable LoxVentSafe{36, 27, 3};             // 5
 // On Pasafire Node
-ValveEnable PasaFuelVentSafe{11, 11, 15};
-ValveEnable PasaLoxVentSafe{12, 12, 15};
-ValveEnable PasaMainValvesSafe{24, 24, 15};
-ValveEnable PasaLoxFuelDomesSafe{25, 25, 15}; 
+ValveEnable PasaFuelVentSafe{11, 11, 15};       // 6
+ValveEnable PasaLoxVentSafe{12, 12, 15};        // 7
+ValveEnable PasaMainValvesSafe{24, 24, 15};     // 8
+ValveEnable PasaLoxFuelDomesSafe{25, 25, 15};   // 9
 
 // BabyShark should be one to one Valve Enables to outputs with planned ALARA design
 

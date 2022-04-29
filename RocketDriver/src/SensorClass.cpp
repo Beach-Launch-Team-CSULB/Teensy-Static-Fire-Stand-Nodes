@@ -42,9 +42,11 @@ void MCU_SENSOR::read(ADC* adc)
     {
     if (timer >= (1000000/currentSampleRate))   // Divides 1 second in microseconds by current sample rate in Hz
         {
-            if (internalMCUTemp)
+            if (internalMCUTemp) //Stupid library forces ADCs to internal reference 1V2 and I can't figure out how to override currently
             {
-                currentRawValue = InternalTemperature.readTemperatureC();
+/*                 currentRawValue = InternalTemperature.readTemperatureC();
+                adc->adc0->setReference(ADC_REFERENCE::REF_3V3);
+                adc->adc1->setReference(ADC_REFERENCE::REF_3V3); */
                 setRollingSensorArrayRaw(currentRollingArrayPosition, currentRawValue);
             }
             else
@@ -55,18 +57,21 @@ void MCU_SENSOR::read(ADC* adc)
                 // This automatically stores converted value for the on board nodes
                 //currentConvertedValue = linConvCoef1_m*currentRawValue + linConvCoef1_b;
             }
+            //if (sensorID == 58)
+            //{
 /*             Serial.print("sensorID: ");
             Serial.print(sensorID);
             Serial.print(", currentRawValue: ");
             Serial.println(currentRawValue);
             Serial.print(", currentConvertedValue: ");
             Serial.println(currentConvertedValue); */
-            Serial.print("sensorID: ");
+            //}
+/*             Serial.print("sensorID: ");
             Serial.print(sensorID);
             Serial.print(", currentRawValue: ");
             Serial.println(currentRawValue);
             Serial.print(", currentRollingAverage: ");
-            Serial.println(getCurrentRollingAverage());
+            Serial.println(getCurrentRollingAverage()); */
             //Serial.println("newSensorREADbefore");
             //Serial.println(newSensorValueCheck);
             newSensorValueCheck = true;

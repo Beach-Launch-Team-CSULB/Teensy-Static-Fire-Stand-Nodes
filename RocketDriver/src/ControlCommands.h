@@ -43,7 +43,7 @@ enum Command
     command_openLoxMV = 49,    
     command_closeFuelMV = 50,
     command_openFuelMV = 51,
-    command_engineIgniterPyro1_Off = 52,
+    command_engineIgniterPyro1_Off = 52,            //DO NOT MATCH ID FORMAT
     command_engineIgniterPyro1_On = 53,
     command_engineIgniterPyro2_Off = 54,
     command_engineIgniterPyro2_On = 55,                         //End of individual device states
