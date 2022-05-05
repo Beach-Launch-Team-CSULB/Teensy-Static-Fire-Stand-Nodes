@@ -330,7 +330,7 @@ void SensorArrayConvertedCANSend(FlexCAN& CANbus, const std::array<MCU_SENSOR*, 
         if (sensor->getNewSensorConversionCheck())
         {
             msgOut.id = sensor->getSensorID() + (sensor->getCANTimestamp())<<11; //packing IDA as normal CAN ID/sensorID and IDB as CAN timestamp
-            
+            //sensorValueToSend = sensor->getCurrentRawValue();
             sensorValueToSend = sensor->getCurrentConvertedValue();
             msgOut.buf[0] = sensorValueToSend;
             msgOut.buf[1] = (sensorValueToSend >> 8);

@@ -34,7 +34,7 @@ using std::string;
 #include <TimeLib.h>
 #include <DS1307RTC.h>
 
-#define NODEIDPRESET 3;     //NOT in use normally, for testing with the address IO register inactive
+#define NODEIDPRESET 2;     //NOT in use normally, for testing with the address IO register inactive
 
 //For use in doing serial inputs as CAN commands for testing
 uint8_t fakeCANmsg;

@@ -28,18 +28,18 @@ Valve HiPressVent{17, 2, NormalClosed, 5, 25000, false};
 Valve LoxMV{24, 2, NormalClosed, 7, 25000, false, -1, 50};
 Valve FuelMV{25, 2, NormalClosed, 6, 25000, false, -1, 50};
 // On Renegade SF Prop Node
-Valve LoxVent{18, 3, NormalOpen, 9, 500000, false, 166};
+Valve LoxVent{18, 3, NormalOpen, 2, 500000, false, 166};
 Valve LoxDomeReg{19, 3, NormalClosed, 5, 25000, false};
 Valve LoxDomeRegVent{20, 3, NormalClosed, 6, 25000, false};
-Valve FuelVent{21, 3, NormalClosed, 2, 25000, false};               //WRONG PIN - INSPECT WIRING, was set to 2 and changed for breadboard testing, (was now 30?)
+Valve FuelVent{21, 3, NormalClosed, 9, 25000, false};               //WRONG PIN - INSPECT WIRING, was set to 2 and changed for breadboard testing, (was now 30?)
 Valve FuelDomeReg{22, 3, NormalClosed, 7, 25000, false};
 Valve FuelDomeRegVent{23, 3, NormalClosed, 8, 25000, false};
 // On Pasafire Node
-Valve PasaLoxVent{18, 15, NormalOpen, 5, 500000, false, 166};           //10
+Valve PasaLoxVent{18, 15, NormalClosed, 5, 500000, false, 166};           //10
 Valve PasaLoxDomeReg{19, 15, NormalClosed, 6, 25000, false};            //11
 Valve PasaFuelVent{21, 15, NormalClosed, 7, 25000, false};              //12
 Valve PasaFuelDomeReg{22, 15, NormalClosed, 8, 25000, false};           //13
-Valve PasaLoxMV{24, 15, NormalClosed, 9, 25000, false, -1, 50};         //14
+Valve PasaLoxMV{24, 15, NormalClosed, 9, 25000, false, 200000, 50};         //14
 Valve PasaFuelMV{25, 15, NormalClosed, 10, 25000, false, -1, 50};       //15
 
 // On BabyShark Pad Node

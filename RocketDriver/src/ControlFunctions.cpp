@@ -100,33 +100,37 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);  // Reengade, Global? Not sure how I want to handle multinode autosequence yet
             autoSequenceArray.at(1)->setState(AutoSequenceState::Standby);  // Pasafire
-            sensorArray.at(0)->setState(SensorState::Slow);         // Renegade SF Stand
-            sensorArray.at(1)->setState(SensorState::Slow);         // Renegade SF Stand
-            sensorArray.at(2)->setState(SensorState::Slow);         // Renegade SF Stand
-            sensorArray.at(3)->setState(SensorState::Slow);         // Renegade SF Stand
-            sensorArray.at(4)->setState(SensorState::Slow);         // Renegade SF Stand
-            sensorArray.at(5)->setState(SensorState::Slow);         // Renegade SF Stand
-            sensorArray.at(6)->setState(SensorState::Slow);         // Renegade SF Stand
-            sensorArray.at(7)->setState(SensorState::Slow);         // Renegade SF Stand
-            sensorArray.at(8)->setState(SensorState::Slow);         // Renegade SF Stand
-            sensorArray.at(9)->setState(SensorState::Slow);         // Renegade SF Stand
-            sensorArray.at(10)->setState(SensorState::Slow);        // Renegade SF Stand
-            sensorArray.at(11)->setState(SensorState::Slow);        // Renegade SF Stand
-            sensorArray.at(12)->setState(SensorState::Slow);        // Renegade SF Stand
-            sensorArray.at(13)->setState(SensorState::Slow);        // Renegade SF Stand
-            sensorArray.at(14)->setState(SensorState::Slow);        // Renegade SF Stand
-            sensorArray.at(15)->setState(SensorState::Slow);        // Renegade SF Stand
-            sensorArray.at(16)->setState(SensorState::Slow);        // Renegade SF Stand
-            sensorArray.at(17)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(18)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(19)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(21)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(22)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(23)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(24)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(25)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(26)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(0)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1pos
+            sensorArray.at(1)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1neg
+            sensorArray.at(2)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2pos
+            sensorArray.at(3)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2neg
+            sensorArray.at(4)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3pos
+            sensorArray.at(5)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3neg
+            sensorArray.at(6)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT2
+            sensorArray.at(7)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT1
+            sensorArray.at(8)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInletPropSidePT
+            sensorArray.at(9)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInjectorPT
+            sensorArray.at(10)->setState(SensorState::Medium);        // Renegade SF Stand - LoxInletPropSidePT
+            sensorArray.at(11)->setState(SensorState::Medium);        // Renegade SF Stand - MVPneumaticsPT
+            sensorArray.at(12)->setState(SensorState::Medium);        // Renegade SF Stand - DomeRegFuelPT
+            sensorArray.at(13)->setState(SensorState::Medium);        // Renegade SF Stand - DomeRegLoxPT
+            sensorArray.at(14)->setState(SensorState::Medium);        // Renegade SF Stand - FuelTankPT
+            sensorArray.at(15)->setState(SensorState::Medium);        // Renegade SF Stand - LoxTankPT
+            sensorArray.at(16)->setState(SensorState::Medium);        // Renegade SF Stand - HiPressFuelPT
+            sensorArray.at(17)->setState(SensorState::Medium);        // Renegade SF Stand - HiPressLoxPT
+            sensorArray.at(18)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode2
+            sensorArray.at(19)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode3
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireChamberPT1
+            sensorArray.at(21)->setState(SensorState::Medium);        // Pasafire - PasafireFuelTankPT
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireLOXTankPT
+            sensorArray.at(23)->setState(SensorState::Medium);        // Pasafire - PasafireFuelRegPT
+            sensorArray.at(24)->setState(SensorState::Medium);        // Pasafire - PasafireLOXRegPT
+            sensorArray.at(25)->setState(SensorState::Medium);        // Pasafire - PasafireFuelLinePT
+            sensorArray.at(26)->setState(SensorState::Medium);        // Pasafire - PasafireLOXLinePT
+            sensorArray.at(27)->setState(SensorState::Medium);        // Pasafire - PasafirePneumaticPT
+            sensorArray.at(28)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1pos
+            sensorArray.at(29)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1neg
+            sensorArray.at(30)->setState(SensorState::Medium);        // Pasafire - MCUtempNode8
             currentState = State::passive;
             haltFlag = false;
             break;
@@ -205,33 +209,37 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire
             autoSequenceArray.at(0)->setState(AutoSequenceState::Hold);  // Renegade
             autoSequenceArray.at(1)->setState(AutoSequenceState::Hold);  // Pasafire
-            sensorArray.at(0)->setState(SensorState::Medium);
-            sensorArray.at(1)->setState(SensorState::Medium);
-            sensorArray.at(2)->setState(SensorState::Medium);
-            sensorArray.at(3)->setState(SensorState::Slow);
-            sensorArray.at(4)->setState(SensorState::Slow);
-            sensorArray.at(5)->setState(SensorState::Slow);
-            sensorArray.at(6)->setState(SensorState::Slow);
-            sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Medium);
-            sensorArray.at(9)->setState(SensorState::Medium);
-            sensorArray.at(10)->setState(SensorState::Medium);
-            sensorArray.at(11)->setState(SensorState::Fast);
-            sensorArray.at(12)->setState(SensorState::Fast);
-            sensorArray.at(13)->setState(SensorState::Fast);
-            sensorArray.at(14)->setState(SensorState::Medium);
-            sensorArray.at(15)->setState(SensorState::Slow);
-            sensorArray.at(16)->setState(SensorState::Slow);
-            sensorArray.at(17)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(18)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(19)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(20)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(21)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(22)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(23)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(24)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(25)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(26)->setState(SensorState::Slow);        // Pasafire
+            sensorArray.at(0)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1pos
+            sensorArray.at(1)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1neg
+            sensorArray.at(2)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2pos
+            sensorArray.at(3)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2neg
+            sensorArray.at(4)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3pos
+            sensorArray.at(5)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3neg
+            sensorArray.at(6)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT2
+            sensorArray.at(7)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT1
+            sensorArray.at(8)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInletPropSidePT
+            sensorArray.at(9)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInjectorPT
+            sensorArray.at(10)->setState(SensorState::Medium);        // Renegade SF Stand - LoxInletPropSidePT
+            sensorArray.at(11)->setState(SensorState::Medium);        // Renegade SF Stand - MVPneumaticsPT
+            sensorArray.at(12)->setState(SensorState::Medium);        // Renegade SF Stand - DomeRegFuelPT
+            sensorArray.at(13)->setState(SensorState::Medium);        // Renegade SF Stand - DomeRegLoxPT
+            sensorArray.at(14)->setState(SensorState::Fast);        // Renegade SF Stand - FuelTankPT
+            sensorArray.at(15)->setState(SensorState::Fast);        // Renegade SF Stand - LoxTankPT
+            sensorArray.at(16)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressFuelPT
+            sensorArray.at(17)->setState(SensorState::Medium);        // Renegade SF Stand - HiPressLoxPT
+            sensorArray.at(18)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode2
+            sensorArray.at(19)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode3
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireChamberPT1
+            sensorArray.at(21)->setState(SensorState::Medium);        // Pasafire - PasafireFuelTankPT
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireLOXTankPT
+            sensorArray.at(23)->setState(SensorState::Medium);        // Pasafire - PasafireFuelRegPT
+            sensorArray.at(24)->setState(SensorState::Medium);        // Pasafire - PasafireLOXRegPT
+            sensorArray.at(25)->setState(SensorState::Medium);        // Pasafire - PasafireFuelLinePT
+            sensorArray.at(26)->setState(SensorState::Medium);        // Pasafire - PasafireLOXLinePT
+            sensorArray.at(27)->setState(SensorState::Medium);        // Pasafire - PasafirePneumaticPT
+            sensorArray.at(28)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1pos
+            sensorArray.at(29)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1neg
+            sensorArray.at(30)->setState(SensorState::Medium);        // Pasafire - MCUtempNode8
             currentState = State::vent;
             break;
 // Fire Sequence commands will only be executed from the proper state
@@ -270,33 +278,37 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);  // Renegade SF Stand
             autoSequenceArray.at(1)->setState(AutoSequenceState::Standby);  // Pasafire
-            sensorArray.at(0)->setState(SensorState::Medium);
-            sensorArray.at(1)->setState(SensorState::Medium);
-            sensorArray.at(2)->setState(SensorState::Medium);
-            sensorArray.at(3)->setState(SensorState::Slow);
-            sensorArray.at(4)->setState(SensorState::Slow);
-            sensorArray.at(5)->setState(SensorState::Slow);
-            sensorArray.at(6)->setState(SensorState::Slow);
-            sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Medium);
-            sensorArray.at(9)->setState(SensorState::Fast);
-            sensorArray.at(10)->setState(SensorState::Fast);
-            sensorArray.at(11)->setState(SensorState::Medium);
-            sensorArray.at(12)->setState(SensorState::Medium);
-            sensorArray.at(13)->setState(SensorState::Fast);
-            sensorArray.at(14)->setState(SensorState::Fast);
-            sensorArray.at(15)->setState(SensorState::Slow);
-            sensorArray.at(16)->setState(SensorState::Slow);
-            sensorArray.at(17)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(18)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(19)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(20)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(21)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(22)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(23)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(24)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(25)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(26)->setState(SensorState::Slow);        // Pasafire
+            sensorArray.at(0)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1pos
+            sensorArray.at(1)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1neg
+            sensorArray.at(2)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2pos
+            sensorArray.at(3)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2neg
+            sensorArray.at(4)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3pos
+            sensorArray.at(5)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3neg
+            sensorArray.at(6)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT2
+            sensorArray.at(7)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT1
+            sensorArray.at(8)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInletPropSidePT
+            sensorArray.at(9)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInjectorPT
+            sensorArray.at(10)->setState(SensorState::Medium);        // Renegade SF Stand - LoxInletPropSidePT
+            sensorArray.at(11)->setState(SensorState::Medium);        // Renegade SF Stand - MVPneumaticsPT
+            sensorArray.at(12)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegFuelPT
+            sensorArray.at(13)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegLoxPT
+            sensorArray.at(14)->setState(SensorState::Medium);        // Renegade SF Stand - FuelTankPT
+            sensorArray.at(15)->setState(SensorState::Medium);        // Renegade SF Stand - LoxTankPT
+            sensorArray.at(16)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressFuelPT
+            sensorArray.at(17)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressLoxPT
+            sensorArray.at(18)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode2
+            sensorArray.at(19)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode3
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireChamberPT1
+            sensorArray.at(21)->setState(SensorState::Medium);        // Pasafire - PasafireFuelTankPT
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireLOXTankPT
+            sensorArray.at(23)->setState(SensorState::Medium);        // Pasafire - PasafireFuelRegPT
+            sensorArray.at(24)->setState(SensorState::Medium);        // Pasafire - PasafireLOXRegPT
+            sensorArray.at(25)->setState(SensorState::Medium);        // Pasafire - PasafireFuelLinePT
+            sensorArray.at(26)->setState(SensorState::Medium);        // Pasafire - PasafireLOXLinePT
+            sensorArray.at(27)->setState(SensorState::Medium);        // Pasafire - PasafirePneumaticPT
+            sensorArray.at(28)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1pos
+            sensorArray.at(29)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1neg
+            sensorArray.at(30)->setState(SensorState::Medium);        // Pasafire - MCUtempNode8
             currentState = State::HiPressArm;
             }
             break;
@@ -335,33 +347,37 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(9)->setState(ValveEnableState::Off);        // Pasafire
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);  // Renegade SF Stand
             autoSequenceArray.at(1)->setState(AutoSequenceState::Standby);  // Pasafire
-            sensorArray.at(0)->setState(SensorState::Medium);
-            sensorArray.at(1)->setState(SensorState::Medium);
-            sensorArray.at(2)->setState(SensorState::Medium);
-            sensorArray.at(3)->setState(SensorState::Slow);
-            sensorArray.at(4)->setState(SensorState::Slow);
-            sensorArray.at(5)->setState(SensorState::Slow);
-            sensorArray.at(6)->setState(SensorState::Slow);
-            sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Medium);
-            sensorArray.at(9)->setState(SensorState::Fast);
-            sensorArray.at(10)->setState(SensorState::Fast);
-            sensorArray.at(11)->setState(SensorState::Medium);
-            sensorArray.at(12)->setState(SensorState::Medium);
-            sensorArray.at(13)->setState(SensorState::Fast);
-            sensorArray.at(14)->setState(SensorState::Fast);
-            sensorArray.at(15)->setState(SensorState::Slow);
-            sensorArray.at(16)->setState(SensorState::Slow);
-            sensorArray.at(17)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(18)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(19)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(20)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(21)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(22)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(23)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(24)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(25)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(26)->setState(SensorState::Slow);        // Pasafire
+            sensorArray.at(0)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1pos
+            sensorArray.at(1)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1neg
+            sensorArray.at(2)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2pos
+            sensorArray.at(3)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2neg
+            sensorArray.at(4)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3pos
+            sensorArray.at(5)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3neg
+            sensorArray.at(6)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT2
+            sensorArray.at(7)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT1
+            sensorArray.at(8)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInletPropSidePT
+            sensorArray.at(9)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInjectorPT
+            sensorArray.at(10)->setState(SensorState::Medium);        // Renegade SF Stand - LoxInletPropSidePT
+            sensorArray.at(11)->setState(SensorState::Medium);        // Renegade SF Stand - MVPneumaticsPT
+            sensorArray.at(12)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegFuelPT
+            sensorArray.at(13)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegLoxPT
+            sensorArray.at(14)->setState(SensorState::Medium);        // Renegade SF Stand - FuelTankPT
+            sensorArray.at(15)->setState(SensorState::Medium);        // Renegade SF Stand - LoxTankPT
+            sensorArray.at(16)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressFuelPT
+            sensorArray.at(17)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressLoxPT
+            sensorArray.at(18)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode2
+            sensorArray.at(19)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode3
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireChamberPT1
+            sensorArray.at(21)->setState(SensorState::Medium);        // Pasafire - PasafireFuelTankPT
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireLOXTankPT
+            sensorArray.at(23)->setState(SensorState::Medium);        // Pasafire - PasafireFuelRegPT
+            sensorArray.at(24)->setState(SensorState::Medium);        // Pasafire - PasafireLOXRegPT
+            sensorArray.at(25)->setState(SensorState::Medium);        // Pasafire - PasafireFuelLinePT
+            sensorArray.at(26)->setState(SensorState::Medium);        // Pasafire - PasafireLOXLinePT
+            sensorArray.at(27)->setState(SensorState::Medium);        // Pasafire - PasafirePneumaticPT
+            sensorArray.at(28)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1pos
+            sensorArray.at(29)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1neg
+            sensorArray.at(30)->setState(SensorState::Medium);        // Pasafire - MCUtempNode8
             currentState = State::HiPressPressurized;
             }
             break;
@@ -400,33 +416,37 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(9)->setState(ValveEnableState::On);        // Pasafire
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);  // Renegade SF Stand
             autoSequenceArray.at(1)->setState(AutoSequenceState::Standby);  // Pasafire
-            sensorArray.at(0)->setState(SensorState::Medium);
-            sensorArray.at(1)->setState(SensorState::Medium);
-            sensorArray.at(2)->setState(SensorState::Medium);
-            sensorArray.at(3)->setState(SensorState::Slow);
-            sensorArray.at(4)->setState(SensorState::Slow);
-            sensorArray.at(5)->setState(SensorState::Slow);
-            sensorArray.at(6)->setState(SensorState::Slow);
-            sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Medium);
-            sensorArray.at(9)->setState(SensorState::Medium);
-            sensorArray.at(10)->setState(SensorState::Medium);
-            sensorArray.at(11)->setState(SensorState::Fast);
-            sensorArray.at(12)->setState(SensorState::Fast);
-            sensorArray.at(13)->setState(SensorState::Fast);
-            sensorArray.at(14)->setState(SensorState::Medium);
-            sensorArray.at(15)->setState(SensorState::Slow);
-            sensorArray.at(16)->setState(SensorState::Slow);
-            sensorArray.at(17)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(18)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(19)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(20)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(21)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(22)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(23)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(24)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(25)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(26)->setState(SensorState::Slow);        // Pasafire
+            sensorArray.at(0)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1pos
+            sensorArray.at(1)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1neg
+            sensorArray.at(2)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2pos
+            sensorArray.at(3)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2neg
+            sensorArray.at(4)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3pos
+            sensorArray.at(5)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3neg
+            sensorArray.at(6)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT2
+            sensorArray.at(7)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT1
+            sensorArray.at(8)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInletPropSidePT
+            sensorArray.at(9)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInjectorPT
+            sensorArray.at(10)->setState(SensorState::Medium);        // Renegade SF Stand - LoxInletPropSidePT
+            sensorArray.at(11)->setState(SensorState::Medium);        // Renegade SF Stand - MVPneumaticsPT
+            sensorArray.at(12)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegFuelPT
+            sensorArray.at(13)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegLoxPT
+            sensorArray.at(14)->setState(SensorState::Fast);        // Renegade SF Stand - FuelTankPT
+            sensorArray.at(15)->setState(SensorState::Fast);        // Renegade SF Stand - LoxTankPT
+            sensorArray.at(16)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressFuelPT
+            sensorArray.at(17)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressLoxPT
+            sensorArray.at(18)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode2
+            sensorArray.at(19)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode3
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireChamberPT1
+            sensorArray.at(21)->setState(SensorState::Medium);        // Pasafire - PasafireFuelTankPT
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireLOXTankPT
+            sensorArray.at(23)->setState(SensorState::Medium);        // Pasafire - PasafireFuelRegPT
+            sensorArray.at(24)->setState(SensorState::Medium);        // Pasafire - PasafireLOXRegPT
+            sensorArray.at(25)->setState(SensorState::Medium);        // Pasafire - PasafireFuelLinePT
+            sensorArray.at(26)->setState(SensorState::Medium);        // Pasafire - PasafireLOXLinePT
+            sensorArray.at(27)->setState(SensorState::Medium);        // Pasafire - PasafirePneumaticPT
+            sensorArray.at(28)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1pos
+            sensorArray.at(29)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1neg
+            sensorArray.at(30)->setState(SensorState::Medium);        // Pasafire - MCUtempNode8
             currentState = State::TankPressArm;
             }
             break;
@@ -465,33 +485,37 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(9)->setState(ValveEnableState::On);        // Pasafire
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);  // Renegade SF Stand
             autoSequenceArray.at(1)->setState(AutoSequenceState::Standby);  // Pasafire
-            sensorArray.at(0)->setState(SensorState::Medium);
-            sensorArray.at(1)->setState(SensorState::Medium);
-            sensorArray.at(2)->setState(SensorState::Medium);
-            sensorArray.at(3)->setState(SensorState::Slow);
-            sensorArray.at(4)->setState(SensorState::Slow);
-            sensorArray.at(5)->setState(SensorState::Slow);
-            sensorArray.at(6)->setState(SensorState::Slow);
-            sensorArray.at(7)->setState(SensorState::Slow);
-            sensorArray.at(8)->setState(SensorState::Medium);
-            sensorArray.at(9)->setState(SensorState::Medium);
-            sensorArray.at(10)->setState(SensorState::Medium);
-            sensorArray.at(11)->setState(SensorState::Fast);
-            sensorArray.at(12)->setState(SensorState::Fast);
-            sensorArray.at(13)->setState(SensorState::Fast);
-            sensorArray.at(14)->setState(SensorState::Medium);
-            sensorArray.at(15)->setState(SensorState::Slow);
-            sensorArray.at(16)->setState(SensorState::Slow);
-            sensorArray.at(17)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(18)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(19)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(20)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(21)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(22)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(23)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(24)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(25)->setState(SensorState::Slow);        // Pasafire
-            sensorArray.at(26)->setState(SensorState::Slow);        // Pasafire
+            sensorArray.at(0)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1pos
+            sensorArray.at(1)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell1neg
+            sensorArray.at(2)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2pos
+            sensorArray.at(3)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell2neg
+            sensorArray.at(4)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3pos
+            sensorArray.at(5)->setState(SensorState::Medium);         // Renegade SF Stand - ThrustMountLoadCell3neg
+            sensorArray.at(6)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT2
+            sensorArray.at(7)->setState(SensorState::Medium);         // Renegade SF Stand - ChamberPT1
+            sensorArray.at(8)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInletPropSidePT
+            sensorArray.at(9)->setState(SensorState::Medium);         // Renegade SF Stand - FuelInjectorPT
+            sensorArray.at(10)->setState(SensorState::Medium);        // Renegade SF Stand - LoxInletPropSidePT
+            sensorArray.at(11)->setState(SensorState::Medium);        // Renegade SF Stand - MVPneumaticsPT
+            sensorArray.at(12)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegFuelPT
+            sensorArray.at(13)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegLoxPT
+            sensorArray.at(14)->setState(SensorState::Fast);        // Renegade SF Stand - FuelTankPT
+            sensorArray.at(15)->setState(SensorState::Fast);        // Renegade SF Stand - LoxTankPT
+            sensorArray.at(16)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressFuelPT
+            sensorArray.at(17)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressLoxPT
+            sensorArray.at(18)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode2
+            sensorArray.at(19)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode3
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireChamberPT1
+            sensorArray.at(21)->setState(SensorState::Medium);        // Pasafire - PasafireFuelTankPT
+            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire - PasafireLOXTankPT
+            sensorArray.at(23)->setState(SensorState::Medium);        // Pasafire - PasafireFuelRegPT
+            sensorArray.at(24)->setState(SensorState::Medium);        // Pasafire - PasafireLOXRegPT
+            sensorArray.at(25)->setState(SensorState::Medium);        // Pasafire - PasafireFuelLinePT
+            sensorArray.at(26)->setState(SensorState::Medium);        // Pasafire - PasafireLOXLinePT
+            sensorArray.at(27)->setState(SensorState::Medium);        // Pasafire - PasafirePneumaticPT
+            sensorArray.at(28)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1pos
+            sensorArray.at(29)->setState(SensorState::Medium);        // Pasafire - PasafireThrustMountLoadCell1neg
+            sensorArray.at(30)->setState(SensorState::Medium);        // Pasafire - MCUtempNode8
             currentState = State::TankPressPressurized;
             }
             break;
@@ -530,33 +554,37 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(9)->setState(ValveEnableState::On);        // Pasafire
             autoSequenceArray.at(0)->setState(AutoSequenceState::Standby);  // Renegade SF Stand
             autoSequenceArray.at(1)->setState(AutoSequenceState::Standby);  // Pasafire
-            sensorArray.at(0)->setState(SensorState::Fast);
-            sensorArray.at(1)->setState(SensorState::Fast);
-            sensorArray.at(2)->setState(SensorState::Fast);
-            sensorArray.at(3)->setState(SensorState::Fast);
-            sensorArray.at(4)->setState(SensorState::Fast);
-            sensorArray.at(5)->setState(SensorState::Fast);
-            sensorArray.at(6)->setState(SensorState::Fast);
-            sensorArray.at(7)->setState(SensorState::Fast);
-            sensorArray.at(8)->setState(SensorState::Medium);
-            sensorArray.at(9)->setState(SensorState::Medium);
-            sensorArray.at(10)->setState(SensorState::Medium);
-            sensorArray.at(11)->setState(SensorState::Fast);
-            sensorArray.at(12)->setState(SensorState::Fast);
-            sensorArray.at(13)->setState(SensorState::Fast);
-            sensorArray.at(14)->setState(SensorState::Medium);
-            sensorArray.at(15)->setState(SensorState::Slow);
-            sensorArray.at(16)->setState(SensorState::Slow);
-            sensorArray.at(17)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(18)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(19)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(20)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(21)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(22)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(23)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(24)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(25)->setState(SensorState::Medium);        // Pasafire
-            sensorArray.at(26)->setState(SensorState::Medium);        // Pasafire
+            sensorArray.at(0)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell1pos
+            sensorArray.at(1)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell1neg
+            sensorArray.at(2)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell2pos
+            sensorArray.at(3)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell2neg
+            sensorArray.at(4)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell3pos
+            sensorArray.at(5)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell3neg
+            sensorArray.at(6)->setState(SensorState::Fast);         // Renegade SF Stand - ChamberPT2
+            sensorArray.at(7)->setState(SensorState::Fast);         // Renegade SF Stand - ChamberPT1
+            sensorArray.at(8)->setState(SensorState::Fast);         // Renegade SF Stand - FuelInletPropSidePT
+            sensorArray.at(9)->setState(SensorState::Fast);         // Renegade SF Stand - FuelInjectorPT
+            sensorArray.at(10)->setState(SensorState::Fast);        // Renegade SF Stand - LoxInletPropSidePT
+            sensorArray.at(11)->setState(SensorState::Medium);        // Renegade SF Stand - MVPneumaticsPT
+            sensorArray.at(12)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegFuelPT
+            sensorArray.at(13)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegLoxPT
+            sensorArray.at(14)->setState(SensorState::Fast);        // Renegade SF Stand - FuelTankPT
+            sensorArray.at(15)->setState(SensorState::Fast);        // Renegade SF Stand - LoxTankPT
+            sensorArray.at(16)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressFuelPT
+            sensorArray.at(17)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressLoxPT
+            sensorArray.at(18)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode2
+            sensorArray.at(19)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode3
+            sensorArray.at(20)->setState(SensorState::Fast);        // Pasafire - PasafireChamberPT1
+            sensorArray.at(21)->setState(SensorState::Fast);        // Pasafire - PasafireFuelTankPT
+            sensorArray.at(20)->setState(SensorState::Fast);        // Pasafire - PasafireLOXTankPT
+            sensorArray.at(23)->setState(SensorState::Fast);        // Pasafire - PasafireFuelRegPT
+            sensorArray.at(24)->setState(SensorState::Fast);        // Pasafire - PasafireLOXRegPT
+            sensorArray.at(25)->setState(SensorState::Fast);        // Pasafire - PasafireFuelLinePT
+            sensorArray.at(26)->setState(SensorState::Fast);        // Pasafire - PasafireLOXLinePT
+            sensorArray.at(27)->setState(SensorState::Medium);        // Pasafire - PasafirePneumaticPT
+            sensorArray.at(28)->setState(SensorState::Fast);        // Pasafire - PasafireThrustMountLoadCell1pos
+            sensorArray.at(29)->setState(SensorState::Fast);        // Pasafire - PasafireThrustMountLoadCell1neg
+            sensorArray.at(30)->setState(SensorState::Medium);        // Pasafire - MCUtempNode8
             currentState = State::fireArmed;
             }
             break;
@@ -595,33 +623,37 @@ void commandExecute(State& currentState, State& priorState, Command& currentComm
             valveEnableArray.at(9)->setState(ValveEnableState::On);        // Pasafire
             autoSequenceArray.at(0)->setState(AutoSequenceState::RunCommanded);     // Renegade SF Stand
             autoSequenceArray.at(1)->setState(AutoSequenceState::RunCommanded);     // Pasafire
-            sensorArray.at(0)->setState(SensorState::Fast);
-            sensorArray.at(1)->setState(SensorState::Fast);
-            sensorArray.at(2)->setState(SensorState::Fast);
-            sensorArray.at(3)->setState(SensorState::Fast);
-            sensorArray.at(4)->setState(SensorState::Fast);
-            sensorArray.at(5)->setState(SensorState::Fast);
-            sensorArray.at(6)->setState(SensorState::Fast);
-            sensorArray.at(7)->setState(SensorState::Fast);
-            sensorArray.at(8)->setState(SensorState::Medium);
-            sensorArray.at(9)->setState(SensorState::Medium);
-            sensorArray.at(10)->setState(SensorState::Medium);
-            sensorArray.at(11)->setState(SensorState::Fast);
-            sensorArray.at(12)->setState(SensorState::Fast);
-            sensorArray.at(13)->setState(SensorState::Fast);
-            sensorArray.at(14)->setState(SensorState::Medium);
-            sensorArray.at(15)->setState(SensorState::Slow);
-            sensorArray.at(16)->setState(SensorState::Slow);
-            sensorArray.at(17)->setState(SensorState::Fast);        // Pasafire
-            sensorArray.at(18)->setState(SensorState::Fast);        // Pasafire
-            sensorArray.at(19)->setState(SensorState::Fast);        // Pasafire
-            sensorArray.at(20)->setState(SensorState::Fast);        // Pasafire
-            sensorArray.at(21)->setState(SensorState::Fast);        // Pasafire
-            sensorArray.at(22)->setState(SensorState::Fast);        // Pasafire
-            sensorArray.at(23)->setState(SensorState::Fast);        // Pasafire
-            sensorArray.at(24)->setState(SensorState::Fast);        // Pasafire
-            sensorArray.at(25)->setState(SensorState::Fast);        // Pasafire
-            sensorArray.at(26)->setState(SensorState::Fast);        // Pasafire
+            sensorArray.at(0)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell1pos
+            sensorArray.at(1)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell1neg
+            sensorArray.at(2)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell2pos
+            sensorArray.at(3)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell2neg
+            sensorArray.at(4)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell3pos
+            sensorArray.at(5)->setState(SensorState::Fast);         // Renegade SF Stand - ThrustMountLoadCell3neg
+            sensorArray.at(6)->setState(SensorState::Fast);         // Renegade SF Stand - ChamberPT2
+            sensorArray.at(7)->setState(SensorState::Fast);         // Renegade SF Stand - ChamberPT1
+            sensorArray.at(8)->setState(SensorState::Fast);         // Renegade SF Stand - FuelInletPropSidePT
+            sensorArray.at(9)->setState(SensorState::Fast);         // Renegade SF Stand - FuelInjectorPT
+            sensorArray.at(10)->setState(SensorState::Fast);        // Renegade SF Stand - LoxInletPropSidePT
+            sensorArray.at(11)->setState(SensorState::Medium);        // Renegade SF Stand - MVPneumaticsPT
+            sensorArray.at(12)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegFuelPT
+            sensorArray.at(13)->setState(SensorState::Fast);        // Renegade SF Stand - DomeRegLoxPT
+            sensorArray.at(14)->setState(SensorState::Fast);        // Renegade SF Stand - FuelTankPT
+            sensorArray.at(15)->setState(SensorState::Fast);        // Renegade SF Stand - LoxTankPT
+            sensorArray.at(16)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressFuelPT
+            sensorArray.at(17)->setState(SensorState::Fast);        // Renegade SF Stand - HiPressLoxPT
+            sensorArray.at(18)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode2
+            sensorArray.at(19)->setState(SensorState::Medium);        // Renegade SF Stand - MCUtempNode3
+            sensorArray.at(20)->setState(SensorState::Fast);        // Pasafire - PasafireChamberPT1
+            sensorArray.at(21)->setState(SensorState::Fast);        // Pasafire - PasafireFuelTankPT
+            sensorArray.at(20)->setState(SensorState::Fast);        // Pasafire - PasafireLOXTankPT
+            sensorArray.at(23)->setState(SensorState::Fast);        // Pasafire - PasafireFuelRegPT
+            sensorArray.at(24)->setState(SensorState::Fast);        // Pasafire - PasafireLOXRegPT
+            sensorArray.at(25)->setState(SensorState::Fast);        // Pasafire - PasafireFuelLinePT
+            sensorArray.at(26)->setState(SensorState::Fast);        // Pasafire - PasafireLOXLinePT
+            sensorArray.at(27)->setState(SensorState::Medium);        // Pasafire - PasafirePneumaticPT
+            sensorArray.at(28)->setState(SensorState::Fast);        // Pasafire - PasafireThrustMountLoadCell1pos
+            sensorArray.at(29)->setState(SensorState::Fast);        // Pasafire - PasafireThrustMountLoadCell1neg
+            sensorArray.at(30)->setState(SensorState::Medium);        // Pasafire - MCUtempNode8
             currentState = State::fire;
             }
             break;

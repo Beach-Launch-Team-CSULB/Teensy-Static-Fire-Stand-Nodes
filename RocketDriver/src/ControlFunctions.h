@@ -21,7 +21,7 @@
 #define NUM_VALVEENABLE 10
 #define NUM_PYROS 4
 #define NUM_AUTOSEQUENCES 2
-#define NUM_SENSORS 27
+#define NUM_SENSORS 31
 
 
 // checks the state that was set at start-up and issues the appropriate command as current command
