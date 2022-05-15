@@ -4,6 +4,8 @@
 //#include <FlexCAN.h>
 #include "ControlCommands.h"
 
+//bool localNodeResetFlag = false;
+
 // header file for the function to call every loop, function returns true if a new message was read
 
 bool CANread(FlexCAN& CANbus, Command& CurrentCommand);

@@ -3,6 +3,27 @@
 // For Renegade, Pasafire, Beach Launch Team, and more
 //
 //
+// -------------------------------------------------------------
+// Use top level define conditional to determine which system the code is operating
+#define RENEGADESF
+
+#ifdef RENEGADESF
+#include "ValveDefinitionsRenegadeSF.h"
+#include "PyroDefinitionsRenegadeSF.h"
+#include "AutoSequenceDefinitionsRenegadeSF.h"
+#include "SensorDefinitionsRenegadeSF.h"
+#include "ControlFunctionsRenegadeSF.h"
+#endif
+
+/* //----- BabyShark -----
+#ifdef BABYSHARK
+#include "ValveDefinitionsRenegadeBabyShark.h"
+#include "PyroDefinitionsRenegadeBabyShark.h"
+#include "AutoSequenceDefinitionsRenegadeBabyShark.h"
+#include "SensorDefinitionsRenegadeBabyShark.h"
+#include "ControlFunctionsRenegadeBabyShark.h"
+#endif */
+// -------------------------------------------------------------
 
 #include <Arduino.h>
 #include <EEPROM.h>
@@ -22,13 +43,9 @@ using std::string;
 #include "ToMillisTimeTracker.h"
 #include "CANRead.h"
 #include "CANWrite.h"
-#include "CANReports.h"
+#include "TeensyInternalReset.h"
 #include "OperationFunctionTemplates.h"
 #include "pinList.h"
-#include "ValveDefinitions.h"
-#include "PyroDefinitions.h"
-#include "AutoSequenceDefinitions.h"
-#include "SensorDefinitions.h"
 
 //Trying to figure out RTC stuff with these libs
 #include <TimeLib.h>
@@ -36,23 +53,28 @@ using std::string;
 
 #define NODEIDPRESET 2;     //NOT in use normally, for testing with the address IO register inactive
 
+// Timer for setting main loop debugging print rate
+elapsedMillis mainLoopTestingTimer;
+
 //For use in doing serial inputs as CAN commands for testing
 uint8_t fakeCANmsg;
 
-bool abortHaltFlag; //creates halt flag
+bool localNodeResetFlag = false; //flag to trigger register reset from commanded reset over CAN
 
-///// NODE DECLARATION!!!!! /////
+bool abortHaltFlag; //creates halt flag that is a backup override of state machine
+
+///// NODE DECLARATION /////
 //default sets to max nodeID intentionally to be bogus until otherwise set
 uint8_t nodeID;       //engine node = 2, prop node = 3, Pasafire node = 8
 uint8_t nodeIDfromEEPROM;   //nodeID read out of EEPROM
 bool nodeIDdeterminefromEEPROM;   //boolean flag for if startup is to run the nodeID detect read
 
+///// WATCHDOG SYSTEM /////
+elapsedMillis propulsionControlWatchdog;                  // Watchdog timer that must be reset by ground control over bus to prevent an autovent
+uint32_t propulsionControlWatchdogVentTime = 120000;   // 120 seconds in millis gives two minutes to reestablish control before autovent, DISABLE IN FLIGHT
 
 ///// ADC /////
 ADC* adc = new ADC();
-
-elapsedMillis sinceRead1;
-elapsedMillis sinceReadRTD;
 
 ///// LED /////
 elapsedMillis sinceLED;
@@ -61,6 +83,7 @@ elapsedMillis sinceLED;
 CAN_message_t message;
 CAN_message_t rxmsg;
 CAN_message_t extended;
+bool CANSensorReportConverted = false;
 
 int value = 0;
 int counter = 0;
@@ -70,7 +93,7 @@ int counter = 0;
 int busSpeed0 = 500000; //baudrate - do not set above 500000 for full distance run bunker to pad
 int busSpeed1 = 500000; //baudrate - do not set above 500000 for full distance run bunker to pad
 
-bool startup{true}; // bool for storing if this is the first loop on startup
+bool startup{true}; // bool for storing if this is the first loop on startup, ESSENTIAL FOR STATE MACHINE OPERATION
 
 uint32_t loopCount {0};// for debugging
 
@@ -91,7 +114,7 @@ uint8_t nodeIDDetermineAddress{3};
 
 ///// Temp Sensor for TC Cold Junction /////
 //Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
-int roundedtemp;
+//int roundedtemp;
 
 
 // -------------------------------------------------------------
@@ -103,62 +126,7 @@ int roundedtemp;
   sei();
   digitalWrite(pin::reset, 0);                                       // set reset pin low to restart
 } */
-#define RESTART_ADDR       0xE000ED0C
-#define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
-#define WRITE_RESTART(val) ((*(volatile uint32_t *)RESTART_ADDR) = (val))
 
-void TeensyInternalReset (Command CurrentCommand, uint8_t nodeID)
-{
-  if (CurrentCommand == command_GLOBALRESET)
-  {
-    Serial.println("wtf why restart (Global)");
-    Serial.println(CurrentCommand);
-    cli(); // disables interrupts to protect write command
-    EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()
-    sei(); // reenables interrupts after write is completed
-    WRITE_RESTART(0x5FA0004);
-  }
-  else if (CurrentCommand == command_node2RESET)
-  {
-    if (nodeID == 2)
-    {
-      Serial.println("wtf why restart (Local Node2)");
-      Serial.println(CurrentCommand);
-      cli(); // disables interrupts to protect write command
-      EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()
-      sei(); // reenables interrupts after write is completed
-      WRITE_RESTART(0x5FA0004);
-    }
-    else;
-  }
-  else if (CurrentCommand == command_node3RESET)
-  {
-    if (nodeID == 3)
-    {
-      Serial.println("wtf why restart (Local Node3)");
-      Serial.println(CurrentCommand);
-      cli(); // disables interrupts to protect write command
-      EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()
-      sei(); // reenables interrupts after write is completed
-      WRITE_RESTART(0x5FA0004);
-    }
-    else;
-  }
-  else if (CurrentCommand == command_node7RESET)
-  {
-    if (nodeID == 15)
-    {
-      Serial.println("wtf why restart (Local Node7)");
-      Serial.println(CurrentCommand);
-      cli(); // disables interrupts to protect write command
-      EEPROM.update(nodeIDDetermineAddress, 1);                                 // Never use .write()
-      sei(); // reenables interrupts after write is completed
-      WRITE_RESTART(0x5FA0004);
-    }
-    else;
-  }
-  else; //nothing else but it feels right
-}
 
 // -------------------------------------------------------------
 uint8_t NodeIDDetect(uint8_t nodeID, bool startup, bool nodeIDdetermine, uint8_t nodeIDfromEEPROM)       //Function to run the nodeID hardware addressing
@@ -189,12 +157,6 @@ uint8_t NodeIDDetect(uint8_t nodeID, bool startup, bool nodeIDdetermine, uint8_t
   else
     nodeID = nodeIDfromEEPROM;      //Need to ADD FEATURE where the nodeIDdetermine is variable so on a quick power cycle it doesn't reset, but a manual "shutdown" can
   return nodeID;
-    
-
-  // I am thinking I program the nodes to only read nodeID pins on a reset commant
-  // Get reset command via the register write implemented
-  // Setup a global reset command over CAN for all nodes and put in ops to do this at setup for any test/launch
-  // Needs to also read pins on a directly commanded reset? Meh, if after a reset pin direct pull down CAN bus doesn't come back node has other issue and scrubs current op
   
 }
 // -------------------------------------------------------------
@@ -228,12 +190,11 @@ void setup() {
 
 
 
+  // -----Initialize ADCs-----
+  MCUADCSetup(adc);
 
   // -----Run Valve NodeID Check-----
   ValveNodeIDCheck(valveArray, nodeID);
-
-  // -----Run Valve NodeID Check-----
-  ValveEnableNodeIDCheck(valveEnableArray, nodeID);
 
   // -----Run Valve NodeID Check-----
   PyroNodeIDCheck(pyroArray, nodeID);
@@ -243,9 +204,6 @@ void setup() {
 
   // -----Run Valve Setup-----
   valveSetUp(valveArray);
-
-  // -----Run ValveEnable Setup-----
-  valveEnableSetUp(valveEnableArray);
 
   // -----Run Valve Setup-----
   pyroSetUp(pyroArray);
@@ -261,65 +219,10 @@ void setup() {
 
   Serial.begin(9600);
 
-///// ADC0 /////
-  // reference can be ADC_REFERENCE::REF_3V3, ADC_REFERENCE::REF_1V2 or ADC_REFERENCE::REF_EXT.
-  //adc->setReference(ADC_REFERENCE::REF_1V2, ADC_0); // change all 3.3 to 1.2 if you change the reference to 1V2
-
-  adc->adc0->setReference(ADC_REFERENCE::REF_3V3);
-  adc->adc0->setAveraging(8);                                    // set number of averages
-  adc->adc0->setResolution(16);                                   // set bits of resolution
-  adc->adc0->setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED_16BITS); // change the conversion speed
-  adc->adc0->setSamplingSpeed(ADC_SAMPLING_SPEED::HIGH_SPEED);     // change the sampling speed
-  adc->adc0->recalibrate();
-
-///// ADC1 /////
-  adc->adc1->setReference(ADC_REFERENCE::REF_3V3);
-  adc->adc1->setAveraging(8);                                    // set number of averages
-  adc->adc1->setResolution(16);                                   // set bits of resolution
-  adc->adc1->setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED_16BITS); // change the conversion speed
-  adc->adc1->setSamplingSpeed(ADC_SAMPLING_SPEED::HIGH_SPEED);     // change the sampling speed
-  adc->adc1->recalibrate();
-
-  //delay(500);
-
 ///// CAN0 and CAN1 Initialize /////
   Can0.begin(busSpeed0);
   //Can1.begin(busSpeed1); //commented out for Teensy3.5, also not current in use even on 3.6
   pinMode(pin::led, OUTPUT);
-
-
-///// Temp Sensor for TC Cold Junction /////
-// Setting alt I2C pins because I used default I2C pins
-//Wire.setSDA(38);
-//Wire.setSCL(37);
-
-/* if(!tempsensor.begin(0x19))
-{
-  Serial.println("Temp Sensor did not initialize.");
-}
-else
-{
-//tempsensor.begin(0x19);
-  //  A2 A1 A0 address
-  //  0  0  0   0x18  this is the default address
-  //  0  0  1   0x19
-  //  0  1  0   0x1A
-  //  0  1  1   0x1B
-  //  1  0  0   0x1C
-  //  1  0  1   0x1D
-  //  1  1  0   0x1E
-  //  1  1  1   0x1F
-tempsensor.setResolution(2);
-  // Match the fastest sample requests in the loop to the sample time for chosen setting or it will not return data
-  // Mode Resolution SampleTime
-  //  0    0.5°C       30 ms
-  //  1    0.25°C      65 ms
-  //  2    0.125°C     130 ms
-  //  3    0.0625°C    250 ms
-} */
-
-  //timer2 = 0;
-
 }
 
 void loop() 
@@ -328,12 +231,11 @@ void loop()
   //Serial.print("NodeID: ");
   //Serial.println(nodeID);
 
+///// Custom function for tracking miliseconds and seconds level system time for timestamping /////
 myTimeTrackingFunction();
 /* Serial.print(second());
 Serial.print(" : ");
 Serial.println(timeSubSecondsMicros); */
-
-
 
   // --- Read CAN bus and update current command ---
   if(CANread(Can0, currentCommand) && !startup) // do not execute on the first loop
@@ -350,54 +252,35 @@ Serial.println(timeSubSecondsMicros); */
           //add in code here to prompt for command code and update current command from this
           //Serial.println("Enter Command Byte");
           //CurrentCommand = Serial.read();
-
               
               //if(fakeCANmsg < command_SIZE)                                           // this checks if the message at that location in the buffer could be a valid command
               //{
                   currentCommand = static_cast<Command>(fakeCANmsg);
               //}
-
           Serial.println("Command Entered");
-
         }
     }
 
 
   // -----Process Commands Here-----
-  commandExecute(currentState, priorState, currentCommand, valveArray, pyroArray, valveEnableArray, autoSequenceArray, sensorArray, abortHaltFlag);
-
+  commandExecute(currentState, priorState, currentCommand, valveArray, pyroArray, autoSequenceArray, sensorArray, abortHaltFlag);
 
   ////// ABORT FUNCTIONALITY!!!///// This is what overrides main valve and igniter processes! /////
   ////// DO NOT MOVE BEFORE "commandExecute" or after "valveTasks"/"pyroTasks"!!! /////
-  haltFlagCheck(abortHaltFlag, valveArray, pyroArray, valveEnableArray);
+  haltFlagCheck(abortHaltFlag, valveArray, pyroArray);
 
   // -----Advance needed propulsion system tasks (valve, valve enables, pyro, autosequences) ----- //
   autoSequenceTasks(autoSequenceArray,nodeID);
-  
-  if (nodeID != 15)
-  {
-  currentCountdownForMain = IgnitionAutoSequence.getCurrentCountdown();
-  }
-  else if (nodeID = (15))
-  {
-  currentCountdownForMain = PasafireIgnitionAutoSequence.getCurrentCountdown();
-  }
-  
-
-  
-  
-  
   autoSequenceValveUpdate(valveArray, currentCountdownForMain);
   autoSequencePyroUpdate(pyroArray, currentCountdownForMain);  
+  
   valveTasks(valveArray, nodeID);
-  valveEnableTasks(valveEnableArray, nodeID);
   pyroTasks(pyroArray, nodeID);
   sensorTasks(sensorArray, adc, rocketDriverSeconds, rocketDriverMicros, nodeID);
   
-
+// For Testing to verify abort halt flag is active as intended
 /*     Serial.print("abortHaltFlag: ");
     Serial.println(abortHaltFlag); */
-
 
   // -----Update State on EEPROM -----
   cli(); // disables interrupts to protect write command
@@ -405,29 +288,28 @@ Serial.println(timeSubSecondsMicros); */
   EEPROM.update(nodeIDAddress, nodeID);                                 // Never use .write()
   sei(); // reenables interrupts after write is completed
 
-  //CAN State Report and Sensor data send Functions
-  CAN2PropSystemStateReport(Can0, currentState, currentCommand, valveArray, pyroArray, valveEnableArray, abortHaltFlag, nodeID);
+  // CAN State Report and Sensor data send Functions
+  CAN2PropSystemStateReport(Can0, currentState, currentCommand, valveArray, pyroArray, abortHaltFlag, nodeID);
   CAN2AutosequenceTimerReport(Can0, autoSequenceArray, abortHaltFlag, nodeID);
-  SensorArrayCANSend(Can0, sensorArray);
-  
+  CAN2SensorArraySend(Can0, sensorArray, nodeID, CANSensorReportConverted);
 
-  TeensyInternalReset(currentCommand, nodeID);
+  // Reset function to reboot Teensy with internal reset register
+  TeensyInternalReset(localNodeResetFlag, nodeIDDetermineAddress, nodeID);
 
-  /* if (sinceRead1 >= 1000000) ///// If Using the old functional sensor reads this WILL BREAK them via resetting the same timer
+  if (mainLoopTestingTimer >= 1000000)
   {
   //Main Loop state and command print statements - for testing only
-  Serial.print("currentState :");
+/*   Serial.print("currentState :");
   Serial.println(static_cast<uint8_t>(currentState));
   Serial.print("currentCommand :");
-  Serial.println(currentCommand);
+  Serial.println(currentCommand); */
 
-  sinceRead1 = 0; //resets timer to zero each time the ADC is read
+  mainLoopTestingTimer = 0; //resets timer to zero each time the loop prints
   //Serial.print("EEPROM Node ID Read :");
   //Serial.println(EEPROM.read(nodeIDAddress));
-  } */
+  }
 
+// Resets the startup bool, DO NOT REMOVE
 startup = false;
-
-
 
 }

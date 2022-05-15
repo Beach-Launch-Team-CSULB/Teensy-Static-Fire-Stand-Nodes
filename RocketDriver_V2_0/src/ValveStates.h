@@ -8,21 +8,15 @@ enum class ValveState
 {
     Closed,             // 0
     Open,               // 1
-    FireCommanded,      // 2
-    OpenCommanded,      // 3
-    CloseCommanded,     // 4
-    OpenProcess,        // 5
-    CloseProcess,       // 6
-    ThrottleCommanded,  // 7    
-    ThrottleProcess,    // 8    //Current State report format can't fit more than 8 states and this would overflow
-    ValveState_SIZE,    // 9
-};
-
-enum class ValveEnableState
-{
-    Off,                    // 0
-    On,                     // 1
-    ValveEnableState_Size,  // 2
+    ToBangBang,         // 2
+    FireCommanded,      // 3
+    OpenCommanded,      // 4
+    CloseCommanded,     // 5
+    OpenProcess,        // 6
+    CloseProcess,       // 7
+    ThrottleCommanded,  // 8    
+    ThrottleProcess,    // 9    //Current State report format can't fit more than 8 states and this would overflow
+    ValveState_SIZE,    // 10
 };
 
 #endif

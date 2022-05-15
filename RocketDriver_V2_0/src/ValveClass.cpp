@@ -2,8 +2,8 @@
 #include <Arduino.h>
 
 
-Valve::Valve(uint32_t setValveID, uint8_t setValveNodeID, ValveType setValveType, uint8_t setPin, uint32_t setFullDutyTime, bool setFireCommandBool, int32_t setFireSequenceTime, uint8_t setHoldDuty,  bool setNodeIDCheck)
-                : valveID{setValveID}, valveNodeID{setValveNodeID}, valveType{setValveType}, pin{setPin}, fullDutyTime{setFullDutyTime}, fireCommandBool{setFireCommandBool}, fireSequenceTime{setFireSequenceTime}, holdDuty{setHoldDuty}, nodeIDCheck{setNodeIDCheck}
+Valve::Valve(uint32_t setValveID, uint8_t setValveNodeID, ValveType setValveType, uint8_t setPinPWM, uint8_t setPinDigital, uint32_t setFullDutyTime, bool setFireCommandBool, int32_t setFireSequenceTime, uint8_t setHoldDuty,  bool setNodeIDCheck)
+                : valveID{setValveID}, valveNodeID{setValveNodeID}, valveType{setValveType}, pinPWM{setPinPWM}, pinDigital{setPinDigital}, fullDutyTime{setFullDutyTime}, fireCommandBool{setFireCommandBool}, fireSequenceTime{setFireSequenceTime}, holdDuty{setHoldDuty}, nodeIDCheck{setNodeIDCheck}
 {
     switch (valveType)
     {
@@ -21,27 +21,14 @@ Valve::Valve(uint32_t setValveID, uint8_t setValveNodeID, ValveType setValveType
     
 }
 
-ValveEnable::ValveEnable(uint32_t setValveEnableID, uint32_t setValveEnablePin, uint8_t setValveEnableNodeID,  bool setNodeIDCheck)
-                : valveEnableID{setValveEnableID}, valveEnablePin{setValveEnablePin}, valveEnableNodeID{setValveEnableNodeID}, nodeIDCheck{setNodeIDCheck}
-{
-    
-}
-
 void Valve::begin()
 {
     if (nodeIDCheck)
     {
-        pinMode(pin, OUTPUT);
-        analogWrite(pin, 0);
-    }
-}
-
-void ValveEnable::begin()
-{
-    if (nodeIDCheck)
-    {
-        pinMode(valveEnablePin, OUTPUT);
-        digitalWriteFast(valveEnablePin, LOW);
+        pinMode(pinPWM, OUTPUT);
+        pinMode(pinDigital, OUTPUT);
+        analogWrite(pinPWM, 0);
+        digitalWriteFast(pinDigital, LOW);
     }
 }
 
@@ -87,14 +74,16 @@ void Valve::stateOperations()
             switch (valveType)
             {
                 case NormalClosed:
-                    analogWrite(pin, fullDuty);
+                    analogWrite(pinPWM, fullDuty);
+                    digitalWriteFast(pinDigital, HIGH);
                     timer = 0;
                     state = ValveState::OpenProcess;
                     //Serial.print("NC OpenCommanded: ");
                     //Serial.println(valveID);
                     break;
                 case NormalOpen:
-                    analogWrite(pin, 0);
+                    analogWrite(pinPWM, 0);
+                    digitalWriteFast(pinDigital, LOW);
                     timer = 0;
                     state = ValveState::Open;
                     //Serial.print("NO OpenCommanded: ");
@@ -117,12 +106,14 @@ void Valve::stateOperations()
             switch (valveType)
             {
                 case NormalClosed:
-                    analogWrite(pin, 0);
+                    analogWrite(pinPWM, 0);
+                    digitalWriteFast(pinDigital, LOW);
                     timer = 0;
                     state = ValveState::Closed;
                     break;
                 case NormalOpen:
-                    analogWrite(pin, fullDuty);
+                    analogWrite(pinPWM, fullDuty);
+                    digitalWriteFast(pinDigital, HIGH);
                     timer = 0;
                     state = ValveState::CloseProcess;
                     break;
@@ -140,8 +131,8 @@ void Valve::stateOperations()
     case ValveState::OpenProcess:
         if(timer >= fullDutyTime)
         {
-            analogWrite(pin, holdDuty);
-            //digitalWrite(pin,1);
+            analogWrite(pinPWM, holdDuty);
+            digitalWriteFast(pinDigital, HIGH);
             timer = 0;
             state = ValveState::Open;
         }
@@ -151,7 +142,8 @@ void Valve::stateOperations()
     case ValveState::CloseProcess:
         if(timer >= fullDutyTime)
         {
-            analogWrite(pin, holdDuty);
+            analogWrite(pinPWM, holdDuty);
+            digitalWriteFast(pinDigital, HIGH);
             timer = 0;
             state = ValveState::Closed;
         }
@@ -160,12 +152,32 @@ void Valve::stateOperations()
         switch (valveType)
         {
             case NormalClosed:
-                analogWrite(pin, 0);
+                analogWrite(pinPWM, 0);
+                digitalWriteFast(pinDigital, LOW);
                 break;
             case NormalOpen:
-                analogWrite(pin, holdDuty);
+                analogWrite(pinPWM, holdDuty);
+                digitalWriteFast(pinDigital, HIGH);
             default:
                 break;
+        }
+        break;
+    case ValveState::ToBangBang:
+        switch (valveType)
+        {
+            bangerBool = true;
+        }
+        break;
+    case ValveState::ThrottleCommanded:
+        switch (valveType)
+        {
+            
+        }
+        break;
+    case ValveState::ThrottleProcess:
+        switch (valveType)
+        {
+            
         }
         break;
 
@@ -175,29 +187,7 @@ void Valve::stateOperations()
     }
 }
 
-void ValveEnable::stateOperations()
+void Valve::bangBang()
 {
-    if (nodeIDCheck)
-    {
-    //Serial.print("LoopRan");
-        switch (state)
-        {
-    /*     Serial.print("valveEnableID: ");
-        Serial.print(valveEnableID);
-        Serial.print(" valveEnablePin: ");
-        Serial.println(valveEnablePin); */
-            case ValveEnableState::On:
-                {
-                digitalWriteFast(valveEnablePin, HIGH);
-                break;
-                }
-            case ValveEnableState::Off:
-                {
-                digitalWriteFast(valveEnablePin, LOW);
-                break;
-                }
-        default:
-            break;
-        }
-    }
+    // Put all the bang bang control code here
 }
